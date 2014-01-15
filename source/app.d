@@ -1,6 +1,17 @@
-import std.stdio;
+import vibe.d;
+import std.conv;
 
-void main()
+shared static this()
 {
-	writeln("Edit source/app.d to start your project.");
+	auto settings = new HTTPServerSettings;
+	settings.port = 8080;
+	settings.bindAddresses = ["::1", "127.0.0.1"];
+	listenHTTP(settings, &hello);
+
+	logInfo("Now listening on port "~to!string(settings.port));
+}
+
+void hello(HTTPServerRequest req, HTTPServerResponse res)
+{
+	res.writeBody("Hello, World!");
 }

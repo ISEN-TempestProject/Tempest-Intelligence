@@ -1,8 +1,9 @@
 {
 	"name": "projetvoilier",
 	"description": "Projet M1 ISEN : Voilier autonome",
-	"copyright": "Copyright © 2014, trysk",
-	"authors": ["trysk", "CromFr"],
+	"copyright": "Copyright © 2014, Trysk and CromFr",
+	"authors": ["Trysk", "CromFr"],
 	"dependencies": {
+		"vibe-d": "==0.7.18"
 	}
 }
