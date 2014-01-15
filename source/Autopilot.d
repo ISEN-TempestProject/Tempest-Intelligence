@@ -2,11 +2,11 @@ import core.thread;
 import std.stdio;
 
 
-class SuivreCap{
+class Autopilot{
 
 	this(){
 		m_thread = new Thread(&ThreadFunction);
-		m_thread.name("ThreadSuivreCap");
+		m_thread.name(typeof(this).stringof);
 		m_thread.isDaemon(true);
 	}
  

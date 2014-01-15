@@ -1,13 +1,13 @@
 
 import std.stdio;
-import SuivreCap;
+import Autopilot;
 
 
 int main(string[] args)
 {
 	writeln("Hello Sea !");
 
-	SuivreCap sc = new SuivreCap();
+	Autopilot sc = new Autopilot();
 	sc.StartDaemon(2000);
 
 	bool b=true;
