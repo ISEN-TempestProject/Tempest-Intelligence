@@ -29,6 +29,10 @@ shared static this()
 	logInfo("Now listening on port "~to!string(settings.port));
 }
 
+
+/*
+*	Route : index page
+*/
 void index(HTTPServerRequest req, HTTPServerResponse res)
 {
 	res.render!("index.dt");
