@@ -9,12 +9,12 @@ class SuivreCap{
 		m_thread.name("ThreadSuivreCap");
 		m_thread.isDaemon(true);
 	}
-
+ 
 	void StartDaemon(in int nLoopTimeMS){
 		m_nLoopTimeMS = nLoopTimeMS;
 		m_thread.start();
 	}
-
+  
 private:
 	Thread m_thread;
 
@@ -24,8 +24,8 @@ private:
 
 			m_thread.sleep(dur!("msecs")(m_nLoopTimeMS));
 		}
-	}
-
+	} 
+  
 	int m_nLoopTimeMS;
 
 }
