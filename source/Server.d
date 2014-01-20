@@ -1,6 +1,7 @@
 import vibe.d;
 import std.conv;
 import std.process;
+import API;
 
 class Server
 {
@@ -21,11 +22,16 @@ class Server
 		m_Settings.bindAddresses = autoip~adresses;
 		m_Settings.port = port;
 
+
+
 		/************************
 		*		ROUTERS
 		*************************/
 		m_Router = new URLRouter;
-		m_Router.get("/", &index);
+		registerRestInterface(m_Router, new API());
+		m_Router
+			.get("/", &index)
+			.get("*", serveStaticFiles("public/"));
 	}
 
 	/*
