@@ -1,2 +1,5 @@
 all:
-	dub build --nodeps --compiler=gdc --version=VibeDefaultMain
+	dub build --nodeps --compiler=gdc
+
+deps:
+	dub build --compiler=gdc
