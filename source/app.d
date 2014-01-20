@@ -1,6 +1,7 @@
+import vibe.vibe;
 import Server;
 
-shared static this()
+void main()
 {
 	Server server = new Server();
 	server.start();

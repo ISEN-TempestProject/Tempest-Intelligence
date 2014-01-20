@@ -7,7 +7,7 @@
 		"CromFr"
 	],
 	"versions": [
-		"VibeDefaultMain"
+		"VibeCustomMain"
 	],
 	"dependencies": {
 		"vibe-d": "==0.7.18"
