@@ -1,3 +1,4 @@
+module col;
 
 enum fg : string{
 	black=			"\x1b[30m",
