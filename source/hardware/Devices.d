@@ -15,7 +15,11 @@ enum DeviceID : ubyte{
 	Compass
 }
 
-class Sail : HWAct!ushort {
+/*!
+	Handles the sail tension
+	@note Values are between 0 and 255
+*/
+class Sail : HWAct!ubyte {
 	this(){
 		m_id = DeviceID.Sail;
 	}

@@ -7,7 +7,14 @@ import std.stdio;
 
 class Config {
 private:
+	/*!
+		@brief Path to configuration file
+	*/
 	enum CONFIG_PATH="res/config.ini";
+
+	/*!
+		@brief Default values of the configuration file
+	*/
 	enum string[string][string] CONFIG_DEFAULT = [
 		"Global" : ([
 			"LogFile":"logs",
@@ -16,6 +23,10 @@ private:
 	];
 
 public:
+	/*!
+		@brief Gets the value of the given entry
+		@throw if the entry does not exists
+	*/
 	static T Get(T)(string sHeader, string sName){
 		if(m_inst is null)m_inst = new Config();
 		return m_inst.m_ini.Get!T(sHeader, sName);
@@ -27,10 +38,11 @@ private:
 
 	this()
 	out{
-		assert(m_ini.Get!string("Hardware", "OverrideWindDirection")=="90");
-		assert(m_ini.Get!string("Global", "LogFile")=="logs");
-		assert(m_ini.Get!string("Global", "")=="");
-		assert(m_ini.Get!string("", "")=="");
+		import std.exception;
+		assert(m_ini.Get!int("Hardware", "OverrideWindDirection")==90);
+		assert(m_ini.Get!string("Global", "LogFile")==CONFIG_DEFAULT["Global"]["LogFile"]);
+		assertThrown(m_ini.Get!string("Global", ""));
+		assertThrown(m_ini.Get!string("", ""));
 	}
 	body{
 		m_ini = new INIReader(CONFIG_PATH, CONFIG_DEFAULT);

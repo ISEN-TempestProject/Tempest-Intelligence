@@ -1,7 +1,7 @@
 module main;
 
 import std.stdio;
-import Autopilot;
+import autopilot;
 import hardware.hardware;
 import config;
 import logger;

@@ -28,6 +28,7 @@ public:
 
 	/*!
 		@brief Gets the value of the field
+		@throw if the value could not be retrieved
 		@return "" if not found
 	*/
 	T Get(T)(string sHeader, string sName)
@@ -35,7 +36,7 @@ public:
 		if(sHeader in m_Data && sName in m_Data[sHeader])
 			return to!(T)(m_Data[sHeader][sName]);
 		else
-			return T.init;
+			throw new Exception("Value not found: "~sHeader~"."~sName);
 	}
 
 	void Print()

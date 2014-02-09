@@ -1,3 +1,5 @@
+module autopilot;
+
 import core.thread;
 import std.stdio;
 import logger;

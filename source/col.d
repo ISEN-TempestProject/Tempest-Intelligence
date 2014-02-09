@@ -44,7 +44,6 @@ enum var : string{
 	italic=		"\x1b[3m",
 	ulined= 	"\x1b[4m",
 	striked= 	"\x1b[9m",
-	inverted= 	"\x1b[7m"
+	inverted= 	"\x1b[7m",
+	end = 		"\x1b[m"
 }
-
-enum string end = 	"\x1b[m";

@@ -19,8 +19,8 @@ public:
 	static void Warning(T...)(T args){//Variadic function with undefined number of parameters
 		CheckInstance();
 		synchronized(m_inst.m_mtx){
-			stderr.writeln(bg.lightyellow~fg.red~var.bold~"Warning:  "~end,args);
-			m_inst.m_logfile.writeln(bg.lightyellow~fg.red~var.bold~"Warning:  "~end,args);
+			stderr.writeln(bg.lightyellow~fg.red~var.bold~"Warning:  "~var.end,args);
+			m_inst.m_logfile.writeln(bg.lightyellow~fg.red~var.bold~"Warning:  "~var.end,args);
 			m_inst.m_logfile.flush();//It is is important to save this
 		}
 	}
@@ -31,8 +31,8 @@ public:
 	static void Critical(T...)(T args){
 		CheckInstance();
 		synchronized(m_inst.m_mtx){
-			stderr.writeln(bg.red~fg.white~var.bold~"CRIT ERR: "~end,args);
-			m_inst.m_logfile.writeln(bg.red~fg.white~var.bold~"CRIT ERR: "~end,args);
+			stderr.writeln(bg.red~fg.white~var.bold~"CRIT ERR: "~var.end,args);
+			m_inst.m_logfile.writeln(bg.red~fg.white~var.bold~"CRIT ERR: "~var.end,args);
 			m_inst.m_logfile.flush();
 		}
 	}
@@ -43,8 +43,8 @@ public:
 	static void Success(T...)(T args){
 		CheckInstance();
 		synchronized(m_inst.m_mtx){
-			writeln(fg.green~var.bold~"Success:  "~end,args);
-			m_inst.m_logfile.writeln(fg.green~var.bold~"Success:  "~end,args);
+			writeln(fg.green~var.bold~"Success:  "~var.end,args);
+			m_inst.m_logfile.writeln(fg.green~var.bold~"Success:  "~var.end,args);
 			debug {
 				m_inst.m_logfile.flush();
 			}
@@ -58,8 +58,8 @@ public:
 	static void Notify(T...)(T args){
 		CheckInstance();
 		synchronized(m_inst.m_mtx){
-			writeln(fg.lightblack~var.bold~"Notify:   "~end,args);
-			m_inst.m_logfile.writeln(fg.lightblack~var.bold~"Notify:   "~end,args);
+			writeln(fg.lightblack~var.bold~"Notify:   "~var.end,args);
+			m_inst.m_logfile.writeln(fg.lightblack~var.bold~"Notify:   "~var.end,args);
 			debug {
 				m_inst.m_logfile.flush();
 			}
@@ -73,7 +73,7 @@ public:
 	static void Post(T...)(T args){
 		CheckInstance();
 		synchronized(m_inst.m_mtx){
-			stdout.writeln("Post:     ",args);
+			stdout.writeln(var.faded~"Post:     "~var.end,args);
 		}
 	}
 
@@ -90,28 +90,28 @@ private:
 	}
 
 	static enum string MOTD = 
-				 bg.white~"                                                            "~end~"\n"
-				~bg.white~"  "~bg.lightgreen~fg.black~"                 AutoShip ©ISEN Brest                   "~bg.white~"  "~end~"\n"
-				~bg.white~"  "~bg.lightgreen~fg.black~"            Thomas ABOT       Thibaut CHARLES           "~bg.white~"  "~end~"\n"
-				~bg.white~"                                                            "~end~"\n";
+				 bg.white~"                                                            "~var.end~"\n"
+				~bg.white~"  "~bg.lightgreen~fg.black~"                 AutoShip ©ISEN Brest                   "~bg.white~"  "~var.end~"\n"
+				~bg.white~"  "~bg.lightgreen~fg.black~"            Thomas ABOT       Thibaut CHARLES           "~bg.white~"  "~var.end~"\n"
+				~bg.white~"                                                            "~var.end~"\n";
 
 	this(){
 		m_mtx = new Mutex();
-		stdout.writeln(MOTD~execute("date").output);
 		synchronized(m_mtx)
 		{
 			try{
 				m_logfile.open(config.Config.Get!string("Global", "LogFile"), "a");
 			}catch(Exception e){
-				stderr.writeln(bg.red~fg.white~var.bold~"CRIT ERR: "~end,e, "\nNow logging to /tmp/logs");
+				stderr.writeln(bg.red~fg.white~var.bold~"CRIT ERR: "~var.end,e, "\nNow logging to /tmp/logs");
 
 				m_logfile.open("/tmp/logs", "a");
-				m_logfile.writeln(bg.red~fg.white~var.bold~"CRIT ERR: "~end,e, "\nNow logging to /tmp/logs");
+				m_logfile.writeln(bg.red~fg.white~var.bold~"CRIT ERR: "~var.end,e, "\nNow logging to /tmp/logs");
 			}
+			stdout.writeln(MOTD~execute("date").output);
 			m_logfile.writeln(MOTD~execute("date").output);
 		}
-		writeln(fg.green~var.bold~"Success:  "~end,typeof(this).stringof~" instantiation");
-		m_logfile.writeln(fg.green~var.bold~"Success:  "~end,typeof(this).stringof~" instantiation");
+		writeln(fg.green~var.bold~"Success:  "~var.end,typeof(this).stringof~" instantiation");
+		m_logfile.writeln(fg.green~var.bold~"Success:  "~var.end,typeof(this).stringof~" instantiation");
 
 		m_logfile.flush();
 	}
