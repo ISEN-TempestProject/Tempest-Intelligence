@@ -35,8 +35,10 @@ class HWSens(T) : HWElement!T {
 		override T value(){
 			if(m_isemulated)
 				return m_lastvalue;
-			else
-				return Hardware.GetClass().QueryGet!T(m_id);
+			else{
+				m_lastvalue = Hardware.GetClass().QueryGet!T(m_id);
+				return m_lastvalue;
+			}
 		}
 
 		override void value(T val){

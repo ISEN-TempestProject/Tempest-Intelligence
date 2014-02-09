@@ -1,11 +1,43 @@
 module hardware.hardware;
 
-import std.stdio;
 import std.process;
 import logger;
 
 public import hardware.devices;
 
+unittest
+{ 
+	import std.stdio;
+	writeln("Starting hardware unittests");
+
+	//HWAct test
+	Sail s = Hardware.Get!Sail(DeviceID.Sail);
+	s.isemulated = true;
+	s.value = 8;
+	assert(s.value == 8);
+
+	s.isemulated = false;
+	assert(s.value == 8);
+	s.value = 42;
+	assert(s.value == 42);
+
+	//HWSens test
+	Roll r = Hardware.Get!Roll(DeviceID.Roll);
+	r.isemulated = true;
+	r.value = 2.5;
+	assert(r.value == 2.5);
+
+	r.isemulated = false;
+	assert(r.value != 2.5);//get via pipe
+	try{
+		r.value = 12.3;
+		assert("Should have throwed");
+	}catch(Exception e){
+
+	}
+
+	writeln("hardware unittests done");
+}
 
 class Hardware {
 
