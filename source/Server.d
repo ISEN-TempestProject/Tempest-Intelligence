@@ -47,7 +47,7 @@ class Server
 	*/
 	void index(HTTPServerRequest req, HTTPServerResponse res)
 	{
-		res.render!("index.dt");
+		res.render!("index.dt", sensorList, actuatorList);
 	}
 
 }

@@ -4,9 +4,26 @@ html
 		title Trysk and CromFr's Remote to Voilier Autonome
 		script( src='jquery.js') 
 	body
-		h1 Hello Sea !
-		span(id="val_helm_position") No value
-		button(id="btn_helm_babord") <--
-		button(id="btn_helm_tribord") --> 
+		div(id="header")
+			Voilier autonome [ISEN Brest]
+
+		div(id="sendors")
+			foreach(sensor; sensorList)		 
+				div(class="sensor")
+					input(type='checkbox', checked=false)
+					#{sensor.caption}
+					span #{sensor.value}
+					button(class="Low") #{sensor.lowCaption}
+					button(class="High") #{sensor.value} 
+
+		div(id="actuators")
+			foreach(act;actuatorList)		 
+				div(class="actuator")
+					input(type='checkbox', checked=false)
+					#{act.caption}
+					span #{act.value}
+					button(class="Low") #{act.lowCaption}
+					button(class="High") #{act.value} 
+		
 
 		script( src='app.js')
