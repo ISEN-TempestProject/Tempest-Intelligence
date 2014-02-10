@@ -13,8 +13,8 @@ class Autopilot{
 	this(){
 		//Get configuration
 		m_nLoopTimeMS = Config.Get!uint("Autopilot", "Period");
-		m_fDelta = Config.Get!uint("Autopilot", "Delta");
-		m_fTolerance = Config.Get!uint("Autopilot", "Tolerance");
+		m_fDelta = Config.Get!float("Autopilot", "Delta");
+		m_fTolerance = Config.Get!float("Autopilot", "Tolerance");
 
 		//Start the thread
 		m_thread = new Thread(&ThreadFunction);
@@ -39,8 +39,13 @@ private:
 	void ThreadFunction(){
 		while(true){
 			Logger.Post("Running "~typeof(this).stringof~" thread");
+			AjustHelm();
 			m_thread.sleep(dur!("msecs")(m_nLoopTimeMS));
 		}
+	}
+
+	void AjustHelm(){
+		
 	}
   
 	uint m_nLoopTimeMS;

@@ -17,8 +17,7 @@ private:
 	*/
 	enum string[string][string] CONFIG_DEFAULT = [
 		"Global" : ([
-			"LogFile":"logs",
-			"ConstantWindValue":""
+			"LogFile":"logs"
 		]),
 		"DecisionCenter" : ([
 			"Targets":"",
@@ -36,7 +35,8 @@ private:
 			"danger":"40.0"
 		]),
 		"Hardware" : ([
-			"Pipe":"/tmp/pipe"
+			"Pipe":"/tmp/pipe",
+			"ConstantWindValue":""
 		]),
 		"HardwareWatchdog" : ([
 			"Enable":"true"
@@ -63,7 +63,7 @@ private:
 	this()
 	out{
 		import std.exception;
-		assert(m_ini.Get!int("Hardware", "OverrideWindDirection")==90);
+		assert(m_ini.Get!float("DecisionCenter", "DistanceToRoute")==50.0);
 		assert(m_ini.Get!string("Global", "LogFile")==CONFIG_DEFAULT["Global"]["LogFile"]);
 		assertThrown(m_ini.Get!string("Global", ""));
 		assertThrown(m_ini.Get!string("", ""));
