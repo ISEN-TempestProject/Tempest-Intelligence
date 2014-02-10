@@ -18,7 +18,31 @@ private:
 	enum string[string][string] CONFIG_DEFAULT = [
 		"Global" : ([
 			"LogFile":"logs",
-			"Test":"Test!! dqioj"
+			"ConstantWindValue":""
+		]),
+		"DecisionCenter" : ([
+			"Targets":"",
+			"DistanceToTarget":"10.0",
+			"DistanceToRoute":"50.0"
+		]),
+		"Autopilot" : ([
+			"Period":"1000",
+			"Delta":"1.0",
+			"Tolerance":"3.0"
+		]),
+		"SailHandler" : ([
+			"Period":"1000",
+			"Delta":"2",
+			"danger":"40.0"
+		]),
+		"Hardware" : ([
+			"Pipe":"/tmp/pipe"
+		]),
+		"HardwareWatchdog" : ([
+			"Enable":"true"
+		]),
+		"WebServer" : ([
+			"port":"8080"
 		])
 	];
 
