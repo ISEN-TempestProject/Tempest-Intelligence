@@ -3,23 +3,34 @@ module autopilot;
 import core.thread;
 import std.stdio;
 import logger;
+import config;
 
+/*!
+	@brief Handles the helm in order to follow a heading
+*/
 class Autopilot{
 
 	this(){
+		//Get configuration
+		m_nLoopTimeMS = Config.Get!uint("Autopilot", "Period");
+		m_fDelta = Config.Get!uint("Autopilot", "Delta");
+		m_fTolerance = Config.Get!uint("Autopilot", "Tolerance");
+
+		//Start the thread
 		m_thread = new Thread(&ThreadFunction);
 		m_thread.name(typeof(this).stringof);
 		m_thread.isDaemon(true);
 		m_thread.start();
+
 		Logger.Success(typeof(this).stringof~" instantiation");
 	}
 
 	/*!
-	@brief Time between two actions on direction
+	@brief Targeted heading
 	*/
 	@property{
-		void loopTimeMS(int n){m_nLoopTimeMS=n;}
-		int loopTimeMS(){return m_nLoopTimeMS;}
+		void heading(float n){m_fTargetedHeading=n;}
+		float heading(){return m_fTargetedHeading;}
 	}
   
 private:
@@ -30,9 +41,12 @@ private:
 			Logger.Post("Running "~typeof(this).stringof~" thread");
 			m_thread.sleep(dur!("msecs")(m_nLoopTimeMS));
 		}
-	} 
+	}
   
-	int m_nLoopTimeMS = 1000;
+	uint m_nLoopTimeMS;
+	float m_fDelta;
+	float m_fTolerance;
+
 	float m_fTargetedHeading = 0.;
 
 }
