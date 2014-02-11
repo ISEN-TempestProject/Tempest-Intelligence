@@ -36,7 +36,7 @@ class HWSens(T) : HWElement!T {
 			if(m_isemulated)
 				return m_lastvalue;
 			else{
-				m_lastvalue = Hardware.GetClass().QueryGet!T(m_id);
+				//m_lastvalue = Hardware.GetClass().QueryGet!T(m_id);
 				return m_lastvalue;
 			}
 		}

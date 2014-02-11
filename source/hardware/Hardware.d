@@ -1,6 +1,8 @@
 module hardware.hardware;
 
 import std.process;
+import std.socket;
+import core.thread;
 import logger;
 
 public import hardware.devices;
@@ -26,35 +28,79 @@ package:
 		return m_inst;
 	}
 
-	T QueryGet(T)(DeviceID id){
-		return T.init;
+	unittest {
+		assert(HWEvent.id.sizeof == 1);
+		assert(HWEvent.data.sizeof == 16);
+	}
+	struct HWEvent{
+		DeviceID id;
+		ulong data[2];
 	}
 
-	void QuerySet(T)(DeviceID id, T data){
+	void OnEventReceived(T)(HWEvent ev){
+		//store data in the correct device
+	}
 
+	void SendEvent(T)(DeviceID id, T data){
+		HWEvent ev = {id, cast(byte[8])(data)};
 	}
 
 
 
 private:
+	static __gshared Hardware m_inst;
 	this() {
-		//Open Pipe
+		//Init devices
+		InitDevices();
 
-		HWElementsInit();
+		version(unittest){}else{
+			//Open Socket
+			m_addr = new UnixAddress("/tmp/socket");
+			m_socket = new Socket(AddressFamily.UNIX, SocketType.SEQPACKET, ProtocolType.ICMP);
+			m_socket.blocking(true);
+			try{
+				m_socket.connect(m_addr);
+			}catch(Exception e){
+				Logger.Critical("Error when trying to connect socket: ",e);
+				return;
+			}
+
+			//Start network thread
+			m_thread = new Thread(&NetworkThread);
+			m_thread.name(typeof(this).stringof~"-Network");
+			m_thread.isDaemon(true);
+			m_thread.start();
+		}
+
+		
 
 		Logger.Success(typeof(this).stringof~" instantiation");
 	}
 
-	void HWElementsInit(){
+	void InitDevices(){
 		m_hwlist[DeviceID.Sail] = new Sail();
 		m_hwlist[DeviceID.Roll] = new Roll();
 		//...
 	}
 
-	static __gshared Hardware m_inst;
+	void NetworkThread(){
 
-	Pipe m_pipe;
+		HWEvent buffer[1];
+		while(true){
+			long nReceived = m_socket.receive(buffer);
+			if(nReceived>0){
+				Logger.Post("Received: [",buffer[0].id,"|",buffer[0].data,"]");
+			}
+		}
+	}
+
+
+	UnixAddress m_addr;
+	Socket m_socket;
+	Thread m_thread;
+
 	Object[DeviceID] m_hwlist;
+
 	//HWWatchdog m_wd;
 
 }
@@ -64,7 +110,6 @@ unittest
 { 
 	import std.stdio;
 	import std.exception;
-	writeln("Starting hardware unittests");
 
 	//HWAct test
 	Sail s = Hardware.Get!Sail(DeviceID.Sail);
@@ -84,8 +129,8 @@ unittest
 	assert(r.value == 2.5);
 
 	r.isemulated = false;
-	assert(r.value != 2.5);//get via pipe
+	assert(r.value == 2.5);
 	assertThrown(r.value = 12.3);//Throw exception
 
-	writeln("hardware unittests done");
+	Logger.Notify("Hardware unittest done");
 }

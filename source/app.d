@@ -9,14 +9,19 @@ import logger;
 
 int main(string[] args)
 {
-	Logger.Success("Starting program");
-
-	Autopilot sc = new Autopilot();
-
-	bool b=true;
-	while(b){
-		
+	version(unittest){
+		Logger.Success("UnitTest finished ! Congratulations !");
 	}
+	else{
+		Logger.Success("Starting program");
 
+		Autopilot sc = new Autopilot();
+		Hardware.Get!Roll(DeviceID.Roll);
+
+		bool b=true;
+		while(b){
+			
+		}
+	}
 	return 0;
 }
