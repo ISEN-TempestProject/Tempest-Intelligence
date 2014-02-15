@@ -1,6 +1,8 @@
 module hardware.devices;
 
+import std.conv;
 import hardware.hardware;
+import logger;
 
 public import hardware.hwelement;
 
@@ -28,6 +30,12 @@ class Sail : HWAct!ubyte {
 
 class Roll : HWSens!double {
 	this(){
+		super(50);
 		m_id = DeviceID.Roll;
+	}
+
+	override void ParseValue(ulong[2] data){
+		m_values.Append(to!float(data[0]*(360.0/ulong.max)));
+		ExecFilter();
 	}
 }

@@ -28,21 +28,9 @@ package:
 		return m_inst;
 	}
 
-	unittest {
-		assert(HWEvent.id.sizeof == 1);
-		assert(HWEvent.data.sizeof == 16);
-	}
-	struct HWEvent{
-		DeviceID id;
-		ulong data[2];
-	}
 
-	void OnEventReceived(T)(HWEvent ev){
-		//store data in the correct device
-	}
-
-	void SendEvent(T)(DeviceID id, T data){
-		HWEvent ev = {id, cast(byte[8])(data)};
+	void SendEvent(DeviceID id, ulong[2] data){
+		HWEvent ev = {id, data};
 	}
 
 
@@ -85,13 +73,38 @@ private:
 
 	void NetworkThread(){
 
-		HWEvent buffer[1];
+		
 		while(true){
+			HWEvent buffer[1];
 			long nReceived = m_socket.receive(buffer);
 			if(nReceived>0){
 				Logger.Post("Received: [",buffer[0].id,"|",buffer[0].data,"]");
+
+				//@TODO clean this: ParseValue should be called on HWSens
+				switch(buffer[0].id){
+					case DeviceID.Roll:
+						(cast(Roll)(m_hwlist[buffer[0].id])).ParseValue(buffer[0].data); 
+						break;
+
+					default:
+						Logger.Warning("@Network: ",buffer[0].id," is not a handled HWSensor");
+				}
 			}
 		}
+	}
+
+
+	unittest {
+		assert(HWEvent.id.sizeof == 1);
+		assert(HWEvent.data.sizeof == 16);
+	}
+	struct HWEvent{
+		DeviceID id;
+		ulong data[2];
+	}
+
+	void OnEventReceived(T)(HWEvent ev){
+		//store data in the correct device
 	}
 
 

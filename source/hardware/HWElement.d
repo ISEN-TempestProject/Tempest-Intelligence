@@ -3,6 +3,7 @@ module hardware.hwelement;
 import logger;
 import hardware.hardware;
 import hardware.devices;
+import fifo;
 
 abstract class HWElement(T) {
 
@@ -36,7 +37,6 @@ class HWSens(T) : HWElement!T {
 			if(m_isemulated)
 				return m_lastvalue;
 			else{
-				//m_lastvalue = Hardware.GetClass().QueryGet!T(m_id);
 				return m_lastvalue;
 			}
 		}
@@ -50,6 +50,20 @@ class HWSens(T) : HWElement!T {
 			}
 		}
 	}
+
+	abstract void ParseValue(ulong[2] data);
+
+protected:
+	this(size_t fifoSize){
+		m_values = new Fifo!T(fifoSize);
+	}
+
+	///Default filter : gets the front value
+	void ExecFilter(){
+		m_lastvalue = m_values.GetHandle().front();
+	}
+
+	Fifo!T m_values;
 }
 
 class HWAct(T) : HWElement!T {
@@ -60,9 +74,15 @@ class HWAct(T) : HWElement!T {
 		}
 
 		override void value(T val){
-			if(!m_isemulated)
-				Hardware.GetClass();//.QuerySet!T(m_id, val);
+			if(!m_isemulated){
+				Hardware.GetClass().SendEvent(m_id, FormatLastValue(val));
+			}
 			m_lastvalue = val;
 		}
+	}
+
+protected:
+	ulong[2] FormatLastValue(in T value){
+		return [cast(ulong)(value), cast(ulong)(0)];
 	}
 }
