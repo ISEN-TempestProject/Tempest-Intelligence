@@ -1,0 +1,10 @@
+//js <%= path %>/scripts/doc.js
+
+load('steal/rhino/rhino.js');
+steal("documentjs", function(DocumentJS){
+	DocumentJS('<%= path %>/index.html', {
+		out: '<%= application_name %>/docs',
+		markdown : ['<%= application_name %>', 'steal', 'jquerypp', 'can', 'funcunit'],
+		parent : '<%= application_name %>'
+	});
+});

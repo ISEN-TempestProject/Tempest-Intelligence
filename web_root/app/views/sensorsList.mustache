@@ -1,0 +1,32 @@
+<ul>
+  {{#each sensors}}
+    <li>
+      	<div class="sensor row">
+
+		 	<div class="col w33">
+			 	<div class="onoffswitch">
+				    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="emul-{{id}}" {{#if emulated}}checked{{/if}}>
+				    <label class="onoffswitch-label" for="emul-{{id}}">
+				        <div class="onoffswitch-inner"></div>
+				        <div class="onoffswitch-switch"></div>
+				    </label>
+				</div>
+			</div>
+
+			<div class="col w33">
+				{{name}}
+			</div>
+
+
+			<div div class="col w33">
+				<button class='lowButton' type="button" {{#unless emulated}}disabled{{/if}}>{{lowCaption}}</button>
+
+				<input type="text" name="value" value="{{value}}">
+
+				<button class='highButton' type="button" {{#unless emulated}}disabled{{/if}}>{{highCaption}}</button>
+			</div>
+
+		</div>
+    </li>
+  {{/each}}
+</ul>

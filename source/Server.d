@@ -30,8 +30,8 @@ class Server
 		m_Router = new URLRouter;
 		registerRestInterface(m_Router, new API());
 		m_Router
-			.get("/", &index)
-			.get("*", serveStaticFiles("public/"));
+			.get("/", serveStaticFile("web_root/app/index.html"))
+			.get("*", serveStaticFiles("web_root/"));
 	}
 
 	/*
@@ -40,14 +40,6 @@ class Server
 	void start()
 	{
 		listenHTTP(m_Settings, m_Router);
-	}
-
-	/*
-	*	Route : index page
-	*/
-	void index(HTTPServerRequest req, HTTPServerResponse res)
-	{
-		res.render!("index.dt", sensorList, actuatorList);
 	}
 
 }

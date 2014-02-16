@@ -1,0 +1,73 @@
+@font-face {
+  font-family: 'Bitstrap';
+  src: url("../fonts/bitstrapregular.eot");
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+    font-family: 'Bitstrap';
+    src: url('../fonts/bitstrapregular.eot');
+    src: url('../fonts/bitstrapregular.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/bitstrapregular.ttf') format('truetype'),
+         url("../fonts/Bitstrap-Regular.otf") format("otf");
+    font-weight: normal;
+    font-style: normal;
+
+}
+[class^="icon-"],
+[class*=" icon-"] {
+  font-family: Bitstrap;
+  font-weight: normal;
+  font-style: normal;
+  text-decoration: inherit;
+  display: inline;
+  width: auto;
+  height: auto;
+  line-height: normal;
+  vertical-align: baseline;
+  background-image: none !important;
+  background-position: 0% 0%;
+  background-repeat: repeat;
+  
+  &:before, &:before{
+    text-decoration: inherit;
+    display: inline-block;
+    speak: none;
+  }
+}
+
+.icon-menudown:before                { content: "\e001"; }
+.icon-bits:before                { content: "\e002"; position:relative; left: -5px; }
+.icon-search:before               { content: "\e012"; }
+
+/* Default */
+.arrow:before { 
+    content: "";
+    border-color:  #636363 transparent;
+    border-style: solid;
+    border-width: 0 5px 5px 5px;
+    display: block;
+    height: 0;
+    width: 0;
+}
+/* Left */
+.arrow.left:before { 
+    border-color: transparent #636363 ;
+    border-width: 5px 5px 5px 0;
+}
+
+/* Right */
+.arrow.right:before { 
+    border-color: transparent #636363 ;
+    border-width: 5px 0 5px 5px;
+}
+/* Up */
+.arrow.up:before { 
+    border-color:  #636363 transparent;
+    border-width: 0 5px 5px 5px;
+}
+/* Down */
+.arrow.down:before { 
+    border-color:  #636363 transparent;
+    border-width: 5px 5px 0 5px;
+}

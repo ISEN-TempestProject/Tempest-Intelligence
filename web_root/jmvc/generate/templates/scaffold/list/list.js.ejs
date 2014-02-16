@@ -1,0 +1,45 @@
+steal('can','./init.ejs', '<%= appPath %>/models/<%= underscore %>.js',
+function (can, initEJS, <%=Alias%>) {
+	/**
+	 * @constructor <%= appPath %>/<%= underscore %>/list
+	 * @alias <%=Alias%>List
+	 * @parent <%= appName %>
+	 * @inherits can.Control
+	 * Lists <%= plural %> and lets you destroy them.
+	 */
+	return can.Control(
+	/** @Static */
+	{
+		/**
+		 * adding default options
+		 */
+		defaults : {
+			<%=Alias%>: <%=Alias%>
+		}
+	},
+	/** @Prototype */
+	{
+		/**
+		 * Create a <%= underscore %> list, render it, and make a request for finding all <%= plural %>.
+		 */
+		init: function () {
+			this.list = new <%=Alias%>.List();
+			this.element.html(initEJS(this.list));
+			this.list.replace(<%=Alias%>.findAll());
+		},
+		/**
+		 * Click handler for destroy link.
+		 */
+		'.destroy click': function (el) {
+			if (confirm("Are you sure you want to destroy?")) {
+				el.closest('.<%= underscore %>').data('<%= underscore %>').destroy();
+			}
+		},
+		/**
+		 * Handler for <%= underscore %> creation.  Pushes to the list of instances.
+		 */
+		"{<%=Alias%>} created": function (Model, ev, instance) {
+			this.list.push(instance);
+		}
+	});
+});
