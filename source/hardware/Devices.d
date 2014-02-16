@@ -26,16 +26,31 @@ class Sail : HWAct!ubyte {
 		m_id = DeviceID.Sail;
 	}
 
+	//Check consistency
+	invariant(){
+		assert(0<=m_lastvalue && m_lastvalue<=255);
+	}
+
 }
 
 class Roll : HWSens!double {
 	this(){
 		super(50);
 		m_id = DeviceID.Roll;
+		m_lastvalue=0.0;
 	}
 
-	override void ParseValue(ulong[2] data){
+	override void ParseValue(ulong[2] data)
+	out{
+		assert(0<=m_values.front && m_values.front<=360);
+	}body{
 		m_values.Append(to!float(data[0]*(360.0/ulong.max)));
 		ExecFilter();
 	}
+
+	//Check consistency
+	invariant(){
+		assert(0<=m_lastvalue && m_lastvalue<=360);
+	}
+
 }

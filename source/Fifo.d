@@ -16,15 +16,16 @@ class Fifo(T) {
 			m_list.insertFront(val);
 			m_nSize++;
 		}
-
 	}
 
-	size_t GetSize() const{
-		return m_nSize;
+	@property const nothrow{
+		bool empty(){return m_list.empty;}
+		size_t size(){return m_nSize;}
 	}
 
-	DList!T GetHandle(){
-		return m_list;
+	@property nothrow{
+		T front(){return m_list.front;}
+		void front(T val){m_list.front = val;}
 	}
 
 private:

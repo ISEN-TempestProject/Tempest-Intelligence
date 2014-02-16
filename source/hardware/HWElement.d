@@ -7,19 +7,21 @@ import fifo;
 
 abstract class HWElement(T) {
 
-	DeviceID GetID(){
-		return m_id;
-	}
+	
 
 	@property{
+		DeviceID id() const{
+			return m_id;
+		}
+
 		void isemulated(bool b){
 			m_isemulated = b;
 		}
-		bool isemulated(){
+		bool isemulated() const{
 			return m_isemulated;
 		}
 
-		abstract T value();
+		abstract T value() const;
 		abstract void value(T val);
 	}
 
@@ -29,11 +31,11 @@ protected:
 	T m_lastvalue;
 }
 
-
+//==============================================================================
 class HWSens(T) : HWElement!T {
 
 	@property{
-		override T value(){
+		override T value() const{
 			if(m_isemulated)
 				return m_lastvalue;
 			else{
@@ -60,16 +62,17 @@ protected:
 
 	///Default filter : gets the front value
 	void ExecFilter(){
-		m_lastvalue = m_values.GetHandle().front();
+		//m_lastvalue = m_values.front();
 	}
 
 	Fifo!T m_values;
 }
 
+//==============================================================================
 class HWAct(T) : HWElement!T {
 
 	@property{
-		override T value(){
+		override T value() const{
 			return m_lastvalue;
 		}
 
