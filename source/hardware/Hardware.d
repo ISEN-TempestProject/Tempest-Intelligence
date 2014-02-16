@@ -49,7 +49,7 @@ private:
 			try{
 				m_socket.connect(m_addr);
 			}catch(Exception e){
-				Logger.Critical("Error when trying to connect socket: ",e);
+				Logger.Critical("Error when trying to connect socket: ",e.msg,"\n",e.file,":",e.line);
 				return;
 			}
 
