@@ -1,4 +1,4 @@
-.dub/
+.obj/
 *.a
-projetvoilier
 logs
+autoboat

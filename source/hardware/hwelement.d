@@ -8,7 +8,7 @@ import fifo;
 abstract class HWElement(T) {
 
 	
-
+ 
 	@property{
 		DeviceID id() const{
 			return m_id;
