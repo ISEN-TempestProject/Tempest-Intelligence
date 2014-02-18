@@ -1,16 +1,24 @@
 module gpscoord;
 
+import logger;
 import std.regex;
 import std.conv;
+import std.math;
 
 
 unittest {
 	import std.exception;
 
-	GPSCoord c = new GPSCoord(GPSCoord.Unit.DecDeg, "42.25 -23.65");
-	assert(c.longitude==42.25 && c.latitude==-23.65);
+	GPSCoord cRef = new GPSCoord(37.391933, -122.04375);
 
-	assertThrown(c.Set(GPSCoord.Unit.DecDeg, "42.25 W23.65"));
+	GPSCoord c = new GPSCoord(GPSCoord.Unit.GPS, "37 23.516 -122 02.625");
+	assert(abs(c.longitude-cRef.longitude)<0.0001 && abs(c.latitude-cRef.latitude)<0.0001);
+
+	//assertThrown(c.Set(GPSCoord.Unit.DecDeg, "42.25 W23.65"));
+
+	Logger.Warning(cRef.GetDistanceTo(new GPSCoord(37.391933, -121.04375)));
+
+	Logger.Post("GPSCoord unittest done");
 }
 
 class GPSCoord {
@@ -44,9 +52,54 @@ class GPSCoord {
 					throw new Exception("'"~expr~"' does not match "~to!string(u)~" value");
 				break;
 			case Unit.DegMinSec:
+				auto results = match(expr, rgxDegMinSec);
+				if(results){
+					string cP1 = results.captures[1];
+					uint nD1 = to!uint(results.captures[2]);
+					uint nM1  = to!uint(results.captures[3]);
+					float nS1  = to!float(results.captures[4]);
+					string cP2 = results.captures[5];
+					uint nD2 = to!uint(results.captures[6]);
+					uint nM2  = to!uint(results.captures[7]);
+					float nS2  = to!float(results.captures[8]);
 
+					m_long = 0;
+					m_long += nD1;
+					m_long += (nM1/60);
+					m_long += (nS1/3600);
+					if(cP1=="S" || cP1=="-")m_long = -m_long;
+
+					m_lat = 0;
+					m_lat += nD2;
+					m_lat += (nM2/60);
+					m_lat += (nS2/3600);
+					if(cP2=="W" || cP2=="-")m_lat = -m_lat;
+				}
+				else
+					throw new Exception("'"~expr~"' does not match "~to!string(u)~" value");
 				break;
 			case Unit.GPS:
+				auto results = match(expr, rgxGPS);
+				if(results){ 
+					string cP1 = results.captures[1];
+					uint nD1 = to!uint(results.captures[2]);
+					double fM1  = to!double(results.captures[3]);
+					string cP2 = results.captures[4];
+					uint nD2 = to!uint(results.captures[5]);
+					double fM2  = to!double(results.captures[6]);
+
+					m_long = 0;
+					m_long += nD1;
+					m_long += (fM1/60);
+					if(cP1=="S" || cP1=="-")m_long = -m_long;
+
+					m_lat = 0;
+					m_lat += nD2;
+					m_lat += (fM2/60);
+					if(cP2=="W" || cP2=="-")m_lat = -m_lat;
+				}
+				else
+					throw new Exception("'"~expr~"' does not match "~to!string(u)~" value");
 
 				break;
 			case Unit.UTM:
@@ -58,19 +111,43 @@ class GPSCoord {
 	string To(Unit u){
 		final switch(u){
 			case Unit.DecDeg:
-
-				break;
+				return to!string(m_long)~" "~to!string(m_lat);
 			case Unit.DegMinSec:
+				string sRet;
+				if(m_long<0)sRet~="S";
+				else sRet~="N";
+				uint nD1 = to!uint(m_long);
+				uint nM1 = to!uint((m_long-nD1)*60);
+				float fS1 = (m_long-nD1-nM1/60)*3600;
+				sRet~=to!string(nD1)~" "~to!string(nM1)~" "~to!string(fS1)~"\t";
 
-				break;
+				if(m_lat<0)sRet~="W";
+				else sRet~="E";
+				uint nD2 = to!uint(m_lat);
+				uint nM2 = to!uint((m_lat-nD2)*60);
+				float fS2 = (m_lat-nD2-nM2/60)*3600;
+				sRet~=to!string(nD2)~" "~to!string(nM2)~" "~to!string(fS2);
+
+				return sRet;
 			case Unit.GPS:
+				string sRet;
+				if(m_long<0)sRet~="S";
+				else sRet~="N";
+				uint nD1 = to!uint(m_long);
+				double fM1 = (m_long-nD1)*60;
+				sRet~=to!string(nD1)~" "~to!string(fM1)~"\t";
 
-				break;
+				if(m_lat<0)sRet~="W";
+				else sRet~="E";
+				uint nD2 = to!uint(m_lat);
+				double fM2 = (m_lat-nD2)*60;
+				sRet~=to!string(nD2)~" "~to!string(fM2);
+
+				return sRet;
 			case Unit.UTM:
 
-				break;
+				return "";
 		}
-		return "";
 	}
 
 	@property{
@@ -80,12 +157,32 @@ class GPSCoord {
 		void latitude(double value){m_lat = value;}
 	}
 
+	enum uint EARTH_RADIUS = 6371;
+	double GetDistanceTo(GPSCoord point){
+
+		//Haversine formula
+		// http://www.movable-type.co.uk/scripts/latlong.html
+		double dLat = (point.latitude - latitude)*PI/180;
+		double dLon = (point.longitude - longitude)*PI/180;
+		double fLat1 = latitude*PI/180;
+		double fLat2 = point.latitude*PI/180;
+
+		double a = (sin(dLat/2))^^2 + cos(fLat1) * cos(fLat2) * (sin(dLon/2))^^2;
+
+		double c = 2*atan2(sqrt(a), sqrt(1-a)); 
+		double d = EARTH_RADIUS * c;
+		return d;
+	}
+	double GetDistanceTo(GPSCoord A, GPSCoord B){
+		return 0;
+	}
+
 private:
 
 	@property static {
 		enum rgxDecDeg = ctRegex!(r"^([0-9\.\-]+)\s+([0-9\.\-]+)\s*$");
-		enum rgxDegMinSec = ctRegex!(r"^([N|S])\s*([0-9]+)\s+([0-9]+)\s+([0-9]+)\s+([E|W])\s*([0-9]+)\s+([0-9]+)\s+([0-9]+)$");
-		enum rgxGPS = ctRegex!(r"^([N|S])\s*([0-9]+)\s+([0-9\.]+)\s+([E|W])\s*([0-9]+)\s+([0-9\.]+)\s*$");
+		enum rgxDegMinSec = ctRegex!(r"^([N|S|-|+]?)\s*([0-9]+)\s+([0-9]+)\s+([0-9\.]+)\s+([E|W|-|+]?)\s*([0-9]+)\s+([0-9]+)\s+([0-9\.]+)$");
+		enum rgxGPS = ctRegex!(r"^([N|S|\-|\+]?)\s*([0-9]+)\s+([0-9\.]+)\s+([E|W|\-|\+]?)\s*([0-9]+)\s+([0-9\.]+)\s*$");
 		enum rgxUTM = ctRegex!(r"^([0-9]+)([N|S])\s*([0-9]+)\s+([0-9]+)$");
 	}
 
