@@ -19,38 +19,122 @@ enum DeviceID : ubyte{
 
 /*!
 	Handles the sail tension
-	@note Values are between 0 and 255
 */
 class Sail : HWAct!ubyte {
 	this(){
 		m_id = DeviceID.Sail;
+		m_min = 0;
+		m_max = 255;
+		m_init = 50;
+		m_lastvalue=m_init;
 	}
-
-	//Check consistency
-	invariant(){
-		assert(0<=m_lastvalue && m_lastvalue<=255);
-	}
-
 }
 
-class Roll : HWSens!double {
+/*!
+	Handles the helm orientation
+*/
+class Helm : HWAct!double {
 	this(){
-		super(50);
+		m_id = DeviceID.Helm;
+		m_min = -1;
+		m_max = 1;
+		m_init = 0;
+		m_lastvalue=m_init;
+	}
+}
+
+//==============================================================================
+
+/*!
+	Gets the GPS Position
+*/
+//class Gps : HWSens!GPSCoord {
+//	this(){
+//		super(50);
+//		m_id = DeviceID.Gps;
+//		m_min.longitude = -180;
+//		m_min.latitude = -90;
+//		m_max.longitude = 180;
+//		m_max.latitude = 90;
+//		m_init.longitude = 0;
+//		m_init.latitude = 0;
+//		m_lastvalue=m_init;
+//	}
+
+//	override void ParseValue(ulong[2] data)
+//	out{
+//		assert(m_min<=m_values.front && m_values.front<=m_max);
+//	}body{
+//		m_values.Append(GPSCoord(
+//			to!double((m_max.longitude-m_min.longitude)*data[0]/ulong.max),
+//			to!double((m_max.latitude-m_min.latitude)*data[0]/ulong.max)
+//			));
+//		ExecFilter();
+//	}
+//}
+
+/*!
+	Gets the roll
+*/
+class Roll : HWSens!float {
+	this(){
+		super(10);
 		m_id = DeviceID.Roll;
-		m_lastvalue=0.0;
+		m_min = -180;
+		m_max = 180;
+		m_init = 0;
+		m_lastvalue=m_init;
 	}
 
 	override void ParseValue(ulong[2] data)
 	out{
-		assert(0<=m_values.front && m_values.front<=360);
+		assert(m_min<=m_values.front && m_values.front<=m_max);
 	}body{
-		m_values.Append(to!float(data[0]*(360.0/ulong.max)));
+		m_values.Append(to!float((m_max-m_min)*data[0]/ulong.max+m_min));
 		ExecFilter();
 	}
+}
 
-	//Check consistency
-	invariant(){
-		assert(0<=m_lastvalue && m_lastvalue<=360);
+/*!
+	Gets the wind direction
+*/
+class WindDir : HWSens!float {
+	this(){
+		super(10);
+		m_id = DeviceID.WindDir;
+		m_min = 0;
+		m_max = 360;
+		m_init = 0;
+		m_lastvalue=m_init;
 	}
 
+	override void ParseValue(ulong[2] data)
+	out{
+		assert(m_min<=m_values.front && m_values.front<=m_max);
+	}body{
+		m_values.Append(to!float((m_max-m_min)*data[0]/ulong.max));
+		ExecFilter();
+	}
+}
+
+/*!
+	Gets the heading
+*/
+class Compass : HWSens!float {
+	this(){
+		super(10);
+		m_id = DeviceID.Compass;
+		m_min = 0;
+		m_max = 360;
+		m_init = 0;
+		m_lastvalue=m_init;
+	}
+
+	override void ParseValue(ulong[2] data)
+	out{
+		assert(m_min<=m_values.front && m_values.front<=m_max);
+	}body{
+		m_values.Append(to!float((m_max-m_min)*data[0]/ulong.max));
+		ExecFilter();
+	}
 }
