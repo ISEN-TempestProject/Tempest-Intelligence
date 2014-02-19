@@ -1,4 +1,5 @@
 .obj/
 *.a
 logs
-autoboat
+.dub/
+projetvoilier
