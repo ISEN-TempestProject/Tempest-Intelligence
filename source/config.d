@@ -1,6 +1,6 @@
 module config;
 
-import logger;
+import saillog;
 import inireader;
 import std.stdio;
 

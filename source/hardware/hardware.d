@@ -3,7 +3,7 @@ module hardware.hardware;
 import std.process;
 import std.socket;
 import core.thread;
-import logger;
+import saillog;
 
 public import hardware.devices;
 
@@ -17,7 +17,7 @@ public:
 			return cast(T)(m_inst.m_hwlist[id]);
 		}
 		else{
-			Logger.Critical("Hardware element not found : ", id);
+			SailLog.Critical("Hardware element not found : ", id);
 			throw new Exception("Hardware element not found : "~id.stringof);
 		}
 	}
@@ -49,7 +49,7 @@ private:
 			try{
 				m_socket.connect(m_addr);
 			}catch(Exception e){
-				Logger.Critical("Error when trying to connect socket: ",e.msg,"\n",e.file,":",e.line);
+				SailLog.Critical("Error when trying to connect socket: ",e.msg,"\n",e.file,":",e.line);
 				return;
 			}
 
@@ -62,7 +62,7 @@ private:
 
 		
 
-		Logger.Success(typeof(this).stringof~" instantiation");
+		SailLog.Success(typeof(this).stringof~" instantiation");
 	}
 
 	void InitDevices(){
@@ -78,7 +78,7 @@ private:
 			HWEvent buffer[1];
 			long nReceived = m_socket.receive(buffer);
 			if(nReceived>0){
-				Logger.Post("Received: [",buffer[0].id,"|",buffer[0].data,"]");
+				SailLog.Post("Received: [",buffer[0].id,"|",buffer[0].data,"]");
 
 				//@TODO clean this: ParseValue should be called on HWSens
 				switch(buffer[0].id){
@@ -87,7 +87,7 @@ private:
 						break;
 
 					default:
-						Logger.Warning("@Network: ",buffer[0].id," is not a handled HWSensor");
+						SailLog.Warning("@Network: ",buffer[0].id," is not a handled HWSensor");
 				}
 			}
 		}
@@ -145,5 +145,5 @@ unittest
 	assert(r.value == 2.5);
 	assertThrown(r.value = 12.3);//Throw exception
 
-	Logger.Notify("Hardware unittest done");
+	SailLog.Notify("Hardware unittest done");
 }
