@@ -1,6 +1,5 @@
 # Autonomous Sailboat Intelligence Program
-
-
+![AutoSailBoat](https://bitbucket.org/triskell/voilier-autonome/raw/HEAD/misc/logo.png "AutoSailBoat")
 ## Informations
 This software has been written by:
 
@@ -14,7 +13,7 @@ for ISEN Brest, M1 Project
 * GDC (we use version 4.8.2)
 * dub (https://github.com/rejectedsoftware/dub)
 
-## Libraries Used
+## Used Libraries
 *You don't need to install these libraries, dub will do it for you* 
 
 * vibe.d

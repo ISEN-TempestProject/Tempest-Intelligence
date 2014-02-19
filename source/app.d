@@ -1,14 +1,32 @@
-import vibe.vibe;
-import Server;
+module main;
 
-void main()
+import std.stdio;
+import autopilot;
+import hardware.hardware;
+import config;
+import logger;
+
+
+int main(string[] args)
 {
-	if (!finalizeCommandLineOptions())
-		return;
+	version(unittest){
+		Logger.Success("UnitTest finished ! Congratulations !");
+	}
+	else{
+		if (!finalizeCommandLineOptions())
+			return;
+		
+		Logger.Success("Starting program");
 
-	Server server = new Server();
-	server.start();
+		Autopilot sc = new Autopilot();
+		Hardware.Get!Roll(DeviceID.Roll);
 
-	lowerPrivileges();
-	runEventLoop();
+		Server server = new Server();
+		server.start();
+
+		lowerPrivileges();
+		runEventLoop();
+
+	}
+	return 0;
 }

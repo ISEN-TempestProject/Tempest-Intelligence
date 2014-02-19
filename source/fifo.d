@@ -1,0 +1,35 @@
+module fifo;
+
+import std.container;
+
+class Fifo(T) {
+	this(size_t size) {
+		m_nMaxSize = size;
+	}
+
+	void Append(T val){
+		if(m_nSize>=m_nMaxSize){
+			m_list.removeBack();
+			m_list.insertFront(val);
+		}
+		else{
+			m_list.insertFront(val);
+			m_nSize++;
+		}
+	}
+
+	@property const nothrow{
+		bool empty(){return m_list.empty;}
+		size_t size(){return m_nSize;}
+	}
+
+	@property nothrow{
+		T front(){return m_list.front;}
+		void front(T val){m_list.front = val;}
+	}
+
+private:
+	size_t m_nMaxSize;
+	size_t m_nSize = 0;
+	DList!T m_list;
+}
