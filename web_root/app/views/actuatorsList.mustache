@@ -1,12 +1,12 @@
 <ul>
-  {{#each sensors}}
+  {{#each actuators}}
     <li>
-      	<div class="sensor row">
+      	<div class="actuator row">
 
 		 	<div class="col w33">
 			 	<div class="onoffswitch">
-				    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="sens-emul-{{id}}" {{#if emulated}}checked{{/if}}>
-				    <label class="onoffswitch-label" for="sens-emul-{{id}}">
+				    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="act-emul-{{id}}" {{#if emulated}}checked{{/if}}>
+				    <label class="onoffswitch-label" for="act-emul-{{id}}">
 				        <div class="onoffswitch-inner"></div>
 				        <div class="onoffswitch-switch"></div>
 				    </label>
