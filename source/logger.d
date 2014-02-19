@@ -1,4 +1,4 @@
-module logger;
+module saillog;
 
 import std.stdio;
 import std.process;
@@ -10,7 +10,7 @@ import config;
 	@brief Logs everything, on console and/or on files
 	@todo May be wise to create a thread if the mutex is locked so it doesn't slow the main process
 */
-class Logger {
+class SailLog {
 
 public:
 	/*!
@@ -78,14 +78,14 @@ public:
 	}
 
 private:
-	static __gshared Logger m_inst;//Stored in global storage, not thread local storage (TLS)
+	static __gshared SailLog m_inst;//Stored in global storage, not thread local storage (TLS)
 
 	File m_logfile;
 	Mutex m_mtx;
 
 	static void CheckInstance(){
 		if(!m_inst){
-			m_inst = new Logger();
+			m_inst = new SailLog();
 		}
 	}
 

@@ -1,6 +1,6 @@
 module hardware.hwelement;
 
-import logger;
+import saillog;
 import hardware.hardware;
 import hardware.devices;
 import fifo;
@@ -56,7 +56,7 @@ class HWSens(T) : HWElement!T {
 			if(m_isemulated)
 				m_lastvalue = val;
 			else{
-				Logger.Warning("Trying to set value of ",m_id," while not emulated");
+				SailLog.Warning("Trying to set value of ",m_id," while not emulated");
 				throw new Exception("Cannot set value of a HWSens while not emulated");
 			}
 		}

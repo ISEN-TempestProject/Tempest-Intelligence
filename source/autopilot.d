@@ -2,7 +2,7 @@ module autopilot;
 
 import core.thread;
 import std.stdio;
-import logger;
+import saillog;
 import config;
 
 /*!
@@ -22,7 +22,7 @@ class Autopilot{
 		m_thread.isDaemon(true);
 		m_thread.start();
 
-		Logger.Success(typeof(this).stringof~" instantiation");
+		SailLog.Success(typeof(this).stringof~" instantiation");
 	}
 
 	/*!
@@ -38,7 +38,7 @@ private:
 
 	void ThreadFunction(){
 		while(true){
-			Logger.Post("Running "~typeof(this).stringof~" thread");
+			SailLog.Post("Running "~typeof(this).stringof~" thread");
 			AjustHelm();
 			m_thread.sleep(dur!("msecs")(m_nLoopTimeMS));
 		}

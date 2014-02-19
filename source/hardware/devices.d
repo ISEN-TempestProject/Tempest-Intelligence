@@ -2,7 +2,7 @@ module hardware.devices;
 
 import std.conv;
 import hardware.hardware;
-import logger;
+import saillog;
 
 public import hardware.hwelement;
 
