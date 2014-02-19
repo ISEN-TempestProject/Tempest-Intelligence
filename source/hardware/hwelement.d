@@ -29,9 +29,7 @@ abstract class HWElement(T) {
 	T min() const{return m_min;}
 	T max() const{return m_max;}
 	T init() const{return m_init;}
-	invariant(){
-		assert(m_min<=m_lastvalue && m_lastvalue<=m_max);
-	}
+	
 
 protected:
 	DeviceID m_id;

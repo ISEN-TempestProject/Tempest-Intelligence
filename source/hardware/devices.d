@@ -3,6 +3,7 @@ module hardware.devices;
 import std.conv;
 import hardware.hardware;
 import saillog;
+import fifo;
 
 public import hardware.hwelement;
 
@@ -28,6 +29,10 @@ class Sail : HWAct!ubyte {
 		m_init = 50;
 		m_lastvalue=m_init;
 	}
+
+	invariant(){
+		assert(m_min<=m_lastvalue && m_lastvalue<=m_max);
+	}
 }
 
 /*!
@@ -40,6 +45,10 @@ class Helm : HWAct!double {
 		m_max = 1;
 		m_init = 0;
 		m_lastvalue=m_init;
+	}
+
+	invariant(){
+		assert(m_min<=m_lastvalue && m_lastvalue<=m_max);
 	}
 }
 
@@ -80,10 +89,14 @@ class Roll : HWSens!float {
 	this(){
 		super(10);
 		m_id = DeviceID.Roll;
-		m_min = -180;
-		m_max = 180;
-		m_init = 0;
+		m_min = -180.0;
+		m_max = 180.0;
+		m_init = 0.0;
 		m_lastvalue=m_init;
+	}
+
+	invariant(){
+		assert(m_min<=m_lastvalue && m_lastvalue<=m_max);
 	}
 
 	override void ParseValue(ulong[2] data)
@@ -108,6 +121,10 @@ class WindDir : HWSens!float {
 		m_lastvalue=m_init;
 	}
 
+	invariant(){
+		assert(m_min<=m_lastvalue && m_lastvalue<=m_max);
+	}
+
 	override void ParseValue(ulong[2] data)
 	out{
 		assert(m_min<=m_values.front && m_values.front<=m_max);
@@ -128,6 +145,10 @@ class Compass : HWSens!float {
 		m_max = 360;
 		m_init = 0;
 		m_lastvalue=m_init;
+	}
+
+	invariant(){
+		assert(m_min<=m_lastvalue && m_lastvalue<=m_max);
 	}
 
 	override void ParseValue(ulong[2] data)
