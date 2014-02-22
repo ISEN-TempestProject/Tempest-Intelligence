@@ -1,9 +1,8 @@
 module autopilot;
 
 import core.thread;
-import std.stdio;
-import saillog;
-import config;
+import saillog, config, decisioncenter;
+import hardware.hardware;
 
 /*!
 	@brief Handles the helm in order to follow a heading
@@ -45,7 +44,27 @@ private:
 	}
 
 	void AjustHelm(){
-		
+		auto comp = Hardware.Get!Compass(DeviceID.Compass);
+		auto helm = Hardware.Get!Helm(DeviceID.Helm);
+
+		float fDeltaHead = (DecisionCenter.Get()).targetheading - comp.value;
+
+		if(fDeltaHead>m_fTolerance){
+			float fNewValue = helm.value + m_fDelta;
+
+			if(fNewValue>helm.max)
+				helm.value = helm.init;
+			else
+				helm.value = fNewValue;
+		}
+		else if(fDeltaHead<m_fTolerance){
+			float fNewValue = helm.value - m_fDelta;
+			
+			if(fNewValue<helm.min)
+				helm.value = helm.init;
+			else
+				helm.value = fNewValue;
+		}
 	}
   
 	uint m_nLoopTimeMS;

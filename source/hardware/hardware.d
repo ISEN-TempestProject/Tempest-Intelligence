@@ -67,7 +67,10 @@ private:
 
 	void InitDevices(){
 		m_hwlist[DeviceID.Sail] = new Sail();
+		m_hwlist[DeviceID.Helm] = new Helm();
 		m_hwlist[DeviceID.Roll] = new Roll();
+		m_hwlist[DeviceID.WindDir] = new WindDir();
+		m_hwlist[DeviceID.Compass] = new Compass();
 		//...
 	}
 

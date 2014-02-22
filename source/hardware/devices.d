@@ -2,8 +2,7 @@ module hardware.devices;
 
 import std.conv;
 import hardware.hardware;
-import saillog;
-import fifo;
+import saillog, fifo, gpscoord;
 
 public import hardware.hwelement;
 
@@ -57,30 +56,32 @@ class Helm : HWAct!double {
 /*!
 	Gets the GPS Position
 */
-//class Gps : HWSens!GPSCoord {
-//	this(){
-//		super(50);
-//		m_id = DeviceID.Gps;
-//		m_min.longitude = -180;
-//		m_min.latitude = -90;
-//		m_max.longitude = 180;
-//		m_max.latitude = 90;
-//		m_init.longitude = 0;
-//		m_init.latitude = 0;
-//		m_lastvalue=m_init;
-//	}
+class Gps : HWSens!GpsCoord {
+	this(){
+		super(50);
+		m_id = DeviceID.Gps;
+		m_min.longitude = -180;
+		m_min.latitude = -90;
+		m_max.longitude = 180;
+		m_max.latitude = 90;
+		m_init.longitude = 0;
+		m_init.latitude = 0;
+		m_lastvalue=m_init;
+	}
 
-//	override void ParseValue(ulong[2] data)
-//	out{
-//		assert(m_min<=m_values.front && m_values.front<=m_max);
-//	}body{
-//		m_values.Append(GPSCoord(
-//			to!double((m_max.longitude-m_min.longitude)*data[0]/ulong.max),
-//			to!double((m_max.latitude-m_min.latitude)*data[0]/ulong.max)
-//			));
-//		ExecFilter();
-//	}
-//}
+	override void ParseValue(ulong[2] data)
+	out{
+		assert(m_min.longitude<=m_values.front.longitude && m_values.front.longitude<=m_max.longitude);
+		assert(m_min.latitude<=m_values.front.latitude && m_values.front.latitude<=m_max.latitude);
+	}body{
+		GpsCoord coord = GpsCoord(
+			to!double((m_max.longitude-m_min.longitude)*data[0]/ulong.max),
+			to!double((m_max.latitude-m_min.latitude)*data[0]/ulong.max)
+			);
+		m_values.Append(coord);
+		ExecFilter();
+	}
+}
 
 /*!
 	Gets the roll

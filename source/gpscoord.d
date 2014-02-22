@@ -13,7 +13,7 @@ unittest {
 	assertThrown(c.Set(GPSCoord.Unit.DecDeg, "42.25 W23.65"));
 }
 
-class GPSCoord {
+struct GpsCoord {
 
 	/*!
 		@brief Constructor for decimal degrees
