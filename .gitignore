@@ -2,4 +2,6 @@
 *.a
 logs
 .dub/
+web_root/libs/
+web_root/app_old/
 projetvoilier

@@ -2,6 +2,7 @@ import vibe.d;
 import std.conv;
 import std.process;
 import API;
+import saillog;
 
 class Server
 {
@@ -30,7 +31,7 @@ class Server
 		m_Router = new URLRouter;
 		registerRestInterface(m_Router, new API());
 		m_Router
-			.get("/", serveStaticFile("web_root/app/index.html"))
+			.get("/", serveStaticFile("web_root/index.html"))
 			.get("*", serveStaticFiles("web_root/"));
 	}
 
