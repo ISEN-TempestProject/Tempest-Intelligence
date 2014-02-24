@@ -5,15 +5,18 @@ import inireader;
 import std.stdio;
 
 
+/**
+	Configuration class, to handle configuration lines... >_<"
+*/
 class Config {
 private:
-	/*!
-		@brief Path to configuration file
+	/**
+		Path to configuration file
 	*/
 	enum CONFIG_PATH="res/config.ini";
 
-	/*!
-		@brief Default values of the configuration file
+	/**
+		Default values of the configuration file
 	*/
 	enum string[string][string] CONFIG_DEFAULT = [
 		"Global" : ([
@@ -48,7 +51,7 @@ private:
 	];
 
 public:
-	/*!
+	/**
 		@brief Gets the value of the given entry
 		@throw if the entry does not exists
 	*/

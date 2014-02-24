@@ -17,7 +17,7 @@ enum DeviceID : ubyte{
 	Compass
 }
 
-/*!
+/**
 	Handles the sail tension
 */
 class Sail : HWAct!ubyte {
@@ -34,14 +34,14 @@ class Sail : HWAct!ubyte {
 	}
 }
 
-/*!
+/**
 	Handles the helm orientation
 */
 class Helm : HWAct!double {
 	this(){
 		m_id = DeviceID.Helm;
-		m_min = -1;
-		m_max = 1;
+		m_min = -45;
+		m_max = 45;
 		m_init = 0;
 		m_lastvalue=m_init;
 	}
@@ -53,7 +53,7 @@ class Helm : HWAct!double {
 
 //==============================================================================
 
-/*!
+/**
 	Gets the GPS Position
 */
 class Gps : HWSens!GpsCoord {
@@ -83,7 +83,7 @@ class Gps : HWSens!GpsCoord {
 	}
 }
 
-/*!
+/**
 	Gets the roll
 */
 class Roll : HWSens!float {
@@ -109,7 +109,7 @@ class Roll : HWSens!float {
 	}
 }
 
-/*!
+/**
 	Gets the wind direction
 */
 class WindDir : HWSens!float {
@@ -135,7 +135,7 @@ class WindDir : HWSens!float {
 	}
 }
 
-/*!
+/**
 	Gets the heading
 */
 class Compass : HWSens!float {
