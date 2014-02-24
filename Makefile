@@ -18,3 +18,11 @@ crossunittest:
 
 crossrelease:
 	dub build --compiler=arm-unknown-linux-gnueabi-gdc --build=release
+
+
+#documentation generation
+.PHONY: doc
+
+doc:
+	dmd -D -X -Xfdocs.json `find source -name "*.d"` -Dddoc -c -o-
+	ddox generate-html docs.json doc

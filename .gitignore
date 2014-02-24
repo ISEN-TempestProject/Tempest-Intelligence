@@ -3,3 +3,12 @@
 logs
 .dub/
 projetvoilier
+
+
+#Documentation related
+docs.json
+doc/*
+!doc/images/
+!doc/prettify/
+!doc/scripts/
+!doc/styles/
