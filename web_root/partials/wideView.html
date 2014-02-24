@@ -7,7 +7,7 @@
 				<li class="container" ng-repeat="sensor in sensors">
 					<div class="col-sm-2">
 						<div class="onoffswitch">
-							<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="sensor-emul-{{sensor.id}}"  ng-checked="{{sensor.emulated}}" ng-click="toggleSensor(sensor.id);">
+							<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="sensor-emul-{{sensor.id}}"  ng-checked="sensor.emulated" ng-click="toggleSensor(sensor.id);">
 							<label class="onoffswitch-label" for="sensor-emul-{{sensor.id}}">
 						        <div class="onoffswitch-inner"></div>
 						        <div class="onoffswitch-switch"></div>
@@ -17,11 +17,11 @@
 					
 					<div class="col-sm-2">{{sensor.name}}</div>
 					<div class="col-sm-8">
-						<button class="lowButton" type="button" ng-click="deltaSensor(sensor.id, -sensor.delta)" ng-disabled="sensor.emulated">{{sensor.lowCaption}}</button>
+						<button class="lowButton" type="button" ng-click="deltaSensor(sensor.id, -sensor.delta)" ng-disabled="!sensor.emulated">{{sensor.lowCaption}}</button>
 
-						<input type="text" name="value" value="{{sensor.value}}" ng-disabled="sensor.emulated">
+						<input type="text" name="value" value="{{sensor.value}}" ng-disabled="!sensor.emulated">
 
-						<button class="highButton" type="button" ng-click="deltaSensor(sensor.id, sensor.delta)" ng-disabled="sensor.emulated">{{sensor.highCaption}}</button>
+						<button class="highButton" type="button" ng-click="deltaSensor(sensor.id, sensor.delta)" ng-disabled="!sensor.emulated">{{sensor.highCaption}}</button>
 					</div>
 				</li>
 			</ul>
