@@ -1,16 +1,36 @@
-<div class='row'>
-	<div class="col w50">
+<div class='container'>
+
+	<div class="col-md-6">
 		<div id="sensors">
-			<ul>
-				<li ng-repeat="sensor in sensors">
-					{{sensor.name}}
-					<p>{{sensor.value}}</p>
+		Sensors
+			<ul class="list-unstyled">
+				<li class="container" ng-repeat="sensor in sensors">
+					<div class="col-sm-2">
+						<div class="onoffswitch">
+							<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="sensor-emul-{{sensor.id}}"  ng-checked="{{sensor.emulated}}" ng-click="toggleSensor(sensor.id);">
+							<label class="onoffswitch-label" for="sensor-emul-{{sensor.id}}">
+						        <div class="onoffswitch-inner"></div>
+						        <div class="onoffswitch-switch"></div>
+						    </label>
+						</div>
+					</div>
+					
+					<div class="col-sm-2">{{sensor.name}}</div>
+					<div class="col-sm-8">
+						<button class="lowButton" type="button" ng-click="deltaSensor(sensor.id, -sensor.delta)" ng-disabled="sensor.emulated">{{sensor.lowCaption}}</button>
+
+						<input type="text" name="value" value="{{sensor.value}}" ng-disabled="sensor.emulated">
+
+						<button class="highButton" type="button" ng-click="deltaSensor(sensor.id, sensor.delta)" ng-disabled="sensor.emulated">{{sensor.highCaption}}</button>
+					</div>
 				</li>
 			</ul>
 		</div>
 		<div id="actuators">actuators here</div>
 	</div>
-	<div class="col w50">
+	
+	<div class="col-md-6">
 		Et le reste ici !
 	</div>
+
 </div>

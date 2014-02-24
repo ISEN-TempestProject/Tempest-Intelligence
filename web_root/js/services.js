@@ -4,9 +4,13 @@
 
 var sailServices = angular.module('sailServices', ['ngResource']);
 
-sailServices.factory('Sensors', ['$resource',
+sailServices.service('Sensors', ['$resource',
   function($resource){
-    return $resource('data/sensors.json', {}, {
-      query: {method:'GET', isArray:true}
-    });
+    return $resource(
+        "/api/:id/sensors",
+        {id: "@id" },
+        {
+            "update": {method: "PUT"}
+        }
+    );
 }]);
