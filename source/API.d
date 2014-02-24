@@ -5,27 +5,24 @@ import saillog;
 
 interface ISailAPI
 {
-	// GET /sensors
-	Json getSensors();
+	// GET /devices
+	Json getDevices();
 
-	// GET /:id/sensors
-	Json getSensors(int id);
+	// GET /:id/devices
+	Json getDevices(int id);
 
-	// POST /:id/sensors
-	void addSensors(int id);
+	// POST /:id/devices
+	void addDevices(int id);
 }
 
-// vibe.d takes care of all JSON encoding/decoding
-// and actual API implementation can work directly
-// with native types
 
 class API : ISailAPI
 {
 
-	Json getSensors()
+	Json getDevices()
 	{
-		SailLog.Post("sensor all");
-		return parseJsonString("[
+		return parseJsonString("
+		[
 		    {
 		      \"id\": 1,
 		      \"name\": \"Capt-1\",
@@ -52,17 +49,34 @@ class API : ISailAPI
 		      \"lowCaption\": \"lower\",
 		      \"highCaption\": \"higher\",
 		      \"emulated\" : true
+		    },
+		    {
+		      \"id\": 4,
+		      \"name\": \"Act-1\",
+		      \"value\": 13.37,
+		      \"delta\": 0.15,
+		      \"lowCaption\": \"High\",
+		      \"highCaption\": \"Low\",
+		      \"emulated\" : false
+		    },
+		    {
+		      \"id\": 5, 
+		      \"name\": \"Act-2\",
+		      \"value\": 22.29,
+		      \"delta\": 12.37,
+		      \"lowCaption\": \"Hi\",
+		      \"highCaption\": \"Lo\",
+		      \"emulated\" : true
 		    }
 		]");
 	}	
 
-	Json getSensors(int id=0)
+	Json getDevices(int id=0)
 	{
-		SailLog.Post("sensor : " ~ to!string(id));
 		return parseJsonString("{}");
 	}
 
-	void addSensors(int id){
-		SailLog.Post("Sensor set : " ~ to!string(id));
+	void addDevices(int id){
+		SailLog.Post("Device set : " ~ to!string(id));
 	}
 }

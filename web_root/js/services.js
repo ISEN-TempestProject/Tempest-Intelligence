@@ -4,10 +4,10 @@
 
 var sailServices = angular.module('sailServices', ['ngResource']);
 
-sailServices.service('Sensors', ['$resource',
+sailServices.service('Devices', ['$resource',
   function($resource){
     return $resource(
-        "/api/:id/sensors",
+        "/api/:id/devices",
         {id: "@id" },
         {
             "update": {method: "PUT"}

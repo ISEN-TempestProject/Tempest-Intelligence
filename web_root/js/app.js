@@ -13,11 +13,11 @@ sailApp.config(['$routeProvider',
     $routeProvider
       .when('/wide', {
         templateUrl: 'partials/wideView.html',
-        controller: 'sensorCtrl'
+        controller: 'deviceCtrl'
       })
       .when('/mobile', {
         templateUrl: 'partials/mobileView.html',
-        controller: 'sensorCtrl'
+        controller: 'deviceCtrl'
       })
       .otherwise({
         redirectTo: '/wide'

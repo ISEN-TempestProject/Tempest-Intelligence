@@ -4,20 +4,20 @@
 
 var sailControllers = angular.module('sailControllers', []);
 
-sailControllers.controller('sensorCtrl', ['$scope', 'Sensors',
-	function($scope, Sensors) {
-	    $scope.sensors = Sensors.query();
+sailControllers.controller('deviceCtrl', ['$scope', 'Devices',
+	function($scope, Devices) {
+	    $scope.devices = Devices.query();
 
-	    $scope.toggleSensor = function(id) {
-	    	var sensor = getById($scope.sensors, id);
-	    	sensor.emulated = !sensor.emulated;
+	    $scope.toggleDevice = function(id) {
+	    	var device = getById($scope.devices, id);
+	    	device.emulated = !device.emulated;
 		}
 
-		$scope.deltaSensor = function(id, delta) {
-	    	var sensor = Sensors.get({},{'id':id});
+		$scope.deltaDevice = function(id, delta) {
+	    	var device = Devices.get({},{'id':id});
 	    	console.log('id : ' + id)
-	    	sensor.value += delta;
-	    	sensor.$save();
+	    	device.value += delta;
+	    	device.$save();
 		}
 	}
 ]);

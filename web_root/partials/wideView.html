@@ -1,36 +1,33 @@
 <div class="row">
 
 	<div class="col-md-6">
-		<div id="sensors">
-		Sensors
-			<ul class="list-unstyled">
-				<li class="row" ng-repeat="sensor in sensors">
-					<div class="col-sm-2">
-						<div class="onoffswitch">
-							<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="sensor-emul-{{sensor.id}}"  ng-checked="sensor.emulated" ng-click="toggleSensor(sensor.id);">
-							<label class="onoffswitch-label" for="sensor-emul-{{sensor.id}}">
-						        <div class="onoffswitch-inner"></div>
-						        <div class="onoffswitch-switch"></div>
-						    </label>
-						</div>
+	<h2>Devices</h2>
+		<ul class="list-unstyled well">
+			<li class="row" ng-repeat="device in devices">
+				<div class="col-sm-3">
+					<div class="onoffswitch">
+						<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="device-emul-{{device.id}}"  ng-checked="device.emulated" ng-click="toggleDevice(device.id);">
+						<label class="onoffswitch-label" for="device-emul-{{device.id}}">
+					        <div class="onoffswitch-inner"></div>
+					        <div class="onoffswitch-switch"></div>
+					    </label>
 					</div>
-					
-					<div class="col-sm-2">{{sensor.name}}</div>
-					<div class="col-sm-8">
-						<button class="lowButton" type="button" ng-click="deltaSensor(sensor.id, -sensor.delta)" ng-disabled="!sensor.emulated">{{sensor.lowCaption}}</button>
+				</div>
+				
+				<div class="col-sm-3">{{device.name}}</div>
+				<div class="col-sm-6 row">
+					<button class="col-xs-3" type="button" ng-click="deltadevice(device.id, -device.delta)" ng-disabled="!device.emulated">{{device.lowCaption}}</button>
 
-						<input type="text" name="value" value="{{sensor.value}}" ng-disabled="!sensor.emulated">
+					<input type="text" class="col-xs-6" name="value" value="{{device.value}}" ng-disabled="!device.emulated">
 
-						<button class="highButton" type="button" ng-click="deltaSensor(sensor.id, sensor.delta)" ng-disabled="!sensor.emulated">{{sensor.highCaption}}</button>
-					</div>
-				</li>
-			</ul>
-		</div>
-		<div id="actuators">actuators here</div>
+					<button class="col-xs-3" type="button" ng-click="deltadevice(device.id, device.delta)" ng-disabled="!device.emulated">{{device.highCaption}}</button>
+				</div>
+			</li>
+		</ul>
 	</div>
 	
 	<div class="col-md-6">
-		Et le reste ici !<br>
+		<h2>Et le reste ici !</h2><br>
 		dflgksm<br>
 		dflgksm<br>
 		dflgksm<br>
