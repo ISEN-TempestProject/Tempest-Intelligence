@@ -116,8 +116,8 @@ class WindDir : HWSens!float {
 	this(){
 		super(10);
 		m_id = DeviceID.WindDir;
-		m_min = 0;
-		m_max = 360;
+		m_min = -180;
+		m_max = 180;
 		m_init = 0;
 		m_lastvalue=m_init;
 	}
@@ -130,7 +130,10 @@ class WindDir : HWSens!float {
 	out{
 		assert(m_min<=m_values.front && m_values.front<=m_max);
 	}body{
-		m_values.Append(to!float((m_max-m_min)*data[0]/ulong.max));
+		float fValue = to!float((m_max-m_min)*data[0]/ulong.max);
+		if(fValue>180)
+			fValue = 360-fValue;
+		m_values.Append(fValue);
 		ExecFilter();
 	}
 

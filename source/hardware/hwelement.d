@@ -33,6 +33,15 @@ abstract class HWElement(T) {
 	}
 
 	/**
+		Out of service state of the device
+	*/
+	@property{
+		bool isoutofservice() const{
+			return m_isoutofservice;
+		}
+	}
+
+	/**
 		Value of the device, must be between min and max
 	*/
 	@property{
@@ -54,6 +63,7 @@ abstract class HWElement(T) {
 protected:
 	DeviceID m_id;
 	bool m_isemulated = false;
+	bool m_isoutofservice = false;
 	T m_lastvalue;
 	T m_min, m_max, m_init;
 }
@@ -112,6 +122,7 @@ protected:
 
 /**
 	Abstract class to represent an actuator
+	Todo: find a way to check if actuators are working correctly
 */
 class HWAct(T) : HWElement!T {
 
