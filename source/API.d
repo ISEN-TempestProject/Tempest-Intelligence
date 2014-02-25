@@ -4,6 +4,7 @@ import vibe.http.rest;
 import vibe.core.log;
 import vibe.data.json;
 import std.datetime;
+import std.stdio;
 import saillog;
 
 interface ISailAPI
@@ -97,9 +98,7 @@ class API : ISailAPI
 	}
 
 	Json getLogs(){
-		Json logs = logCache;
-		logCache = Json.emptyArray; //resetting cache
-		return logs;
+		return logCache;
 	}
 
 	/**
@@ -111,12 +110,17 @@ class API : ISailAPI
 		log.level = level;
 		log.date = Clock.currTime().toSimpleString();
 
+		//Format content in a single string
 		string content = "";
 		foreach(arg; args){
 			content ~= to!string(arg);
 		}
-		log.content = content; //TODO : format it
+		log.content = content;
 
+
+		if(logCache.length >= 256){
+			logCache = logCache.opSlice(1, 256);
+		}
 		logCache ~= log;
 	}
 
