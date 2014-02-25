@@ -5,15 +5,18 @@ import inireader;
 import std.stdio;
 
 
+/**
+	Configuration class, to handle configuration lines... >_<"
+*/
 class Config {
 private:
-	/*!
-		@brief Path to configuration file
+	/**
+		Path to configuration file
 	*/
 	enum CONFIG_PATH="res/config.ini";
 
-	/*!
-		@brief Default values of the configuration file
+	/**
+		Default values of the configuration file
 	*/
 	enum string[string][string] CONFIG_DEFAULT = [
 		"Global" : ([
@@ -22,7 +25,8 @@ private:
 		"DecisionCenter" : ([
 			"Targets":"",
 			"DistanceToTarget":"10.0",
-			"DistanceToRoute":"50.0"
+			"DistanceToRoute":"50.0",
+			"Period":"5000"
 		]),
 		"Autopilot" : ([
 			"Period":"1000",
@@ -32,7 +36,7 @@ private:
 		"SailHandler" : ([
 			"Period":"1000",
 			"Delta":"2",
-			"danger":"40.0"
+			"Danger":"40.0"
 		]),
 		"Hardware" : ([
 			"Pipe":"/tmp/pipe",
@@ -42,12 +46,12 @@ private:
 			"Enable":"true"
 		]),
 		"WebServer" : ([
-			"port":"8080"
+			"Port":"8080"
 		])
 	];
 
 public:
-	/*!
+	/**
 		@brief Gets the value of the given entry
 		@throw if the entry does not exists
 	*/

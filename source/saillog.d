@@ -6,15 +6,15 @@ import core.sync.mutex;
 import col;
 import config;
 
-/*!
-	@brief Logs everything, on console and/or on files
-	@todo May be wise to create a thread if the mutex is locked so it doesn't slow the main process
+/**
+	Logs everything, on console and/or on files
+	Todo: May be wise to create a thread if the mutex is locked so it doesn't slow the main process
 */
 class SailLog {
 
 public:
-	/*!
-		@brief Posts a Warning, and immediately writes it to disk
+	/**
+		Posts a Warning, and immediately writes it to disk
 	*/
 	static void Warning(T...)(T args){//Variadic function with undefined number of parameters
 		CheckInstance();
@@ -25,8 +25,8 @@ public:
 		}
 	}
 
-	/*!
-		@brief Posts a Critical Error, and immediately writes it to disk
+	/**
+		Posts a Critical Error, and immediately writes it to disk
 	*/
 	static void Critical(T...)(T args){
 		CheckInstance();
@@ -37,8 +37,8 @@ public:
 		}
 	}
 
-	/*!
-		@brief Posts a Success, and writes it to disk
+	/**
+		Posts a Success, and writes it to disk
 	*/
 	static void Success(T...)(T args){
 		CheckInstance();
@@ -52,8 +52,8 @@ public:
 	}
 
 
-	/*!
-		@brief Posts a Notification, and writes it to disk
+	/**
+		Posts a Notification, and writes it to disk
 	*/
 	static void Notify(T...)(T args){
 		CheckInstance();
@@ -67,8 +67,8 @@ public:
 	}
 
 
-	/*!
-		@brief Posts a Success, without writing it to disk
+	/**
+		Posts a Success, without writing it to disk
 	*/
 	static void Post(T...)(T args){
 		CheckInstance();

@@ -7,13 +7,16 @@ import std.conv;
 unittest {
 	import std.exception;
 
-	GPSCoord c = new GPSCoord(GPSCoord.Unit.DecDeg, "42.25 -23.65");
+	GpsCoord c = GpsCoord(GpsCoord.Unit.DecDeg, "42.25 -23.65");
 	assert(c.longitude==42.25 && c.latitude==-23.65);
 
-	assertThrown(c.Set(GPSCoord.Unit.DecDeg, "42.25 W23.65"));
+	assertThrown(c.Set(GpsCoord.Unit.DecDeg, "42.25 W23.65"));
 }
 
-class GPSCoord {
+/**
+	GPS Coordinates, handling types conversions between dms, gps, ...
+*/
+struct GpsCoord {
 
 	/*!
 		@brief Constructor for decimal degrees
@@ -27,11 +30,16 @@ class GPSCoord {
 		DecDeg, DegMinSec, GPS, UTM
 	}
 
-
+	/**
+		Constructs the gps coordinates by parsing an expression
+	*/
 	this(Unit u, string expr){
 		Set(u, expr);
 	}
 
+	/**
+		Sets the gps coordinates by parsing an expression
+	*/
 	void Set(Unit u, string expr) {
 		final switch(u){
 			case Unit.DecDeg:
@@ -55,6 +63,9 @@ class GPSCoord {
 		}
 	}
 
+	/**
+		Converts the gps coordinates into the given representation
+	*/
 	string To(Unit u){
 		final switch(u){
 			case Unit.DecDeg:
@@ -73,6 +84,9 @@ class GPSCoord {
 		return "";
 	}
 
+	/**
+		Accessor for the value in decimal degrees
+	*/
 	@property{
 		double longitude()const{return m_long;}
 		void longitude(double value){m_long = value;}
@@ -82,6 +96,9 @@ class GPSCoord {
 
 private:
 
+	/**
+		Precompiled regexes for types recognition
+	*/
 	@property static {
 		enum rgxDecDeg = ctRegex!(r"^([0-9\.\-]+)\s+([0-9\.\-]+)\s*$");
 		enum rgxDegMinSec = ctRegex!(r"^([N|S])\s*([0-9]+)\s+([0-9]+)\s+([0-9]+)\s+([E|W])\s*([0-9]+)\s+([0-9]+)\s+([0-9]+)$");
