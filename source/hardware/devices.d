@@ -81,6 +81,10 @@ class Gps : HWSens!GpsCoord {
 		m_values.Append(coord);
 		ExecFilter();
 	}
+
+	override void CheckIsOutOfService(){
+		//May be wise to check if values are coherent
+	}
 }
 
 /**
@@ -106,6 +110,10 @@ class Roll : HWSens!float {
 	}body{
 		m_values.Append(to!float((m_max-m_min)*data[0]/ulong.max+m_min));
 		ExecFilter();
+	}
+
+	override void CheckIsOutOfService(){
+		//May be wise to check if values are coherent
 	}
 }
 
@@ -135,6 +143,10 @@ class WindDir : HWSens!float {
 			fValue = 360-fValue;
 		m_values.Append(fValue);
 		ExecFilter();
+	}
+
+	override void CheckIsOutOfService(){
+		//May be wise to check if values are coherent
 	}
 
 	float CalcAbsoluteWind(){
@@ -171,5 +183,9 @@ class Compass : HWSens!float {
 	}body{
 		m_values.Append(to!float((m_max-m_min)*data[0]/ulong.max));
 		ExecFilter();
+	}
+
+	override void CheckIsOutOfService(){
+		//May be wise to check if values are coherent
 	}
 }

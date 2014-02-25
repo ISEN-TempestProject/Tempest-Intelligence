@@ -4,6 +4,7 @@ import saillog;
 import hardware.hardware;
 import hardware.devices;
 import fifo;
+
 /**
 	Abstract class to represent a hardware element/device
 */
@@ -100,13 +101,20 @@ class HWSens(T) : HWElement!T {
 
 	/**
 		Called from the Hardware class, handles the parsing of received data
+		You should call CheckIsOutOfService sometimes in the function
 	*/
 	abstract void ParseValue(ulong[2] data);
+
 
 protected:
 	this(size_t fifoSize){
 		m_values = new Fifo!T(fifoSize);
 	}
+
+	/**
+		Checks if the last values are coherent, and sets isoutofservice if something is wrong
+	*/
+	abstract void CheckIsOutOfService();
 
 	/**
 		Default filter : gets the front value. Override it to customize
