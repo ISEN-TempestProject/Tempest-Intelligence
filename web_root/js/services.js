@@ -14,3 +14,11 @@ sailServices.service('Devices', ['$resource',
         }
     );
 }]);
+
+sailServices.service('Logs', ['$resource',
+  function($resource){
+    return $resource(
+        "/api/logs",
+        {},{}
+    );
+}]);

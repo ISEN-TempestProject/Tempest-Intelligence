@@ -1,0 +1,16 @@
+<h2>Logs</h2>
+<div class="well">
+	Filter: <input ng-model="query">
+	<select ng-model="level">
+		<option value="">All</option>
+		<option value="Success">Success</option>
+		<option value="Error">Error</option>
+		<option value="Warning">Warning</option>
+		<option value="Notify">Notify</option>
+		<option value="post">Post</option>
+	</select>
+
+	<ul class="list-group scroll-log">
+	  <li class="list-group-item  {{log.level | logLevelCSS}}" ng-repeat="log in logs | filter:level | filter:query"><span class="badge">{{log.date}}</span>{{log.content}}</li>
+	</ul>
+</div>

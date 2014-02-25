@@ -1,48 +1,11 @@
 <div class="row">
 
-	<div class="col-md-6">
-	<h2>Devices</h2>
-		<ul class="list-unstyled well">
-			<li class="row" ng-repeat="device in devices">
-				<div class="col-sm-3">
-					<div class="onoffswitch">
-						<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="device-emul-{{device.id}}"  ng-checked="device.emulated" ng-click="toggleDevice(device.id);">
-						<label class="onoffswitch-label" for="device-emul-{{device.id}}">
-					        <div class="onoffswitch-inner"></div>
-					        <div class="onoffswitch-switch"></div>
-					    </label>
-					</div>
-				</div>
-				
-				<div class="col-sm-3">{{device.name}}</div>
-				<div class="col-sm-6 row">
-					<button class="col-xs-3" type="button" ng-click="deltadevice(device.id, -device.delta)" ng-disabled="!device.emulated">{{device.lowCaption}}</button>
-
-					<input type="text" class="col-xs-6" name="value" value="{{device.value}}" ng-disabled="!device.emulated">
-
-					<button class="col-xs-3" type="button" ng-click="deltadevice(device.id, device.delta)" ng-disabled="!device.emulated">{{device.highCaption}}</button>
-				</div>
-			</li>
-		</ul>
+	<div class="col-md-6" ng-controller="deviceCtrl">
+		<div devices></div>
 	</div>
 	
-	<div class="col-md-6">
-		<h2>Logs</h2>
-		<ul class="list-group scroll-l">
-		  <li class="list-group-item list-group-item-success">Dapibus ac facilisis in</li>
-		  <li class="list-group-item list-group-item-info">Cras sit amet nibh libero</li>
-		  <li class="list-group-item list-group-item-warning">Porta ac consectetur ac</li>
-		  <li class="list-group-item list-group-item-danger">Vestibulum at eros</li>
-		  <li class="list-group-item list-group-item-info">Cras sit amet nibh libero</li>
-		  <li class="list-group-item list-group-item-warning">Porta ac consectetur ac</li>
-		  <li class="list-group-item list-group-item-danger">Vestibulum at eros</li>
-		  <li class="list-group-item list-group-item-info">Cras sit amet nibh libero</li>
-		  <li class="list-group-item list-group-item-warning">Porta ac consectetur ac</li>
-		  <li class="list-group-item list-group-item-danger">Vestibulum at eros</li>
-		  <li class="list-group-item list-group-item-info">Cras sit amet nibh libero</li>
-		  <li class="list-group-item list-group-item-warning">Porta ac consectetur ac</li>
-		  <li class="list-group-item list-group-item-danger">Vestibulum at eros</li>
-		</ul>
+	<div class="col-md-6" ng-controller="logCtrl">
+		<div logs></div>
 	</div>
 
 </div>

@@ -5,19 +5,22 @@
 var sailApp = angular.module('sailApp', [
 	'ngRoute',
 	'sailControllers',
-	'sailServices'
+	'sailServices',
+  'sailDirectives',
+  'sailFilters'
 ]);
+
 
 sailApp.config(['$routeProvider',
   function($routeProvider) {
     $routeProvider
       .when('/wide', {
         templateUrl: 'partials/wideView.html',
-        controller: 'deviceCtrl'
+        controller: 'mainCtrl'
       })
       .when('/mobile', {
         templateUrl: 'partials/mobileView.html',
-        controller: 'deviceCtrl'
+        controller: 'mainCtrl'
       })
       .otherwise({
         redirectTo: '/wide'
