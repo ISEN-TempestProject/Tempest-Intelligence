@@ -29,12 +29,20 @@ sailControllers.controller('deviceCtrl', ['$scope', 'Devices',
 
 sailControllers.controller('logCtrl', ['$scope', '$interval', 'Logs',
 	function($scope, $interval, Logs) {
-		$scope.logs = Logs.query();
-		/*$interval(function(){
-			$scope.logs += Logs.query();
-		}, 1000);
-	    $scope.logs += Logs.query();*/
+		$scope.refreshLog = '1000';
 
+		$scope.relog = function(){
+			if($scope.logging !== undefined) $interval.cancel($scope.logging);
+			
+			if($scope.refreshLog > 0) {
+				$scope.logging = $interval(function(){
+					$scope.logs = Logs.query();
+				}, $scope.refreshLog);
+			}
+		}
+		
+
+		$scope.logs = Logs.query();
 	    $scope.level = '';
 	}
 ]);

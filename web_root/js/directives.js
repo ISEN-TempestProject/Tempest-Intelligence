@@ -11,7 +11,7 @@ sailDirectives.directive('devices', function () {
     replace: false,
     templateUrl:'partials/devices.html'
   }
-})
+});
 
 sailDirectives.directive('logs', function () {
   return {
@@ -19,4 +19,4 @@ sailDirectives.directive('logs', function () {
     replace: false,
     templateUrl:'partials/logs.html'
   }
-})
+});

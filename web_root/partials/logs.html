@@ -13,4 +13,12 @@
 	<ul class="list-group scroll-log">
 	  <li class="list-group-item  {{log.level | logLevelCSS}}" ng-repeat="log in logs | filter:level | filter:query"><span class="badge">{{log.date}}</span>{{log.content}}</li>
 	</ul>
+	AutoRefresh: <select ng-model="refreshLog" ng-change="relog()">
+		<option value="-1">None</option>
+		<option value="1000">1 sec</option>
+		<option value="3000">3 sec</option>
+		<option value="5000">5 sec</option>
+		<option value="10000">10 sec</option>
+		<option value="30000">30 sec</option>
+	</select>
 </div>

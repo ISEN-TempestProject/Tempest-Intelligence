@@ -21,4 +21,5 @@ sailServices.service('Logs', ['$resource',
         "/api/logs",
         {},{}
     );
+
 }]);
