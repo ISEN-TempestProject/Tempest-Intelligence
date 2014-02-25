@@ -2,11 +2,17 @@ module fifo;
 
 import std.container;
 
+/**
+	Basic fifo class
+*/
 class Fifo(T) {
 	this(size_t size) {
 		m_nMaxSize = size;
 	}
 
+	/**
+		Appends a value to the front of the fifo
+	*/
 	void Append(T val){
 		if(m_nSize>=m_nMaxSize){
 			m_list.removeBack();
@@ -26,6 +32,15 @@ class Fifo(T) {
 	@property nothrow{
 		T front(){return m_list.front;}
 		void front(T val){m_list.front = val;}
+	}
+
+	/**
+		Returns the contained elements
+	*/
+	@property{
+		DList!T elements(){
+			return m_list;
+		}
 	}
 
 private:

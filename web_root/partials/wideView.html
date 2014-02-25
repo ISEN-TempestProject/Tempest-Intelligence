@@ -1,0 +1,44 @@
+<div class="row">
+
+	<div class="col-md-6">
+	<h2>Devices</h2>
+		<ul class="list-unstyled well">
+			<li class="row" ng-repeat="device in devices">
+				<div class="col-sm-3">
+					<div class="onoffswitch">
+						<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="device-emul-{{device.id}}"  ng-checked="device.emulated" ng-click="toggleDevice(device.id);">
+						<label class="onoffswitch-label" for="device-emul-{{device.id}}">
+					        <div class="onoffswitch-inner"></div>
+					        <div class="onoffswitch-switch"></div>
+					    </label>
+					</div>
+				</div>
+				
+				<div class="col-sm-3">{{device.name}}</div>
+				<div class="col-sm-6 row">
+					<button class="col-xs-3" type="button" ng-click="deltadevice(device.id, -device.delta)" ng-disabled="!device.emulated">{{device.lowCaption}}</button>
+
+					<input type="text" class="col-xs-6" name="value" value="{{device.value}}" ng-disabled="!device.emulated">
+
+					<button class="col-xs-3" type="button" ng-click="deltadevice(device.id, device.delta)" ng-disabled="!device.emulated">{{device.highCaption}}</button>
+				</div>
+			</li>
+		</ul>
+	</div>
+	
+	<div class="col-md-6">
+		<h2>Et le reste ici !</h2><br>
+		dflgksm<br>
+		dflgksm<br>
+		dflgksm<br>
+		dflgksm<br>
+		dflgksm<br>
+		dflgksm<br>
+		dflgksm<br>
+		dflgksm<br>
+		dflgksm<br>
+		dflgksm<br>
+		dsmlkfmsldk
+	</div>
+
+</div>

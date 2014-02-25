@@ -1,9 +1,8 @@
 module main;
 
 import std.stdio;
-import autopilot;
 import hardware.hardware;
-import config;
+import decisioncenter;
 import saillog;
 
 import vibe.vibe;
@@ -21,8 +20,7 @@ int main(string[] args)
 		
 		SailLog.Success("Starting program");
 
-		Autopilot sc = new Autopilot();
-		Hardware.Get!Roll(DeviceID.Roll);
+		DecisionCenter.Get();
 
 		Server server = new Server();
 		server.start();

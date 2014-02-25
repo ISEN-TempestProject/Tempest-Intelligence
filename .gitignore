@@ -2,6 +2,13 @@
 *.a
 logs
 .dub/
-web_root/app_old/
 web_root/libs/
+web_root/app_old/
 projetvoilier
+#Documentation related
+docs.json
+doc/*
+!doc/images/
+!doc/prettify/
+!doc/scripts/
+!doc/styles/

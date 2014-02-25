@@ -28,9 +28,9 @@ class Server
 		*		ROUTERS
 		*************************/
 		m_Router = new URLRouter;
-		registerRestInterface(m_Router, new API());
+		registerRestInterface!ISailAPI(m_Router, new API(), "/api/");
 		m_Router
-			.get("/", serveStaticFile("web_root/app/index.html"))
+			.get("/", serveStaticFile("web_root/index.html"))
 			.get("*", serveStaticFiles("web_root/"));
 	}
 
