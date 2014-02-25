@@ -41,7 +41,7 @@ private:
 				SailLog.Post("Running "~typeof(this).stringof~" thread");
 			}
 			if(m_bEnabled)
-				AjustHelm();
+				AdjustHelm();
 
 			m_thread.sleep(dur!("msecs")(m_nLoopTimeMS));
 		}
@@ -50,7 +50,7 @@ private:
 	/**
 		Do a helm adjustment, to maintain the given heading
 	*/
-	void AjustHelm(){
+	void AdjustHelm(){
 		auto comp = Hardware.Get!Compass(DeviceID.Compass);
 		auto helm = Hardware.Get!Helm(DeviceID.Helm);
 
@@ -95,20 +95,20 @@ private:
 
 		//Delta compensation
 		helm.value = helm.init;
-		ap.AjustHelm();
+		ap.AdjustHelm();
 		assert(helm.value==helm.init+ap.m_fDelta);
-		ap.AjustHelm();
-		ap.AjustHelm();
+		ap.AdjustHelm();
+		ap.AdjustHelm();
 		assert(helm.value==helm.init+3*ap.m_fDelta);
 
 		//return to init position
 		helm.value = helm.max - ap.m_fDelta/2;
-		ap.AjustHelm();
+		ap.AdjustHelm();
 		assert(helm.value == helm.init);
 
 		//-delta compensation
 		dec.targetheading = 15;
-		ap.AjustHelm();
+		ap.AdjustHelm();
 		assert(helm.value == helm.init-ap.m_fDelta);
 	}
 }

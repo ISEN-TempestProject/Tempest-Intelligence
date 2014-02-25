@@ -3,7 +3,7 @@ module decisioncenter;
 import core.thread;
 import gpscoord, config, saillog;
 
-public import autopilot;
+public import autopilot, sailhandler;
 
 /**
 	Singleton class where all decisions are taken, to guide the boat
@@ -49,7 +49,7 @@ class DecisionCenter {
 	*/
 	@property{
 		Autopilot autopilot(){return m_autopilot;}
-		//SailHandler sailhandler()const{return m_sailhandler;}
+		SailHandler sailhandler(){return m_sailhandler;}
 	}
 
 
@@ -67,7 +67,7 @@ private:
 		MakeDecision();//Will update m_targetposition and m_targetheading
 
 		m_autopilot = new Autopilot();
-		//m_sailhandler = new SailHandler();
+		m_sailhandler = new SailHandler();
 
 		m_thread = new Thread(&DecisionThread);
 		m_thread.name(typeof(this).stringof);
@@ -105,7 +105,7 @@ private:
 	uint m_nLoopTimeMS;
 
 	Autopilot m_autopilot;
-	//SailHandler m_sailhandler;
+	SailHandler m_sailhandler;
 
 	GpsCoord[] m_route;
 }

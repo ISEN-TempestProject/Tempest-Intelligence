@@ -133,6 +133,16 @@ class WindDir : HWSens!float {
 		m_values.Append(to!float((m_max-m_min)*data[0]/ulong.max));
 		ExecFilter();
 	}
+
+	float CalcAbsoluteWind(){
+		float fCompass = Hardware.Get!Compass(DeviceID.Compass).value;
+		float fValue = m_lastvalue+fCompass;
+		if(fValue>360)
+			fValue-=360;
+		else if(fValue<0)
+			fValue+=360;
+		return fValue;
+	}
 }
 
 /**
