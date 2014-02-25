@@ -1,6 +1,9 @@
+module api;
+
 import vibe.http.rest;
 import vibe.core.log;
 import vibe.data.json;
+import std.datetime;
 import saillog;
 
 interface ISailAPI
@@ -13,11 +16,24 @@ interface ISailAPI
 
 	// POST /:id/devices
 	void addDevices(int id);
+
+	// GET /logs
+	Json getLogs();
 }
 
 
 class API : ISailAPI
 {
+
+	/**
+		Singleton getter
+	*/
+	static API Get(){
+		if(m_inst is null)
+			m_inst = new API();
+		return m_inst;
+	}
+
 
 	Json getDevices()
 	{
@@ -79,4 +95,46 @@ class API : ISailAPI
 	void addDevices(int id){
 		SailLog.Post("Device set : " ~ to!string(id));
 	}
+
+	Json getLogs(){
+		Json logs = logCache;
+		logCache = Json.emptyArray; //resetting cache
+		return logs;
+	}
+
+	/**
+		Add a new log line into cache
+	*/
+	static void log(T...)(string level, T args){
+		CheckInstance();
+		Json log = Json.emptyObject;
+		log.level = level;
+		log.date = Clock.currTime().toSimpleString();
+
+		string content = "";
+		foreach(arg; args){
+			content ~= to!string(arg);
+		}
+		log.content = content; //TODO : format it
+
+		logCache ~= log;
+	}
+
+private:
+	static __gshared API m_inst;
+
+	static void CheckInstance(){
+		if(!m_inst){
+			m_inst = new API();
+		}
+	}
+
+
+
+
+	static __gshared Json logCache;
+
+	this(){
+		logCache = Json.emptyArray;
+	}	
 }

@@ -5,6 +5,7 @@ import std.process;
 import core.sync.mutex;
 import col;
 import config;
+import api;
 
 /**
 	Logs everything, on console and/or on files
@@ -19,6 +20,7 @@ public:
 	static void Warning(T...)(T args){//Variadic function with undefined number of parameters
 		CheckInstance();
 		synchronized(m_inst.m_mtx){
+			API.log("Warning", args);
 			stderr.writeln(bg.lightyellow~fg.red~var.bold~"Warning:  "~var.end,args);
 			m_inst.m_logfile.writeln(bg.lightyellow~fg.red~var.bold~"Warning:  "~var.end,args);
 			m_inst.m_logfile.flush();//It is is important to save this
@@ -31,6 +33,7 @@ public:
 	static void Critical(T...)(T args){
 		CheckInstance();
 		synchronized(m_inst.m_mtx){
+			API.log("Critical", args);
 			stderr.writeln(bg.red~fg.white~var.bold~"CRIT ERR: "~var.end,args);
 			m_inst.m_logfile.writeln(bg.red~fg.white~var.bold~"CRIT ERR: "~var.end,args);
 			m_inst.m_logfile.flush();
@@ -43,6 +46,7 @@ public:
 	static void Success(T...)(T args){
 		CheckInstance();
 		synchronized(m_inst.m_mtx){
+			API.log("Success", args);
 			writeln(fg.green~var.bold~"Success:  "~var.end,args);
 			m_inst.m_logfile.writeln(fg.green~var.bold~"Success:  "~var.end,args);
 			debug {
@@ -58,6 +62,7 @@ public:
 	static void Notify(T...)(T args){
 		CheckInstance();
 		synchronized(m_inst.m_mtx){
+			API.log("Notify", args);
 			writeln(fg.lightblack~var.bold~"Notify:   "~var.end,args);
 			m_inst.m_logfile.writeln(fg.lightblack~var.bold~"Notify:   "~var.end,args);
 			debug {
@@ -73,6 +78,7 @@ public:
 	static void Post(T...)(T args){
 		CheckInstance();
 		synchronized(m_inst.m_mtx){
+			API.log("Post", args);
 			stdout.writeln(var.faded~"Post:     "~var.end,args);
 		}
 	}

@@ -1,7 +1,7 @@
 import vibe.d;
 import std.conv;
 import std.process;
-import API;
+import api;
 
 class Server
 {
@@ -28,7 +28,7 @@ class Server
 		*		ROUTERS
 		*************************/
 		m_Router = new URLRouter;
-		registerRestInterface!ISailAPI(m_Router, new API(), "/api/");
+		registerRestInterface!ISailAPI(m_Router, API.Get(), "/api/");
 		m_Router
 			.get("/", serveStaticFile("web_root/index.html"))
 			.get("*", serveStaticFiles("web_root/"));
