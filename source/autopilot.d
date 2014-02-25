@@ -73,9 +73,6 @@ private:
 			else
 				helm.value = fNewValue;
 		}
-		debug{
-			SailLog.Post("Autopilot adjusted helm to ", helm.value);
-		}
 	}
   
 	uint m_nLoopTimeMS;
