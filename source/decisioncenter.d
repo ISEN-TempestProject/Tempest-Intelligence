@@ -1,6 +1,7 @@
 module decisioncenter;
 
 import core.thread;
+import std.json, std.file, std.conv, std.string;
 import gpscoord, config, saillog;
 
 public import autopilot, sailhandler;
@@ -64,7 +65,24 @@ private:
 
 		m_nLoopTimeMS = Config.Get!uint("DecisionCenter", "Period");
 		m_bEnabled = true;
-		//@todo: Parse values from config to fill m_route
+
+		//Route parsing
+		string sFile = Config.Get!string("DecisionCenter", "Route");
+		JSONValue jsonFile = parseJSON(readText(sFile).removechars("\n\r\t"));
+
+		GpsCoord.Unit unit;
+		foreach(ref json ; jsonFile.array){
+			switch(json["unit"].str){
+				case "DecDeg": unit=GpsCoord.Unit.DecDeg; break;
+				case "DegMinSec": unit=GpsCoord.Unit.DegMinSec; break;
+				case "GPS": unit=GpsCoord.Unit.GPS; break;
+				case "UTM": unit=GpsCoord.Unit.UTM; break;
+				default: unit=GpsCoord.Unit.DecDeg;	break;
+			}
+			m_route~=GpsCoord(unit, json["value"].str);
+		}
+		SailLog.Notify("Route set to: ",m_route);
+		
 		//	fill first cell with actual GPS position
 		MakeDecision();//Will update m_targetposition and m_targetheading
 
