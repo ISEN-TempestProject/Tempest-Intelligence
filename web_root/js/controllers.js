@@ -29,7 +29,7 @@ sailControllers.controller('deviceCtrl', ['$scope', 'Devices',
 
 sailControllers.controller('logCtrl', ['$scope', '$interval', 'Logs',
 	function($scope, $interval, Logs) {
-		$scope.refreshLog = 1000;
+		$scope.refreshLog = -1;
 
 		$scope.relog = function(){
 			if($scope.logging !== undefined) $interval.cancel($scope.logging);
@@ -47,3 +47,12 @@ sailControllers.controller('logCtrl', ['$scope', '$interval', 'Logs',
 	    $scope.level = '';
 	}
 ]);
+
+
+sailControllers.controller("GPSController", [ '$scope', function($scope) {
+    angular.extend($scope, {
+        defaults: {
+            scrollWheelZoom: false
+        }
+    });
+}]);

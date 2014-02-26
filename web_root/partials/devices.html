@@ -13,11 +13,12 @@
 		
 		<div class="col-sm-3">{{device.name}}</div>
 		<div class="col-sm-6 row">
-			<button class="col-xs-3" type="button" ng-click="deltadevice(device.id, -device.delta)" ng-disabled="!device.emulated">{{device.lowCaption}}</button>
+			<button class="col-xs-3" type="button" ng-click="deltaDevice(device.id, -device.delta)" ng-disabled="!device.emulated">{{device.lowCaption}}</button>
 
 			<input type="text" class="col-xs-6" name="value" value="{{device.value}}" ng-disabled="!device.emulated">
 
-			<button class="col-xs-3" type="button" ng-click="deltadevice(device.id, device.delta)" ng-disabled="!device.emulated">{{device.highCaption}}</button>
+			<button class="col-xs-3" type="button" ng-click="deltaDevice(device.id, device.delta)" ng-disabled="!device.emulated">{{device.highCaption}}</button>
 		</div>
 	</li>
 </ul>
+<div leaflet></div>

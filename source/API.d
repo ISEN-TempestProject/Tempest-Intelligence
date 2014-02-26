@@ -6,6 +6,8 @@ import vibe.data.json;
 import std.datetime;
 import std.stdio;
 import saillog;
+import hardware.hardware;
+import hardware.devices;
 
 interface ISailAPI
 {
@@ -72,8 +74,8 @@ class API : ISailAPI
 		      \"name\": \"Act-1\",
 		      \"value\": 13.37,
 		      \"delta\": 0.15,
-		      \"lowCaption\": \"High\",
-		      \"highCaption\": \"Low\",
+		      \"lowCaption\": \"Low\",
+		      \"highCaption\": \"High\",
 		      \"emulated\" : false
 		    },
 		    {
@@ -81,16 +83,64 @@ class API : ISailAPI
 		      \"name\": \"Act-2\",
 		      \"value\": 22.29,
 		      \"delta\": 12.37,
-		      \"lowCaption\": \"Hi\",
-		      \"highCaption\": \"Lo\",
+		      \"lowCaption\": \"Lo\",
+		      \"highCaption\": \"Hi\",
 		      \"emulated\" : true
 		    }
 		]");
 	}	
 
-	Json getDevices(int id=0)
+	Json getDevices(int id_)
 	{
-		return parseJsonString("{}");
+		DeviceID id = cast(DeviceID) id_ ;
+		Json device = Json.emptyObject;
+		switch(id){
+			case DeviceID.Roll: 
+				Roll roll = Hardware.Get!Roll(id);
+				device.id = roll.id();
+				device.isEmulated = roll.isemulated();
+				device.value = roll.value();
+				break;
+			case DeviceID.WindDir: 
+				WindDir wd = Hardware.Get!WindDir(id);
+				device.id = wd.id();
+				device.isEmulated = wd.isemulated();
+				device.value = wd.value();
+				break;
+			case DeviceID.Compass: 
+				Compass compass = Hardware.Get!Compass(id);
+				device.id = compass.id();
+				device.isEmulated = compass.isemulated();
+				device.value = compass.value();
+				break;
+			case DeviceID.Sail:
+				Sail sail = Hardware.Get!Sail(id);
+				device.id = sail.id();
+				device.isEmulated = sail.isemulated();
+				device.value = sail.value();
+				break;	
+			case DeviceID.Helm:
+				Helm helm = Hardware.Get!Helm(id);
+				device.id = helm.id();
+				device.isEmulated = helm.isemulated();
+				device.value = helm.value();
+				break;
+			case DeviceID.Gps:
+				Gps gps = Hardware.Get!Gps(id);
+				device.id = gps.id();
+				device.isEmulated = gps.isemulated();
+				device.value = Json.emptyObject;
+				device.value.longitude = gps.value().longitude();
+				device.value.latitude = gps.value().latitude();
+				break;
+			default:
+				SailLog.Warning("Called unknown Device ID. Sending empty object.");
+				return parseJsonString("{}");
+		}
+
+		return device;
+
+		
 	}
 
 	void addDevices(int id){

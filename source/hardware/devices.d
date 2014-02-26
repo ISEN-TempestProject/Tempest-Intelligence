@@ -7,14 +7,14 @@ import saillog, fifo, gpscoord;
 public import hardware.hwelement;
 
 enum DeviceID : ubyte{
-	Invalid,
-	Sail,
-	Helm,
+	Invalid=0,
+	Sail=1,
+	Helm=2,
 
-	Gps,
-	Roll,
-	WindDir,
-	Compass
+	Gps=3,
+	Roll=4,
+	WindDir=5,
+	Compass=6
 }
 
 /**
