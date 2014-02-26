@@ -10,7 +10,7 @@ import hardware.hardware;
 class Autopilot{
 
 	this(){
-		SailLog.Post("Starting ",typeof(this).stringof," instantiation in ",Thread.getThis().name,"...");
+		SailLog.Notify("Starting ",typeof(this).stringof," instantiation in ",Thread.getThis().name,"...");
 
 		//Get configuration
 		m_nLoopTimeMS = Config.Get!uint("Autopilot", "Period");

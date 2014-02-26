@@ -53,7 +53,7 @@ package:
 private:
 	static __gshared Hardware m_inst;
 	this() {
-		SailLog.Post("Starting ",typeof(this).stringof," instantiation in ",Thread.getThis().name,"...");
+		SailLog.Notify("Starting ",typeof(this).stringof," instantiation in ",Thread.getThis().name,"...");
 
 		//Init devices
 		InitDevices();

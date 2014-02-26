@@ -61,7 +61,7 @@ private:
 		Does the Autopilot and SailHandler instantiation
 	*/
 	this() {
-		SailLog.Post("Starting ",typeof(this).stringof," instantiation in ",Thread.getThis().name,"...");
+		SailLog.Notify("Starting ",typeof(this).stringof," instantiation in ",Thread.getThis().name,"...");
 
 		m_nLoopTimeMS = Config.Get!uint("DecisionCenter", "Period");
 		m_bEnabled = true;

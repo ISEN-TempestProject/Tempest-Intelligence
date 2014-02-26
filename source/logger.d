@@ -59,7 +59,7 @@ public:
 	static void Notify(T...)(T args){
 		CheckInstance();
 		synchronized(m_inst.m_mtx){
-			writeln(fg.lightblack~var.bold~"Notify:   "~var.end,args);
+			writeln(var.bold~"Notify:   "~var.end,args);
 			m_inst.m_logfile.writeln(fg.lightblack~var.bold~"Notify:   "~var.end,args);
 			debug {
 				m_inst.m_logfile.flush();
@@ -97,7 +97,7 @@ private:
 				~bg.white~"                                                            "~var.end~"\n";
 
 	this(){
-		writeln(var.faded~"Post:     "~var.end,typeof(this).stringof~" instantiation in ",Thread.getThis().name,"...");
+		writeln(var.bold~"Notify:   "~var.end,typeof(this).stringof~" instantiation in ",Thread.getThis().name,"...");
 
 		m_mtx = new Mutex();
 		synchronized(m_mtx)
