@@ -29,7 +29,7 @@ sailControllers.controller('deviceCtrl', ['$scope', 'Devices',
 
 sailControllers.controller('logCtrl', ['$scope', '$interval', 'Logs',
 	function($scope, $interval, Logs) {
-		$scope.refreshLog = '1000';
+		$scope.refreshLog = 1000;
 
 		$scope.relog = function(){
 			if($scope.logging !== undefined) $interval.cancel($scope.logging);
@@ -43,6 +43,7 @@ sailControllers.controller('logCtrl', ['$scope', '$interval', 'Logs',
 		
 
 		$scope.logs = Logs.query();
+		$scope.relog();
 	    $scope.level = '';
 	}
 ]);
