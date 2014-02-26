@@ -23,8 +23,8 @@ enum DeviceID : ubyte{
 class Sail : HWAct!ubyte {
 	this(){
 		m_id = DeviceID.Sail;
-		m_min = 0;
-		m_max = 255;
+		m_min = ubyte.min;
+		m_max = ubyte.max;
 		m_init = 50;
 		m_lastvalue=m_init;
 	}
@@ -81,6 +81,10 @@ class Gps : HWSens!GpsCoord {
 		m_values.Append(coord);
 		ExecFilter();
 	}
+
+	override void CheckIsOutOfService(){
+		//May be wise to check if values are coherent
+	}
 }
 
 /**
@@ -107,6 +111,10 @@ class Roll : HWSens!float {
 		m_values.Append(to!float((m_max-m_min)*data[0]/ulong.max+m_min));
 		ExecFilter();
 	}
+
+	override void CheckIsOutOfService(){
+		//May be wise to check if values are coherent
+	}
 }
 
 /**
@@ -116,8 +124,8 @@ class WindDir : HWSens!float {
 	this(){
 		super(10);
 		m_id = DeviceID.WindDir;
-		m_min = 0;
-		m_max = 360;
+		m_min = -180;
+		m_max = 180;
 		m_init = 0;
 		m_lastvalue=m_init;
 	}
@@ -130,8 +138,25 @@ class WindDir : HWSens!float {
 	out{
 		assert(m_min<=m_values.front && m_values.front<=m_max);
 	}body{
-		m_values.Append(to!float((m_max-m_min)*data[0]/ulong.max));
+		float fValue = to!float((m_max-m_min)*data[0]/ulong.max);
+		if(fValue>180)
+			fValue = 360-fValue;
+		m_values.Append(fValue);
 		ExecFilter();
+	}
+
+	override void CheckIsOutOfService(){
+		//May be wise to check if values are coherent
+	}
+
+	float CalcAbsoluteWind(){
+		float fCompass = Hardware.Get!Compass(DeviceID.Compass).value;
+		float fValue = m_lastvalue+fCompass;
+		if(fValue>360)
+			fValue-=360;
+		else if(fValue<0)
+			fValue+=360;
+		return fValue;
 	}
 }
 
@@ -158,5 +183,9 @@ class Compass : HWSens!float {
 	}body{
 		m_values.Append(to!float((m_max-m_min)*data[0]/ulong.max));
 		ExecFilter();
+	}
+
+	override void CheckIsOutOfService(){
+		//May be wise to check if values are coherent
 	}
 }

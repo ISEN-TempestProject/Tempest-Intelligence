@@ -23,7 +23,7 @@ private:
 			"LogFile":"logs"
 		]),
 		"DecisionCenter" : ([
-			"Targets":"",
+			"Route":"res/route.json",
 			"DistanceToTarget":"10.0",
 			"DistanceToRoute":"50.0",
 			"Period":"5000"
@@ -41,9 +41,6 @@ private:
 		"Hardware" : ([
 			"Pipe":"/tmp/pipe",
 			"ConstantWindValue":""
-		]),
-		"HardwareWatchdog" : ([
-			"Enable":"true"
 		]),
 		"WebServer" : ([
 			"Port":"8080"

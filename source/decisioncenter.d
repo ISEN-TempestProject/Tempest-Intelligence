@@ -1,9 +1,10 @@
 module decisioncenter;
 
 import core.thread;
+import std.json, std.file, std.conv, std.string;
 import gpscoord, config, saillog;
 
-public import autopilot;
+public import autopilot, sailhandler;
 
 /**
 	Singleton class where all decisions are taken, to guide the boat
@@ -49,7 +50,7 @@ class DecisionCenter {
 	*/
 	@property{
 		Autopilot autopilot(){return m_autopilot;}
-		//SailHandler sailhandler()const{return m_sailhandler;}
+		SailHandler sailhandler(){return m_sailhandler;}
 	}
 
 
@@ -60,21 +61,40 @@ private:
 		Does the Autopilot and SailHandler instantiation
 	*/
 	this() {
+		SailLog.Notify("Starting ",typeof(this).stringof," instantiation in ",Thread.getThis().name,"...");
+
 		m_nLoopTimeMS = Config.Get!uint("DecisionCenter", "Period");
 		m_bEnabled = true;
-		//@todo: Parse values from config to fill m_route
+
+		//Route parsing
+		string sFile = Config.Get!string("DecisionCenter", "Route");
+		JSONValue jsonFile = parseJSON(readText(sFile).removechars("\n\r\t"));
+
+		GpsCoord.Unit unit;
+		foreach(ref json ; jsonFile.array){
+			switch(json["unit"].str){
+				case "DecDeg": unit=GpsCoord.Unit.DecDeg; break;
+				case "DegMinSec": unit=GpsCoord.Unit.DegMinSec; break;
+				case "GPS": unit=GpsCoord.Unit.GPS; break;
+				case "UTM": unit=GpsCoord.Unit.UTM; break;
+				default: unit=GpsCoord.Unit.DecDeg;	break;
+			}
+			m_route~=GpsCoord(unit, json["value"].str);
+		}
+		SailLog.Notify("Route set to: ",m_route);
+		
 		//	fill first cell with actual GPS position
 		MakeDecision();//Will update m_targetposition and m_targetheading
 
 		m_autopilot = new Autopilot();
-		//m_sailhandler = new SailHandler();
+		m_sailhandler = new SailHandler();
 
 		m_thread = new Thread(&DecisionThread);
 		m_thread.name(typeof(this).stringof);
 		m_thread.isDaemon(true);
 		m_thread.start();
 
-		SailLog.Success(typeof(this).stringof~" instantiation");
+		SailLog.Success(typeof(this).stringof~" instantiated in ",Thread.getThis().name);
 	}
 
 	Thread m_thread;
@@ -105,7 +125,7 @@ private:
 	uint m_nLoopTimeMS;
 
 	Autopilot m_autopilot;
-	//SailHandler m_sailhandler;
+	SailHandler m_sailhandler;
 
 	GpsCoord[] m_route;
 }

@@ -4,6 +4,7 @@ import saillog;
 import hardware.hardware;
 import hardware.devices;
 import fifo;
+
 /**
 	Abstract class to represent a hardware element/device
 */
@@ -33,6 +34,15 @@ abstract class HWElement(T) {
 	}
 
 	/**
+		Out of service state of the device
+	*/
+	@property{
+		bool isoutofservice() const{
+			return m_isoutofservice;
+		}
+	}
+
+	/**
 		Value of the device, must be between min and max
 	*/
 	@property{
@@ -53,6 +63,7 @@ abstract class HWElement(T) {
 protected:
 	DeviceID m_id;
 	bool m_isemulated = false;
+	bool m_isoutofservice = false;
 	T m_lastvalue;
 	T m_min, m_max, m_init;
 }
@@ -89,13 +100,20 @@ class HWSens(T) : HWElement!T {
 
 	/**
 		Called from the Hardware class, handles the parsing of received data
+		You should call CheckIsOutOfService sometimes in the function
 	*/
 	abstract void ParseValue(ulong[2] data);
+
 
 protected:
 	this(size_t fifoSize){
 		m_values = new Fifo!T(fifoSize);
 	}
+
+	/**
+		Checks if the last values are coherent, and sets isoutofservice if something is wrong
+	*/
+	abstract void CheckIsOutOfService();
 
 	/**
 		Default filter : gets the front value. Override it to customize
@@ -111,6 +129,7 @@ protected:
 
 /**
 	Abstract class to represent an actuator
+	Todo: find a way to check if actuators are working correctly
 */
 class HWAct(T) : HWElement!T {
 
