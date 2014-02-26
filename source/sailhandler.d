@@ -1,13 +1,14 @@
 module sailhandler;
 
 import core.thread;
-import std.conv;
+import std.conv, std.math;
 
 import saillog, config;
 import hardware.hardware;
 
 class SailHandler {
 	this() {
+		SailLog.Post("Starting ",typeof(this).stringof," instantiation in ",Thread.getThis().name,"...");
 		//Get configuration
 		m_nLoopTimeMS = Config.Get!uint("SailHandler", "Period");
 		m_fDelta = Config.Get!float("SailHandler", "Delta");
@@ -21,7 +22,7 @@ class SailHandler {
 		m_thread.isDaemon(true);
 		m_thread.start();
 
-		SailLog.Success(typeof(this).stringof~" instantiation");
+		SailLog.Success(typeof(this).stringof~" instantiated in ",Thread.getThis().name);
 	}
 
 
@@ -50,11 +51,8 @@ private:
 		Do a sail adjustment, to match the wind direction
 	*/
 	void AdjustSail(){
-		float fWind = Hardware.Get!WindDir(DeviceID.WindDir).value;
+		float fWind = abs(Hardware.Get!WindDir(DeviceID.WindDir).value);
 		auto sail = Hardware.Get!Sail(DeviceID.Sail);
-
-		if(fWind>180)
-			fWind = 360-fWind;
 
 		if(fWind<25){
 			sail.value = sail.max;
@@ -72,4 +70,37 @@ private:
 	uint m_nLoopTimeMS;
 	float m_fDelta;
 	float m_fDanger;
+}
+
+
+
+
+
+
+
+unittest {
+	import decisioncenter;
+
+	auto dec = DecisionCenter.Get();
+	auto sh = dec.sailhandler;
+	auto wind = Hardware.Get!WindDir(DeviceID.WindDir);
+	auto sail = Hardware.Get!Sail(DeviceID.Sail);
+
+	dec.enabled = false;
+	sh.enabled = false;
+	Thread.sleep(dur!("msecs")(100));
+
+	wind.isemulated = true;
+
+	wind.value = 20;
+	sh.AdjustSail();
+	assert(sail.value==sail.max);
+
+	wind.value = wind.max;
+	sh.AdjustSail();
+	assert(sail.value==sail.min);
+
+	wind.value = wind.min;
+	sh.AdjustSail();
+	assert(sail.value==sail.min);
 }

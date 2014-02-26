@@ -17,7 +17,9 @@ public:
 		Getter for hardware devices
 	*/
 	static T Get(T)(DeviceID id){
-		if(m_inst is null) m_inst = new Hardware();
+		synchronized(this.classinfo){
+			if(m_inst is null) m_inst = new Hardware();
+		}
 
 		if(id in m_inst.m_hwlist){
 			return cast(T)(m_inst.m_hwlist[id]);
@@ -33,7 +35,9 @@ package:
 		Simple getter, not used outside the package
 	*/
 	static Hardware GetClass(){
-		if(m_inst is null) m_inst = new Hardware();
+		synchronized(this.classinfo){
+			if(m_inst is null) m_inst = new Hardware();
+		}
 		return m_inst;
 	}
 
@@ -49,6 +53,8 @@ package:
 private:
 	static __gshared Hardware m_inst;
 	this() {
+		SailLog.Post("Starting ",typeof(this).stringof," instantiation in ",Thread.getThis().name,"...");
+
 		//Init devices
 		InitDevices();
 
@@ -70,10 +76,7 @@ private:
 			m_thread.isDaemon(true);
 			m_thread.start();
 		}
-
-		
-
-		SailLog.Success(typeof(this).stringof~" instantiation");
+		SailLog.Success(typeof(this).stringof~" instantiated in ",Thread.getThis().name);
 	}
 
 	/**

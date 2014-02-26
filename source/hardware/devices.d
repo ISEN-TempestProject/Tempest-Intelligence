@@ -23,8 +23,8 @@ enum DeviceID : ubyte{
 class Sail : HWAct!ubyte {
 	this(){
 		m_id = DeviceID.Sail;
-		m_min = 0;
-		m_max = 255;
+		m_min = ubyte.min;
+		m_max = ubyte.max;
 		m_init = 50;
 		m_lastvalue=m_init;
 	}

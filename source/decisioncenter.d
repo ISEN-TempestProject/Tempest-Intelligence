@@ -60,6 +60,8 @@ private:
 		Does the Autopilot and SailHandler instantiation
 	*/
 	this() {
+		SailLog.Post("Starting ",typeof(this).stringof," instantiation in ",Thread.getThis().name,"...");
+
 		m_nLoopTimeMS = Config.Get!uint("DecisionCenter", "Period");
 		m_bEnabled = true;
 		//@todo: Parse values from config to fill m_route
@@ -74,7 +76,7 @@ private:
 		m_thread.isDaemon(true);
 		m_thread.start();
 
-		SailLog.Success(typeof(this).stringof~" instantiation");
+		SailLog.Success(typeof(this).stringof~" instantiated in ",Thread.getThis().name);
 	}
 
 	Thread m_thread;

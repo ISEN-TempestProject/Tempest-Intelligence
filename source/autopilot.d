@@ -10,6 +10,8 @@ import hardware.hardware;
 class Autopilot{
 
 	this(){
+		SailLog.Post("Starting ",typeof(this).stringof," instantiation in ",Thread.getThis().name,"...");
+
 		//Get configuration
 		m_nLoopTimeMS = Config.Get!uint("Autopilot", "Period");
 		m_fDelta = Config.Get!float("Autopilot", "Delta");
@@ -23,7 +25,7 @@ class Autopilot{
 		m_thread.isDaemon(true);
 		m_thread.start();
 
-		SailLog.Success(typeof(this).stringof~" instantiation");
+		SailLog.Success(typeof(this).stringof~" instantiated in ",Thread.getThis().name);
 	}
 
 	@property{
@@ -55,7 +57,6 @@ private:
 		auto helm = Hardware.Get!Helm(DeviceID.Helm);
 
 		float fDeltaHead = (DecisionCenter.Get()).targetheading - comp.value;
-		SailLog.Post(fDeltaHead);
 
 		if(fDeltaHead>m_fTolerance){
 			float fNewValue = helm.value + m_fDelta;

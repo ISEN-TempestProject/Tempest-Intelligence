@@ -2,6 +2,7 @@ module saillog;
 
 import std.stdio;
 import std.process;
+import core.thread;
 import core.sync.mutex;
 import col;
 import config;
@@ -96,6 +97,8 @@ private:
 				~bg.white~"                                                            "~var.end~"\n";
 
 	this(){
+		writeln(var.faded~"Post:     "~var.end,typeof(this).stringof~" instantiation in ",Thread.getThis().name,"...");
+
 		m_mtx = new Mutex();
 		synchronized(m_mtx)
 		{
@@ -110,8 +113,8 @@ private:
 			stdout.writeln(MOTD~execute("date").output);
 			m_logfile.writeln(MOTD~execute("date").output);
 		}
-		writeln(fg.green~var.bold~"Success:  "~var.end,typeof(this).stringof~" instantiation");
-		m_logfile.writeln(fg.green~var.bold~"Success:  "~var.end,typeof(this).stringof~" instantiation");
+		writeln(fg.green~var.bold~"Success:  "~var.end,typeof(this).stringof~" instantiated in ",Thread.getThis().name,"");
+		m_logfile.writeln(fg.green~var.bold~"Success:  "~var.end,typeof(this).stringof~" instantiated in ",Thread.getThis().name,"");
 
 		m_logfile.flush();
 	}
