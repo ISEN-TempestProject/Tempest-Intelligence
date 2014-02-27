@@ -1,9 +1,9 @@
 <h2>Devices</h2>
-<ul class="list-unstyled well">
+<ul class="list-unstyled">
 	<li class="row" ng-repeat="device in devices">
 		<div class="col-sm-3">
 			<div class="onoffswitch">
-				<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="device-emul-{{device.id}}"  ng-checked="device.emulated" ng-click="toggleDevice(device.id);">
+				<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="device-emul-{{device.id}}" ng-checked="device.emulated" ng-click="toggleDevice(device.id);">
 				<label class="onoffswitch-label" for="device-emul-{{device.id}}">
 			        <div class="onoffswitch-inner"></div>
 			        <div class="onoffswitch-switch"></div>
@@ -21,4 +21,11 @@
 		</div>
 	</li>
 </ul>
-<div leaflet></div>
+AutoRefresh: <select ng-model="refreshDevices" ng-change="redev()">
+	<option value="-1">None</option>
+	<option value="1000">1 sec</option>
+	<option value="3000">3 sec</option>
+	<option value="5000">5 sec</option>
+	<option value="10000">10 sec</option>
+	<option value="30000">30 sec</option>
+</select>
