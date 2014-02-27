@@ -2,7 +2,7 @@ module decisioncenter;
 
 import core.thread;
 import std.json, std.file, std.conv, std.string;
-import gpscoord, config, saillog;
+import hardware.hardware, gpscoord, config, saillog;
 
 public import autopilot, sailhandler;
 
@@ -81,6 +81,7 @@ private:
 			}
 			m_route~=GpsCoord(unit, json["value"].str);
 		}
+		m_route = (Hardware.Get!Gps(DeviceID.Gps).value)~m_route;
 		SailLog.Notify("Route set to: ",m_route);
 		
 		//	fill first cell with actual GPS position

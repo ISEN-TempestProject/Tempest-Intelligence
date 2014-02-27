@@ -55,9 +55,9 @@ abstract class HWElement(T) {
 		min, max values of the device, and the initial value
 	*/
 	@property{
-		T min() const{return m_min;}
-		T max() const{return m_max;}
-		T init() const{return m_init;}
+		T min() {return m_min;}
+		T max() {return m_max;}
+		T init() {return m_init;}
 	}
 	
 
