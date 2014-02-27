@@ -120,7 +120,7 @@ protected:
 		Default filter : gets the front value. Override it to customize
 	*/
 	void ExecFilter(){
-		//m_lastvalue = m_values.front();
+		m_lastvalue = m_values.front();
 	}
 
 	Fifo!T m_values;
