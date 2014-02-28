@@ -127,7 +127,7 @@ class API : ISailAPI
 		//common values
 		device.lowCaption = "-";
 		device.highCaption = "+";
-		device.delta = 0.1;
+		device.delta = 1; //must be integer for ubyte type !
 
 		return device;
 
