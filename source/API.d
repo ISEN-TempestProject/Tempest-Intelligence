@@ -7,6 +7,7 @@ import std.datetime;
 import saillog;
 import hardware.hardware;
 import hardware.devices;
+import decisioncenter;
 
 interface ISailAPI
 {
@@ -24,6 +25,24 @@ interface ISailAPI
 
 	// GET /logs
 	Json getLogs();
+
+	// GET /dc
+	Json getDc();
+
+	// POST /dc
+	void postDc(bool status);
+
+	// GET /autopilot
+	Json getAutopilot();
+
+	// POST /autopilot
+	void postAutopilot(bool status);
+
+	// GET /sh
+	Json getSh();
+
+	// POST /sh
+	void postSh(bool status);
 }
 
 
@@ -202,6 +221,42 @@ class API : ISailAPI
 			logCache = logCache.opSlice(1, 256);
 		}
 		logCache ~= log;
+	}
+
+	Json getDc(){
+		Json dc = Json.emptyObject;
+		dc.enabled = DecisionCenter.Get().enabled();
+
+		return dc;
+	}
+
+	void postDc(bool status){
+		DecisionCenter.Get().enabled(status);
+		SailLog.Notify("Decision center is now ", DecisionCenter.Get().enabled() ? "Enabled" : "Disbaled");
+	}
+
+	Json getAutopilot(){
+		Json ap = Json.emptyObject;
+		ap.enabled = DecisionCenter.Get().autopilot().enabled();
+
+		return ap;
+	}
+
+	void postAutopilot(bool status){
+		DecisionCenter.Get().autopilot().enabled(status);
+		SailLog.Notify("Autopilot is now ", DecisionCenter.Get().autopilot().enabled() ? "Enabled" : "Disbaled");
+	}
+
+	Json getSh(){
+		Json sh = Json.emptyObject;
+		sh.enabled = DecisionCenter.Get().sailhandler().enabled();
+
+		return sh;
+	}
+
+	void postSh(bool status){
+		DecisionCenter.Get().sailhandler().enabled(status);
+		SailLog.Notify("Sail Handler is now ", DecisionCenter.Get().sailhandler().enabled() ? "Enabled" : "Disbaled");
 	}
 
 private:

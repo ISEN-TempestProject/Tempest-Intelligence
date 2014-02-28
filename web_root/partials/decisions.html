@@ -1,0 +1,42 @@
+<h2>Decisions</h2>
+<ul class="list-unstyled">
+	<li class="row" ng-controller="autopilotCtrl">
+		<div class="col-sm-3">
+			<div class="onoffswitch">
+				<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="toggle-AP" ng-checked="autopilot.enabled" ng-click="toggleAutopilot();">
+				<label class="onoffswitch-label" for="toggle-AP">
+			        <div class="onoffswitch-inner"></div>
+			        <div class="onoffswitch-switch"></div>
+			    </label>
+			</div>
+		</div>
+		
+		<div class="col-sm-3">Autopilot</div>
+	</li>
+	<li class="row" ng-controller="shCtrl">
+		<div class="col-sm-3">
+			<div class="onoffswitch">
+				<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="toggle-SH" ng-checked="sh.enabled" ng-click="toggleSH();">
+				<label class="onoffswitch-label" for="toggle-SH">
+			        <div class="onoffswitch-inner"></div>
+			        <div class="onoffswitch-switch"></div>
+			    </label>
+			</div>
+		</div>
+		
+		<div class="col-sm-3">Sail Handler</div>
+	</li>
+	<li class="row"  ng-controller="dcCtrl">
+		<div class="col-sm-3">
+			<div class="onoffswitch">
+				<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="toggle-DC" ng-checked="dc.enabled" ng-click="toggleDC();">
+				<label class="onoffswitch-label" for="toggle-DC">
+			        <div class="onoffswitch-inner"></div>
+			        <div class="onoffswitch-switch"></div>
+			    </label>
+			</div>
+		</div>
+		
+		<div class="col-sm-3">Decision center</div>
+	</li>
+</ul>

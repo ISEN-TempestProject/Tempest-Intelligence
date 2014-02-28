@@ -103,11 +103,92 @@ sailControllers.controller('logCtrl', ['$scope', '$interval', 'Logs',
 	}
 ]);
 
+sailControllers.controller('dcCtrl', ['$scope', '$interval', '$http', '$log',
+	function($scope, $interval, $http, $log) {
+	    
+		$scope.getDC = function(){	
+		    $http.get('/api/dc')
+			    .success(function(data, status, headers, config) {
+			        $scope.dc = data;
+			    })
+			    .error(function(data, status, headers, config) {
+			        $log.error('Can\'t reach decision center.');
+			    });
+		}
 
-sailControllers.controller("GPSController", [ '$scope', function($scope) {
-    angular.extend($scope, {
-        defaults: {
-            scrollWheelZoom: false
-        }
-    });
-}]);
+	    $scope.toggleDC = function() {
+	    	var dc = $scope.dc;
+	    	dc.enabled = !dc.enabled;
+	    	$http.post('/api/dc', {"status" : dc.enabled})
+			    		.success(function(data, status, headers, config) {
+					        $log.info('POST received : ' + data);
+					        $scope.getDC();
+					    })
+					    .error(function(data, status, headers, config) {
+					        $log.error('Can\'t post DC status.');
+					    });   
+		}
+
+		$scope.getDC();
+	}
+]);
+
+sailControllers.controller('autopilotCtrl', ['$scope', '$interval', '$http', '$log',
+	function($scope, $interval, $http, $log) {
+	    
+		$scope.getAutopilot = function(){	
+		    $http.get('/api/autopilot')
+			    .success(function(data, status, headers, config) {
+			        $scope.autopilot = data;
+			    })
+			    .error(function(data, status, headers, config) {
+			        $log.error('Can\'t reach autopilot..');
+			    });
+		}
+
+	    $scope.toggleAutopilot = function() {
+	    	var autopilot = $scope.autopilot;
+	    	autopilot.enabled = !autopilot.enabled;
+	    	$http.post('/api/autopilot', {"status" : autopilot.enabled})
+			    		.success(function(data, status, headers, config) {
+					        $log.info('POST received : ' + data);
+					        $scope.getAutopilot();
+					    })
+					    .error(function(data, status, headers, config) {
+					        $log.error('Can\'t post Autopilot status.');
+					    });   
+		}
+
+		$scope.getAutopilot();
+	}
+]);
+
+sailControllers.controller('shCtrl', ['$scope', '$interval', '$http', '$log',
+	function($scope, $interval, $http, $log) {
+	    
+		$scope.getSH = function(){	
+		    $http.get('/api/sh')
+			    .success(function(data, status, headers, config) {
+			        $scope.sh = data;
+			    })
+			    .error(function(data, status, headers, config) {
+			        $log.error('Can\'t reach sail handler.');
+			    });
+		}
+
+	    $scope.toggleSH = function() {
+	    	var sh = $scope.sh;
+	    	sh.enabled = !sh.enabled;
+	    	$http.post('/api/sh', {"status" : sh.enabled})
+			    		.success(function(data, status, headers, config) {
+					        $log.info('POST received : ' + data);
+					        $scope.getSH();
+					    })
+					    .error(function(data, status, headers, config) {
+					        $log.error('Can\'t post sail handler status.');
+					    });   
+		}
+
+		$scope.getSH();
+	}
+]);

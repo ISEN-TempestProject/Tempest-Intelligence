@@ -2,11 +2,11 @@
 <ul class="list-unstyled">
 	<li class="row" ng-repeat="device in devices">
 		<div class="col-sm-3">
-			<div class="onoffswitch">
-				<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="device-emul-{{device.id}}" ng-checked="device.emulated" ng-click="toggleDevice(device.id);">
-				<label class="onoffswitch-label" for="device-emul-{{device.id}}">
-			        <div class="onoffswitch-inner"></div>
-			        <div class="onoffswitch-switch"></div>
+			<div class="emulswitch">
+				<input type="checkbox" name="emulswitch" class="emulswitch-checkbox" id="device-emul-{{device.id}}" ng-checked="device.emulated" ng-click="toggleDevice(device.id);">
+				<label class="emulswitch-label" for="device-emul-{{device.id}}">
+			        <div class="emulswitch-inner"></div>
+			        <div class="emulswitch-switch"></div>
 			    </label>
 			</div>
 		</div>

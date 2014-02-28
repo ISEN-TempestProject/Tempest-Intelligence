@@ -39,16 +39,16 @@
   box-sizing: border-box;
 }
 .onoffswitch-inner:before {
-  content: "EMUL";
+  content: "ON";
   padding-left: 10px;
-  background-color: #1CDAE8;
+  background-color: #0F0;
   color: #FFFFFF;
 }
 .onoffswitch-inner:after {
-  content: "AUTO";
+  content: "OFF";
   padding-right: 10px;
-  background-color: #EEEEEE;
-  color: #999999;
+  background-color: #F00;
+  color: #FFFFFF;
   text-align: right;
 }
 .onoffswitch-switch {

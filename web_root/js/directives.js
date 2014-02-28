@@ -13,6 +13,14 @@ sailDirectives.directive('devices', function () {
   }
 });
 
+sailDirectives.directive('decisions', function () {
+  return {
+    restrict: 'A',
+    replace: false,
+    templateUrl:'partials/decisions.html'
+  }
+});
+
 sailDirectives.directive('logs', function () {
   return {
     restrict: 'A',
