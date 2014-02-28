@@ -33,8 +33,8 @@ class DecisionCenter {
 		Get/set the targeted position
 	*/
 	@property{
-		GpsCoord targetposition()const{return m_targetposition;}
-		void targetposition(GpsCoord target){m_targetposition = target;}
+		GpsCoord targetposition()const{return m_route[m_nDestinationIndex];}
+		void targetposition(GpsCoord target){m_route[m_nDestinationIndex] = target;}
 	}
 
 	/**
@@ -66,6 +66,8 @@ private:
 		m_nLoopTimeMS = Config.Get!uint("DecisionCenter", "Period");
 		m_bEnabled = true;
 
+		m_fDistanceToTarget = Config.Get!float("DecisionCenter", "DistanceToTarget");
+
 		//Route parsing
 		string sFile = Config.Get!string("DecisionCenter", "Route");
 		JSONValue jsonFile = parseJSON(readText(sFile).removechars("\n\r\t"));
@@ -82,6 +84,7 @@ private:
 			m_route~=GpsCoord(unit, json["value"].str);
 		}
 		m_route = (Hardware.Get!Gps(DeviceID.Gps).value)~m_route;
+		m_nDestinationIndex = 1;
 		SailLog.Notify("Route set to: ",m_route);
 		
 		//	fill first cell with actual GPS position
@@ -118,15 +121,29 @@ private:
 		/*
 		THIS IS WHERE DECISIONS ARE TAKEN
 		*/
+
+		CheckIsDestinationReached();
+	}
+
+	void CheckIsDestinationReached(){
+		GpsCoord currPos = Hardware.Get!Gps(DeviceID.Gps).value;
+		float fDistance = m_fDistanceToTarget+1;//todo: use currPos.GetDistanceTo(m_route[m_nDestinationIndex]);
+		if(fDistance<=m_fDistanceToTarget){
+			m_nDestinationIndex++;
+			SailLog.Notify("Set new target to ",m_route[m_nDestinationIndex].To(GpsCoord.Unit.DecDeg)," (index=",m_nDestinationIndex,")");
+		}
 	}
 
 	bool m_bEnabled;
 	double m_targetheading;
-	GpsCoord m_targetposition;
 	uint m_nLoopTimeMS;
 
 	Autopilot m_autopilot;
 	SailHandler m_sailhandler;
 
+	float m_fDistanceToTarget;
+
+	ushort m_nDestinationIndex;
 	GpsCoord[] m_route;
+
 }
