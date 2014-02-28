@@ -26,7 +26,8 @@ private:
 			"Route":"res/route.json",
 			"DistanceToTarget":"10.0",
 			"DistanceToRoute":"50.0",
-			"Period":"5000"
+			"Period":"5000",
+			"ReturnToOrigin":"true"
 		]),
 		"Autopilot" : ([
 			"Period":"1000",

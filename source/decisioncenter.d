@@ -84,6 +84,10 @@ private:
 			m_route~=GpsCoord(unit, json["value"].str);
 		}
 		m_route = (Hardware.Get!Gps(DeviceID.Gps).value)~m_route;
+
+		if(Config.Get!bool("DecisionCenter", "ReturnToOrigin"))
+			m_route~=m_route[0];
+
 		m_nDestinationIndex = 1;
 		SailLog.Notify("Route set to: ",m_route);
 		
