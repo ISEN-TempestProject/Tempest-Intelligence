@@ -5,14 +5,32 @@
 var sailControllers = angular.module('sailControllers', []);
 
 
-sailControllers.controller('mainCtrl', [
-	function() {}
+sailControllers.controller('mainCtrl', ['$rootScope', '$scope', '$interval',
+	function($rootScope, $scope, $interval) {
+		$scope.refreshPeriod = 1000;
+
+		$scope.refresh = function(){
+			if($scope.refreshing !== undefined) $interval.cancel($scope.refreshing);
+			
+			if($scope.refreshPeriod > 0) {
+				$scope.refreshing = $interval(function(){
+					$rootScope.getDevices();
+					$rootScope.getLogs();
+					$rootScope.getDC();
+					$rootScope.getAutopilot();
+					$rootScope.getSH();
+				}, $scope.refreshPeriod);
+			}
+		}
+
+		$scope.refresh();
+	}
 ]);
 
-sailControllers.controller('deviceCtrl', ['$scope', '$interval', '$http', '$log',
-	function($scope, $interval, $http, $log) {
+sailControllers.controller('deviceCtrl', ['$scope', '$rootScope', '$http', '$log',
+	function($scope, $rootScope, $http, $log) {
 	    
-		$scope.getDevices = function(){	
+		$rootScope.getDevices = function(){	
 		    $http.get('/api/devices')
 			    .success(function(data, status, headers, config) {
 			        $scope.devices = data;
@@ -34,7 +52,6 @@ sailControllers.controller('deviceCtrl', ['$scope', '$interval', '$http', '$log'
 			    	data.value += delta;
 			    	$http.post('/api/value', {"data" : JSON.stringify(data)})
 			    		.success(function(data, status, headers, config) {
-					        $log.info('POST received : ' + data);
 					        $scope.getDevices();
 					    })
 					    .error(function(data, status, headers, config) {
@@ -52,7 +69,6 @@ sailControllers.controller('deviceCtrl', ['$scope', '$interval', '$http', '$log'
 			    	data.emulated = isEmulated;
 			    	$http.post('/api/emulation', {"data" : JSON.stringify(data)})
 			    		.success(function(data, status, headers, config) {
-					        $log.info('POST received : ' + data);
 					        $scope.getDevices();
 					    })
 					    .error(function(data, status, headers, config) {
@@ -64,49 +80,26 @@ sailControllers.controller('deviceCtrl', ['$scope', '$interval', '$http', '$log'
 			    });
 		}
 
-
-		$scope.refreshDevices = -1;
-
-		$scope.redev = function(){
-			if($scope.refreshing !== undefined) $interval.cancel($scope.refreshing);
-			
-			if($scope.refreshDevices > 0) {
-				$scope.refreshing = $interval(function(){
-					$scope.getDevices();
-				}, $scope.refreshDevices);
-			}
-		}
-
-		$scope.getDevices();
-		$scope.redev();
+		$rootScope.getDevices();
 	}
 ]);
 
-sailControllers.controller('logCtrl', ['$scope', '$interval', 'Logs',
-	function($scope, $interval, Logs) {
-		$scope.refreshLog = -1;
+sailControllers.controller('logCtrl', ['$scope', '$rootScope', 'Logs',
+	function($scope, $rootScope, Logs) {
 
-		$scope.relog = function(){
-			if($scope.logging !== undefined) $interval.cancel($scope.logging);
-			
-			if($scope.refreshLog > 0) {
-				$scope.logging = $interval(function(){
-					$scope.logs = Logs.query();
-				}, $scope.refreshLog);
-			}
+		$rootScope.getLogs = function(){
+			$scope.logs = Logs.query();
 		}
-		
 
-		$scope.logs = Logs.query();
-		$scope.relog();
+		$rootScope.getLogs();
 	    $scope.level = '';
 	}
 ]);
 
-sailControllers.controller('dcCtrl', ['$scope', '$interval', '$http', '$log',
-	function($scope, $interval, $http, $log) {
+sailControllers.controller('dcCtrl', ['$scope', '$rootScope', '$http', '$log',
+	function($scope, $rootScope, $http, $log) {
 	    
-		$scope.getDC = function(){	
+		$rootScope.getDC = function(){	
 		    $http.get('/api/dc')
 			    .success(function(data, status, headers, config) {
 			        $scope.dc = data;
@@ -122,21 +115,21 @@ sailControllers.controller('dcCtrl', ['$scope', '$interval', '$http', '$log',
 	    	$http.post('/api/dc', {"status" : dc.enabled})
 			    		.success(function(data, status, headers, config) {
 					        $log.info('POST received : ' + data);
-					        $scope.getDC();
+					        $rootScope.getDC();
 					    })
 					    .error(function(data, status, headers, config) {
 					        $log.error('Can\'t post DC status.');
 					    });   
 		}
 
-		$scope.getDC();
+		$rootScope.getDC();
 	}
 ]);
 
-sailControllers.controller('autopilotCtrl', ['$scope', '$interval', '$http', '$log',
-	function($scope, $interval, $http, $log) {
+sailControllers.controller('autopilotCtrl', ['$scope', '$rootScope', '$http', '$log',
+	function($scope, $rootScope, $http, $log) {
 	    
-		$scope.getAutopilot = function(){	
+		$rootScope.getAutopilot = function(){	
 		    $http.get('/api/autopilot')
 			    .success(function(data, status, headers, config) {
 			        $scope.autopilot = data;
@@ -151,22 +144,21 @@ sailControllers.controller('autopilotCtrl', ['$scope', '$interval', '$http', '$l
 	    	autopilot.enabled = !autopilot.enabled;
 	    	$http.post('/api/autopilot', {"status" : autopilot.enabled})
 			    		.success(function(data, status, headers, config) {
-					        $log.info('POST received : ' + data);
-					        $scope.getAutopilot();
+					        $rootScope.getAutopilot();
 					    })
 					    .error(function(data, status, headers, config) {
 					        $log.error('Can\'t post Autopilot status.');
 					    });   
 		}
 
-		$scope.getAutopilot();
+		$rootScope.getAutopilot();
 	}
 ]);
 
-sailControllers.controller('shCtrl', ['$scope', '$interval', '$http', '$log',
-	function($scope, $interval, $http, $log) {
+sailControllers.controller('shCtrl', ['$scope', '$rootScope', '$http', '$log',
+	function($scope, $rootScope, $http, $log) {
 	    
-		$scope.getSH = function(){	
+		$rootScope.getSH = function(){	
 		    $http.get('/api/sh')
 			    .success(function(data, status, headers, config) {
 			        $scope.sh = data;
@@ -181,14 +173,13 @@ sailControllers.controller('shCtrl', ['$scope', '$interval', '$http', '$log',
 	    	sh.enabled = !sh.enabled;
 	    	$http.post('/api/sh', {"status" : sh.enabled})
 			    		.success(function(data, status, headers, config) {
-					        $log.info('POST received : ' + data);
-					        $scope.getSH();
+					        $rootScope.getSH();
 					    })
 					    .error(function(data, status, headers, config) {
 					        $log.error('Can\'t post sail handler status.');
 					    });   
 		}
 
-		$scope.getSH();
+		$rootScope.getSH();
 	}
 ]);

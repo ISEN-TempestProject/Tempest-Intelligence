@@ -16,3 +16,6 @@ doc/*
 !doc/prettify/
 !doc/scripts/
 !doc/styles/
+
+#Notes
+*.notes
