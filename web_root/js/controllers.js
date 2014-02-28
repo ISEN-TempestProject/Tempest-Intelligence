@@ -14,13 +14,17 @@ sailControllers.controller('mainCtrl', ['$rootScope', '$scope', '$interval',
 			
 			if($scope.refreshPeriod > 0) {
 				$scope.refreshing = $interval(function(){
-					$rootScope.getDevices();
-					$rootScope.getLogs();
-					$rootScope.getDC();
-					$rootScope.getAutopilot();
-					$rootScope.getSH();
+					$scope.forceRefresh();
 				}, $scope.refreshPeriod);
 			}
+		}
+
+		$scope.forceRefresh = function(){
+			$rootScope.getDevices();
+			$rootScope.getLogs();
+			$rootScope.getDC();
+			$rootScope.getAutopilot();
+			$rootScope.getSH();
 		}
 
 		$scope.refresh();

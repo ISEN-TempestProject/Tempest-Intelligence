@@ -12,7 +12,8 @@
 	<nav class="navbar navbar-default navbar-fixed-bottom" role="navigation">
   		<div class="container">
 	  		<div class="navbar-form navbar-left">
-		    	AutoRefresh <select ng-model="refreshPeriod" ng-change="refresh()">
+		    	<label for="refreshPeriodInput">Auto-Refresh : </label>
+		    	<select id="refreshPeriodInput" class="form-control" ng-model="refreshPeriod" ng-change="refresh()">
 					<option value="-1">None</option>
 					<option value="1000">1 sec</option>
 					<option value="3000">3 sec</option>
@@ -20,6 +21,7 @@
 					<option value="10000">10 sec</option>
 					<option value="30000">30 sec</option>
 				</select>
+				<button class="btn btn-default" ng-click="forceRefresh()">Refresh once</button>
 			</div>
 		</div>
 	</nav>
