@@ -78,36 +78,42 @@ class API : ISailAPI
 			case DeviceID.Roll: 
 				Roll roll = Hardware.Get!Roll(id);
 				device.id = roll.id();
+				device.name = "Roll";
 				device.emulated = roll.isemulated();
 				device.value = roll.value();
 				break;
 			case DeviceID.WindDir: 
 				WindDir wd = Hardware.Get!WindDir(id);
 				device.id = wd.id();
+				device.name = "Wind direction";
 				device.emulated = wd.isemulated();
 				device.value = wd.value();
 				break;
 			case DeviceID.Compass: 
 				Compass compass = Hardware.Get!Compass(id);
 				device.id = compass.id();
+				device.name = "Compass";
 				device.emulated = compass.isemulated();
 				device.value = compass.value();
 				break;
 			case DeviceID.Sail:
 				Sail sail = Hardware.Get!Sail(id);
 				device.id = sail.id();
+				device.name = "Sail";
 				device.emulated = sail.isemulated();
 				device.value = to!int(sail.value());
 				break;	
 			case DeviceID.Helm:
 				Helm helm = Hardware.Get!Helm(id);
 				device.id = helm.id();
+				device.name = "Helm";
 				device.emulated = helm.isemulated();
 				device.value = helm.value();
 				break;
 			case DeviceID.Gps:
 				Gps gps = Hardware.Get!Gps(id);
 				device.id = gps.id();
+				device.name = "GPS";
 				device.emulated = gps.isemulated();
 				device.value = Json.emptyObject;
 				device.value.longitude = gps.value().longitude();
