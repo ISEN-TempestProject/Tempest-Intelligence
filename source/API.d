@@ -5,6 +5,7 @@ import vibe.core.log;
 import vibe.data.json;
 import std.datetime;
 import saillog;
+import gpscoord;
 import hardware.hardware;
 import hardware.devices;
 import decisioncenter;
@@ -31,6 +32,9 @@ interface ISailAPI
 
 	// POST /dc
 	void postDc(bool status);
+
+	// POST /targetposition
+	void postTargetposition(float longitude, float latitude);
 
 	// GET /autopilot
 	Json getAutopilot();
@@ -233,12 +237,22 @@ class API : ISailAPI
 		Json dc = Json.emptyObject;
 		dc.enabled = DecisionCenter.Get().enabled();
 
+		dc.targetPosition = Json.emptyObject;
+		dc.targetPosition.longitude = DecisionCenter.Get().targetposition().longitude();
+		dc.targetPosition.latitude = DecisionCenter.Get().targetposition().latitude();
+
+		//dc.targetHeading = DecisionCenter.Get().targetheading();
+
 		return dc;
 	}
 
 	void postDc(bool status){
 		DecisionCenter.Get().enabled(status);
 		SailLog.Notify("Decision center is now ", DecisionCenter.Get().enabled() ? "Enabled" : "Disbaled");
+	}
+
+	void postTargetposition(float longitude, float latitude){
+		DecisionCenter.Get().targetposition(GpsCoord(to!double(longitude), to!double(latitude)));
 	}
 
 	Json getAutopilot(){

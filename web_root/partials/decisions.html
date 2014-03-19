@@ -41,10 +41,29 @@
 			
 			<div class="col-sm-3">Decision center</div>
 		</li>
-		<li class="panel panel-default">
+		<li class="panel panel-default" ng-controller="dcCtrl">
 			<ul class="panel-body list-unstyled">
-				<li class="row">Prochain point</li>
-				<li class="row">Cap à suivre</li>
+				<li class="row">
+
+					<div class="panel panel-default">
+						<div class="panel-heading">Target position</div>
+						<ul class="panel-body list-unstyled">
+							<li class="row">
+								<div class="col-sm-3">Longitude</div>
+								<input  class="col-sm-9 row"type="text" class="col-xs-6" name="longitude" ng-model="dc.targetPosition.longitude" ng-disabled="dc.enabled">
+							</li>
+							<li class="row">
+								<div class="col-sm-3">Latitude</div>
+								<input  class="col-sm-9 row"type="text" class="col-xs-6" name="latitude" ng-model="dc.targetPosition.latitude" ng-disabled="dc.enabled">
+							</li>
+							<li class="row">
+								<button type="button" ng-click="setTargetPosition();" ng-hide="dc.enabled" ng-disabled="dc.enabled">Set</button>
+							</li>
+						</ul>
+					</div>
+
+				</li>
+				<li class="row">Target Heading</li>
 			</ul>
 		</li>
 	</ul>
