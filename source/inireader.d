@@ -8,7 +8,9 @@ import std.conv;
 
 public import std.string;
 
-
+/**
+	INI config file reader
+*/
 class INIReader
 {
 public:
@@ -26,10 +28,10 @@ public:
 		string path(){return m_sPath;}
 	}
 
-	/*!
-		@brief Gets the value of the field
-		@throw if the value could not be retrieved
-		@return "" if not found
+	/**
+		Gets the value of the field
+		Throws: if the value could not be retrieved
+		Returns: "" if not found
 	*/
 	T Get(T)(string sHeader, string sName)
 	{
@@ -39,6 +41,9 @@ public:
 			throw new Exception("Value not found: "~sHeader~"."~sName);
 	}
 
+	/**
+		Prints the configuration entries, useful for debugging purposes
+	*/
 	void Print()
 	{
 		foreach(string section, entries ; m_Data)

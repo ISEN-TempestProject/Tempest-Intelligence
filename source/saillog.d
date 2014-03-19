@@ -1,20 +1,21 @@
-module logger;
+module saillog;
 
 import std.stdio;
 import std.process;
+import core.thread;
 import core.sync.mutex;
 import col;
 import config;
 
-/*!
-	@brief Logs everything, on console and/or on files
-	@todo May be wise to create a thread if the mutex is locked so it doesn't slow the main process
+/**
+	Logs everything, on console and/or on files
+	Todo: May be wise to create a thread if the mutex is locked so it doesn't slow the main process
 */
-class Logger {
+class SailLog {
 
 public:
-	/*!
-		@brief Posts a Warning, and immediately writes it to disk
+	/**
+		Posts a Warning, and immediately writes it to disk
 	*/
 	static void Warning(T...)(T args){//Variadic function with undefined number of parameters
 		CheckInstance();
@@ -25,8 +26,8 @@ public:
 		}
 	}
 
-	/*!
-		@brief Posts a Critical Error, and immediately writes it to disk
+	/**
+		Posts a Critical Error, and immediately writes it to disk
 	*/
 	static void Critical(T...)(T args){
 		CheckInstance();
@@ -37,8 +38,8 @@ public:
 		}
 	}
 
-	/*!
-		@brief Posts a Success, and writes it to disk
+	/**
+		Posts a Success, and writes it to disk
 	*/
 	static void Success(T...)(T args){
 		CheckInstance();
@@ -52,13 +53,13 @@ public:
 	}
 
 
-	/*!
-		@brief Posts a Notification, and writes it to disk
+	/**
+		Posts a Notification, and writes it to disk
 	*/
 	static void Notify(T...)(T args){
 		CheckInstance();
 		synchronized(m_inst.m_mtx){
-			writeln(fg.lightblack~var.bold~"Notify:   "~var.end,args);
+			writeln(var.bold~"Notify:   "~var.end,args);
 			m_inst.m_logfile.writeln(fg.lightblack~var.bold~"Notify:   "~var.end,args);
 			debug {
 				m_inst.m_logfile.flush();
@@ -67,8 +68,8 @@ public:
 	}
 
 
-	/*!
-		@brief Posts a Success, without writing it to disk
+	/**
+		Posts a Success, without writing it to disk
 	*/
 	static void Post(T...)(T args){
 		CheckInstance();
@@ -78,14 +79,14 @@ public:
 	}
 
 private:
-	static __gshared Logger m_inst;//Stored in global storage, not thread local storage (TLS)
+	static __gshared SailLog m_inst;//Stored in global storage, not thread local storage (TLS)
 
 	File m_logfile;
 	Mutex m_mtx;
 
 	static void CheckInstance(){
 		if(!m_inst){
-			m_inst = new Logger();
+			m_inst = new SailLog();
 		}
 	}
 
@@ -96,6 +97,8 @@ private:
 				~bg.white~"                                                            "~var.end~"\n";
 
 	this(){
+		writeln(var.bold~"Notify:   "~var.end,typeof(this).stringof~" instantiation in ",Thread.getThis().name,"...");
+
 		m_mtx = new Mutex();
 		synchronized(m_mtx)
 		{
@@ -110,8 +113,8 @@ private:
 			stdout.writeln(MOTD~execute("date").output);
 			m_logfile.writeln(MOTD~execute("date").output);
 		}
-		writeln(fg.green~var.bold~"Success:  "~var.end,typeof(this).stringof~" instantiation");
-		m_logfile.writeln(fg.green~var.bold~"Success:  "~var.end,typeof(this).stringof~" instantiation");
+		writeln(fg.green~var.bold~"Success:  "~var.end,typeof(this).stringof~" instantiated in ",Thread.getThis().name,"");
+		m_logfile.writeln(fg.green~var.bold~"Success:  "~var.end,typeof(this).stringof~" instantiated in ",Thread.getThis().name,"");
 
 		m_logfile.flush();
 	}

@@ -3,32 +3,53 @@ module hardware.hardware;
 import std.process;
 import std.socket;
 import core.thread;
-import logger;
+import saillog;
 
 public import hardware.devices;
 
+/**
+	Singleton to handle communication with the hardware
+*/
 class Hardware {
 
 public:
+	/**
+		Getter for hardware devices
+	*/
 	static T Get(T)(DeviceID id){
-		if(m_inst is null) m_inst = new Hardware();
+		synchronized(this.classinfo){
+			if(m_inst is null) m_inst = new Hardware();
+		}
 
 		if(id in m_inst.m_hwlist){
-			return cast(T)(m_inst.m_hwlist[id]);
+			if(auto ret = cast(T)(m_inst.m_hwlist[id]))
+				return ret;
+			else{
+				SailLog.Critical("Trying to cast "~(m_inst.m_hwlist[id].classinfo.name)~" to type "~id);
+				throw new Exception("Trying to cast "~(m_inst.m_hwlist[id].classinfo.name)~" to type "~id);
+			}
+			//return cast(T)(m_inst.m_hwlist[id]);
 		}
 		else{
-			Logger.Critical("Hardware element not found : ", id);
+			SailLog.Critical("Hardware element not found : ", id);
 			throw new Exception("Hardware element not found : "~id.stringof);
 		}
 	}
 
 package:
+	/**
+		Simple getter, not used outside the package
+	*/
 	static Hardware GetClass(){
-		if(m_inst is null) m_inst = new Hardware();
+		synchronized(this.classinfo){
+			if(m_inst is null) m_inst = new Hardware();
+		}
 		return m_inst;
 	}
 
-
+	/**
+		Sends and event into the socket
+	*/
 	void SendEvent(DeviceID id, ulong[2] data){
 		HWEvent ev = {id, data};
 	}
@@ -38,6 +59,8 @@ package:
 private:
 	static __gshared Hardware m_inst;
 	this() {
+		SailLog.Notify("Starting ",typeof(this).stringof," instantiation in ",Thread.getThis().name,"...");
+
 		//Init devices
 		InitDevices();
 
@@ -49,7 +72,7 @@ private:
 			try{
 				m_socket.connect(m_addr);
 			}catch(Exception e){
-				Logger.Critical("Error when trying to connect socket: ",e.msg,"\n",e.file,":",e.line);
+				SailLog.Critical("Error when trying to connect socket: ",e.msg,"\n",e.file,":",e.line);
 				return;
 			}
 
@@ -59,35 +82,51 @@ private:
 			m_thread.isDaemon(true);
 			m_thread.start();
 		}
-
-		
-
-		Logger.Success(typeof(this).stringof~" instantiation");
+		SailLog.Success(typeof(this).stringof~" instantiated in ",Thread.getThis().name);
 	}
 
+	/**
+		Contains the instantiation list of the devices
+	*/
 	void InitDevices(){
 		m_hwlist[DeviceID.Sail] = new Sail();
+		m_hwlist[DeviceID.Helm] = new Helm();
+		m_hwlist[DeviceID.Gps] = new Gps();
 		m_hwlist[DeviceID.Roll] = new Roll();
-		//...
+		m_hwlist[DeviceID.WindDir] = new WindDir();
+		m_hwlist[DeviceID.Compass] = new Compass();
 	}
 
+
+	/**
+		Handles socket communications
+	*/
 	void NetworkThread(){
 
-		
 		while(true){
 			HWEvent buffer[1];
 			long nReceived = m_socket.receive(buffer);
 			if(nReceived>0){
-				Logger.Post("Received: [",buffer[0].id,"|",buffer[0].data,"]");
+				SailLog.Post("Received: [",buffer[0].id,"|",buffer[0].data,"]");
+
 
 				//@TODO clean this: ParseValue should be called on HWSens
 				switch(buffer[0].id){
+					case DeviceID.Gps:
+						(cast(Gps)(m_hwlist[buffer[0].id])).ParseValue(buffer[0].data); 
+						break;
 					case DeviceID.Roll:
 						(cast(Roll)(m_hwlist[buffer[0].id])).ParseValue(buffer[0].data); 
 						break;
+					case DeviceID.WindDir:
+						(cast(WindDir)(m_hwlist[buffer[0].id])).ParseValue(buffer[0].data); 
+						break;
+					case DeviceID.Compass:
+						(cast(Compass)(m_hwlist[buffer[0].id])).ParseValue(buffer[0].data); 
+						break;
 
 					default:
-						Logger.Warning("@Network: ",buffer[0].id," is not a handled HWSensor");
+						SailLog.Warning("NetworkThread: ",buffer[0].id," is not a handled HWSensor");
 				}
 			}
 		}
@@ -98,11 +137,17 @@ private:
 		assert(HWEvent.id.sizeof == 1);
 		assert(HWEvent.data.sizeof == 16);
 	}
+	/**
+		Events for socket communication
+	*/
 	struct HWEvent{
 		DeviceID id;
 		ulong data[2];
 	}
 
+	/**
+		Callback for parsing received events
+	*/
 	void OnEventReceived(T)(HWEvent ev){
 		//store data in the correct device
 	}
@@ -113,8 +158,6 @@ private:
 	Thread m_thread;
 
 	Object[DeviceID] m_hwlist;
-
-	//HWWatchdog m_wd;
 
 }
 
@@ -145,5 +188,5 @@ unittest
 	assert(r.value == 2.5);
 	assertThrown(r.value = 12.3);//Throw exception
 
-	Logger.Notify("Hardware unittest done");
+	SailLog.Notify("Hardware unittest done");
 }

@@ -1,22 +1,22 @@
 module main;
 
 import std.stdio;
-import autopilot;
 import hardware.hardware;
-import config;
-import logger;
+import decisioncenter;
+import saillog;
+import core.thread;
 
 
 int main(string[] args)
 {
+	Thread.getThis().name = "Main";
 	version(unittest){
-		Logger.Success("UnitTest finished ! Congratulations !");
+		SailLog.Success("UnitTest finished ! Congratulations !");
 	}
 	else{
-		Logger.Success("Starting program");
+		SailLog.Success("Starting program !");
 
-		Autopilot sc = new Autopilot();
-		Hardware.Get!Roll(DeviceID.Roll);
+		DecisionCenter.Get();
 
 		bool b=true;
 		while(b){

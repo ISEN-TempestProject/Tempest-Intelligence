@@ -1,6 +1,6 @@
 module gpscoord;
 
-import logger;
+import saillog;
 import std.regex;
 import std.conv;
 import std.math;
@@ -9,19 +9,22 @@ import std.math;
 unittest {
 	import std.exception;
 
-	GPSCoord cRef = new GPSCoord(37.391933, -122.04375);
+	GpsCoord cRef = GpsCoord(37.391933, -122.04375);
 
-	GPSCoord c = new GPSCoord(GPSCoord.Unit.GPS, "37 23.516 -122 02.625");
+	GpsCoord c = GpsCoord(GpsCoord.Unit.GPS, "37 23.516 -122 02.625");
 	assert(abs(c.longitude-cRef.longitude)<0.0001 && abs(c.latitude-cRef.latitude)<0.0001);
 
-	//assertThrown(c.Set(GPSCoord.Unit.DecDeg, "42.25 W23.65"));
+	//assertThrown(c.Set(GpsCoord.Unit.DecDeg, "42.25 W23.65"));
 
-	Logger.Warning(cRef.GetDistanceTo(new GPSCoord(37.391933, -121.04375)));
+	SailLog.Warning(cRef.GetDistanceTo(GpsCoord(37.391933, -121.04375)));
 
-	Logger.Post("GPSCoord unittest done");
+	SailLog.Post("GpsCoord unittest done");
 }
 
-class GPSCoord {
+/**
+	GPS Coordinates, handling types conversions between dms, gps, ...
+*/
+struct GpsCoord {
 
 	/*!
 		@brief Constructor for decimal degrees
@@ -35,11 +38,16 @@ class GPSCoord {
 		DecDeg, DegMinSec, GPS, UTM
 	}
 
-
+	/**
+		Constructs the gps coordinates by parsing an expression
+	*/
 	this(Unit u, string expr){
 		Set(u, expr);
 	}
 
+	/**
+		Sets the gps coordinates by parsing an expression
+	*/
 	void Set(Unit u, string expr) {
 		final switch(u){
 			case Unit.DecDeg:
@@ -108,6 +116,9 @@ class GPSCoord {
 		}
 	}
 
+	/**
+		Converts the gps coordinates into the given representation
+	*/
 	string To(Unit u){
 		final switch(u){
 			case Unit.DecDeg:
@@ -150,6 +161,9 @@ class GPSCoord {
 		}
 	}
 
+	/**
+		Accessor for the value in decimal degrees
+	*/
 	@property{
 		double longitude()const{return m_long;}
 		void longitude(double value){m_long = value;}
@@ -158,7 +172,7 @@ class GPSCoord {
 	}
 
 	enum uint EARTH_RADIUS = 6371;
-	double GetDistanceTo(GPSCoord point){
+	double GetDistanceTo(GpsCoord point){
 
 		//Haversine formula
 		// http://www.movable-type.co.uk/scripts/latlong.html
@@ -173,12 +187,15 @@ class GPSCoord {
 		double d = EARTH_RADIUS * c;
 		return d;
 	}
-	double GetDistanceTo(GPSCoord A, GPSCoord B){
+	double GetDistanceTo(GpsCoord A, GpsCoord B){
 		return 0;
 	}
 
 private:
 
+	/**
+		Precompiled regexes for types recognition
+	*/
 	@property static {
 		enum rgxDecDeg = ctRegex!(r"^([0-9\.\-]+)\s+([0-9\.\-]+)\s*$");
 		enum rgxDegMinSec = ctRegex!(r"^([N|S|-|+]?)\s*([0-9]+)\s+([0-9]+)\s+([0-9\.]+)\s+([E|W|-|+]?)\s*([0-9]+)\s+([0-9]+)\s+([0-9\.]+)$");
