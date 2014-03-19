@@ -5,8 +5,8 @@
 var sailControllers = angular.module('sailControllers', []);
 
 
-sailControllers.controller('mainCtrl', ['$rootScope', '$scope', '$interval',
-	function($rootScope, $scope, $interval) {
+sailControllers.controller('mainCtrl', ['$rootScope', '$scope', '$interval', '$http',
+	function($rootScope, $scope, $interval, $http) {
 		$scope.refreshPeriod = 1000;
 
 		$scope.refresh = function(){
@@ -32,7 +32,7 @@ sailControllers.controller('mainCtrl', ['$rootScope', '$scope', '$interval',
 		}
 
 		$scope.emergencyStop = function(){
-
+			$http.post('/api/emergency', {});
 		}
 
 		$scope.refresh();

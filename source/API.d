@@ -50,6 +50,10 @@ interface ISailAPI
 
 	// POST /sh
 	void postSh(bool status);
+
+	// POST /emergency
+	void postEmergency();
+
 }
 
 
@@ -142,7 +146,6 @@ class API : ISailAPI
 	}
 
 	void postEmulation(string data){
-		SailLog.Post("Device set : " ~ data);
 		Json device = parseJsonString(data);
 		switch(to!ubyte(device.id)){
 			case DeviceID.Roll: 
@@ -286,6 +289,21 @@ class API : ISailAPI
 		DecisionCenter.Get().sailhandler().enabled(status);
 		SailLog.Notify("Sail Handler is now ", DecisionCenter.Get().sailhandler().enabled() ? "Enabled" : "Disbaled");
 	}
+
+	void postEmergency(){
+		//Disable systems
+		postDc(false);
+		postSh(false);
+		postAutopilot(false);
+
+		//Emulate sensors and actuators
+		for(int i = 1 ; i<DeviceID.max ; i++){
+			postEmulation("{\"id\":"~to!string(i)~",\"emulated\":true}");
+
+		}
+	}
+
+
 
 private:
 	static __gshared API m_inst;
