@@ -11,6 +11,7 @@ unittest {
 	import std.exception;
 
 	GpsCoord cRef = GpsCoord(37.3919331, -122.043751);
+	SailLog.Post(cRef.To(GpsCoord.Unit.DecDeg));
 
 	//Creation and GPS parsing
 	GpsCoord c = GpsCoord(GpsCoord.Unit.GPS, "37 23.516 -122 02.625");
@@ -133,7 +134,7 @@ struct GpsCoord {
 	string To(Unit u){
 		final switch(u){
 			case Unit.DecDeg:
-				return format("%15f %15f", m_lat, m_long).strip();
+				return format("%.15f %.15f", m_lat, m_long).strip();
 			case Unit.DegMinSec:
 				char c1 = m_lat<0 ? 'S' : 'N';
 				uint nD1 = to!uint(abs(m_lat));
@@ -145,7 +146,7 @@ struct GpsCoord {
 				uint nM2 = to!uint(abs((abs(m_long)-nD2)*60.0));
 				float fS2 = abs((abs(m_long)-nD2-nM2/60.0)*3600.0);
 
-				return format("%c %d %d %15f %c %d %d %15f", c1, nD1, nM1, fS1, c2, nD2, nM2, fS2).strip();
+				return format("%c %d %d %.15f %c %d %d %.15f", c1, nD1, nM1, fS1, c2, nD2, nM2, fS2).strip();
 			case Unit.GPS:
 				char c1 = m_lat<0 ? 'S' : 'N';
 				uint nD1 = to!uint(abs(m_lat));
@@ -155,7 +156,7 @@ struct GpsCoord {
 				uint nD2 = to!uint(abs(m_long));
 				double fM2 = abs((abs(m_long)-nD2)*60.0);
 
-				return format("%c %d %15f %c %d %15f", c1, nD1, fM1, c2, nD2, fM2).strip();
+				return format("%c %d %.15f %c %d %.15f", c1, nD1, fM1, c2, nD2, fM2).strip();
 		}
 	}
 
