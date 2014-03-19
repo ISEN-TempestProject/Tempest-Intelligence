@@ -63,7 +63,20 @@
 					</div>
 
 				</li>
-				<li class="row">Target Heading</li>
+				<li class="row">
+					<div class="panel panel-default">
+						<div class="panel-heading">Target Heading</div>
+						<ul class="panel-body list-unstyled">
+							<li class="row">
+								<div class="col-sm-3">Angle</div>
+								<input  class="col-sm-9 row"type="text" class="col-xs-6" name="angle" ng-model="dc.targetHeading" ng-disabled="dc.enabled">
+							</li>
+							<li class="row">
+								<button type="button" ng-click="setTargetHeading();" ng-hide="dc.enabled" ng-disabled="dc.enabled">Set</button>
+							</li>
+						</ul>
+					</div>
+				</li>
 			</ul>
 		</li>
 	</ul>

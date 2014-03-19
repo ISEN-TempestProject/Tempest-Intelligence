@@ -128,7 +128,6 @@ sailControllers.controller('dcCtrl', ['$scope', '$rootScope', '$http', '$log',
 
 		$scope.setTargetPosition = function() {
 	    	var data = '{"longitude" : '+$scope.dc.targetPosition.longitude+', "latitude" : '+$scope.dc.targetPosition.latitude+'}';
-	    	console.log('TYPE : ' + typeof(data));
 
 	    	$http.post('/api/targetposition', data)
     		.success(function(data, status, headers, config) {
@@ -137,6 +136,19 @@ sailControllers.controller('dcCtrl', ['$scope', '$rootScope', '$http', '$log',
 		    })
 		    .error(function(data, status, headers, config) {
 		        $log.error('Can\'t post new Target Position.');
+		    });
+		}  
+
+		$scope.setTargetHeading = function() {
+	    	var data = '{"angle" : '+$scope.dc.targetHeading+'}';
+
+	    	$http.post('/api/targetheading', data)
+    		.success(function(data, status, headers, config) {
+		        $log.info('POST received : ' + data);
+		        $rootScope.getDC();
+		    })
+		    .error(function(data, status, headers, config) {
+		        $log.error('Can\'t post new Target Heading.');
 		    });
 		}  
 

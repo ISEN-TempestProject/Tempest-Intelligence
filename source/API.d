@@ -36,6 +36,9 @@ interface ISailAPI
 	// POST /targetposition
 	void postTargetposition(float longitude, float latitude);
 
+	// POST /targetheading
+	void postTargetheading(float angle);
+
 	// GET /autopilot
 	Json getAutopilot();
 
@@ -241,7 +244,7 @@ class API : ISailAPI
 		dc.targetPosition.longitude = DecisionCenter.Get().targetposition().longitude();
 		dc.targetPosition.latitude = DecisionCenter.Get().targetposition().latitude();
 
-		//dc.targetHeading = DecisionCenter.Get().targetheading();
+		dc.targetHeading = DecisionCenter.Get().targetheading();
 
 		return dc;
 	}
@@ -254,6 +257,11 @@ class API : ISailAPI
 	void postTargetposition(float longitude, float latitude){
 		DecisionCenter.Get().targetposition(GpsCoord(to!double(longitude), to!double(latitude)));
 	}
+
+	void postTargetheading(float angle){
+		DecisionCenter.Get().targetheading(to!double(angle));
+	}
+
 
 	Json getAutopilot(){
 		Json ap = Json.emptyObject;

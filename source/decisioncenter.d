@@ -139,7 +139,7 @@ private:
 	}
 
 	bool m_bEnabled;
-	double m_targetheading;
+	double m_targetheading = 0; //TODO : remove assignation once DC can handle TH
 	uint m_nLoopTimeMS;
 
 	Autopilot m_autopilot;
