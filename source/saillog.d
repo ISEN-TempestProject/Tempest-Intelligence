@@ -97,7 +97,7 @@ private:
 				~bg.white~"                                                            "~var.end~"\n";
 
 	this(){
-		writeln(var.bold~"Notify:   "~var.end,typeof(this).stringof~" instantiation in ",Thread.getThis().name,"...");
+		writeln(var.bold~"Notify:   "~var.end,typeof(this).stringof~" instantiation in ",Thread.getThis().name," thread...");
 
 		m_mtx = new Mutex();
 		synchronized(m_mtx)
@@ -113,8 +113,8 @@ private:
 			stdout.writeln(MOTD~execute("date").output);
 			m_logfile.writeln(MOTD~execute("date").output);
 		}
-		writeln(fg.green~var.bold~"Success:  "~var.end,typeof(this).stringof~" instantiated in ",Thread.getThis().name,"");
-		m_logfile.writeln(fg.green~var.bold~"Success:  "~var.end,typeof(this).stringof~" instantiated in ",Thread.getThis().name,"");
+		writeln(fg.green~var.bold~"Success:  "~var.end,typeof(this).stringof~" instantiated in ",Thread.getThis().name," thread");
+		m_logfile.writeln(fg.green~var.bold~"Success:  "~var.end,typeof(this).stringof~" instantiated in ",Thread.getThis().name," thread");
 
 		m_logfile.flush();
 	}

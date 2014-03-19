@@ -15,8 +15,10 @@ class DecisionCenter {
 		Singleton getter
 	*/
 	static DecisionCenter Get(){
-		if(m_inst is null)
-			m_inst = new DecisionCenter();
+		synchronized{
+			if(m_inst is null)
+				m_inst = new DecisionCenter();
+		}
 		return m_inst;
 	}
 
@@ -61,7 +63,7 @@ private:
 		Does the Autopilot and SailHandler instantiation
 	*/
 	this() {
-		SailLog.Notify("Starting ",typeof(this).stringof," instantiation in ",Thread.getThis().name,"...");
+		SailLog.Notify("Starting ",typeof(this).stringof," instantiation in ",Thread.getThis().name," thread...");
 
 		m_nLoopTimeMS = Config.Get!uint("DecisionCenter", "Period");
 		m_bEnabled = true;
@@ -102,7 +104,7 @@ private:
 		m_thread.isDaemon(true);
 		m_thread.start();
 
-		SailLog.Success(typeof(this).stringof~" instantiated in ",Thread.getThis().name);
+		SailLog.Success(typeof(this).stringof~" instantiated in ",Thread.getThis().name," thread");
 	}
 
 	Thread m_thread;
