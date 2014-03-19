@@ -59,7 +59,7 @@ package:
 private:
 	static __gshared Hardware m_inst;
 	this() {
-		SailLog.Notify("Starting ",typeof(this).stringof," instantiation in ",Thread.getThis().name,"...");
+		SailLog.Notify("Starting ",typeof(this).stringof," instantiation in ",Thread.getThis().name," thread...");
 
 		//Init devices
 		InitDevices();
@@ -82,7 +82,7 @@ private:
 			m_thread.isDaemon(true);
 			m_thread.start();
 		}
-		SailLog.Success(typeof(this).stringof~" instantiated in ",Thread.getThis().name);
+		SailLog.Success(typeof(this).stringof~" instantiated in ",Thread.getThis().name," thread");
 	}
 
 	/**
