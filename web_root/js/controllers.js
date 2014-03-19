@@ -27,6 +27,14 @@ sailControllers.controller('mainCtrl', ['$rootScope', '$scope', '$interval',
 			$rootScope.getSH();
 		}
 
+		$scope.backToStart = function(){
+
+		}
+
+		$scope.emergencyStop = function(){
+
+		}
+
 		$scope.refresh();
 	}
 ]);
