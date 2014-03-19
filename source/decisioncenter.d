@@ -74,21 +74,21 @@ private:
 		string sFile = Config.Get!string("DecisionCenter", "Route");
 		JSONValue jsonFile = parseJSON(readText(sFile).removechars("\n\r\t"));
 
-		GpsCoord.Unit unit;
-		foreach(ref json ; jsonFile.array){
-			switch(json["unit"].str){
-				case "DecDeg": unit=GpsCoord.Unit.DecDeg; break;
-				case "DegMinSec": unit=GpsCoord.Unit.DegMinSec; break;
-				case "GPS": unit=GpsCoord.Unit.GPS; break;
-				case "UTM": unit=GpsCoord.Unit.UTM; break;
-				default: unit=GpsCoord.Unit.DecDeg;	break;
-			}
-			m_route~=GpsCoord(unit, json["value"].str);
-		}
-		m_route = (Hardware.Get!Gps(DeviceID.Gps).value)~m_route;
+		//GpsCoord.Unit unit;
+		//foreach(ref json ; jsonFile.array){
+		//	switch(json["unit"].str){
+		//		case "DecDeg": unit=GpsCoord.Unit.DecDeg; break;
+		//		case "DegMinSec": unit=GpsCoord.Unit.DegMinSec; break;
+		//		case "GPS": unit=GpsCoord.Unit.GPS; break;
+		//		case "UTM": unit=GpsCoord.Unit.UTM; break;
+		//		default: unit=GpsCoord.Unit.DecDeg;	break;
+		//	}
+		//	m_route~=GpsCoord(unit, json["value"].str);
+		//}
+		//m_route = (Hardware.Get!Gps(DeviceID.Gps).value)~m_route;
 
-		if(Config.Get!bool("DecisionCenter", "ReturnToOrigin"))
-			m_route~=m_route[0];
+		//if(Config.Get!bool("DecisionCenter", "ReturnToOrigin"))
+		//	m_route~=m_route[0];
 
 		m_nDestinationIndex = 1;
 		SailLog.Notify("Route set to: ",m_route);
