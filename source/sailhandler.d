@@ -8,7 +8,7 @@ import hardware.hardware;
 
 class SailHandler {
 	this() {
-		SailLog.Notify("Starting ",typeof(this).stringof," instantiation in ",Thread.getThis().name,"...");
+		SailLog.Notify("Starting ",typeof(this).stringof," instantiation in ",Thread.getThis().name," thread...");
 		//Get configuration
 		m_nLoopTimeMS = Config.Get!uint("SailHandler", "Period");
 		m_fDelta = Config.Get!float("SailHandler", "Delta");
@@ -22,7 +22,7 @@ class SailHandler {
 		m_thread.isDaemon(true);
 		m_thread.start();
 
-		SailLog.Success(typeof(this).stringof~" instantiated in ",Thread.getThis().name);
+		SailLog.Success(typeof(this).stringof~" instantiated in ",Thread.getThis().name," thread");
 	}
 
 

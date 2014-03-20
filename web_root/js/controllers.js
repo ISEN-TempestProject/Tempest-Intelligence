@@ -28,11 +28,12 @@ sailControllers.controller('mainCtrl', ['$rootScope', '$scope', '$interval', '$h
 		}
 
 		$scope.backToStart = function(){
-
+			$http.post('/api/backtostart', {});
 		}
 
 		$scope.emergencyStop = function(){
 			$http.post('/api/emergency', {});
+			$scope.forceRefresh();
 		}
 
 		$scope.refresh();
@@ -115,6 +116,8 @@ sailControllers.controller('dcCtrl', ['$scope', '$rootScope', '$http', '$log',
 		    $http.get('/api/dc')
 			    .success(function(data, status, headers, config) {
 			        $scope.dc = data;
+			  		console.log("ZOUZOU" + data.enabled);
+			        console.log("ZOUZOUZOU " + $scope.dc.enabled);
 			    })
 			    .error(function(data, status, headers, config) {
 			        $log.error('Can\'t reach decision center.');

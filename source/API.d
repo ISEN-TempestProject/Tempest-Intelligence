@@ -54,6 +54,9 @@ interface ISailAPI
 	// POST /emergency
 	void postEmergency();
 
+	// POST /backtostart
+	void postBacktostart();
+
 }
 
 
@@ -301,6 +304,10 @@ class API : ISailAPI
 			postEmulation("{\"id\":"~to!string(i)~",\"emulated\":true}");
 
 		}
+	}
+
+	void postBacktostart(){
+		DecisionCenter.Get().backToStartPosition();
 	}
 
 
