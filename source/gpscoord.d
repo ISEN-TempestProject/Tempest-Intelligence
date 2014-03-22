@@ -12,60 +12,6 @@ import std.string;
 */
 struct GpsCoord {
 
-	unittest {
-		import std.exception;
-
-		GpsCoord cRef = GpsCoord(toRad(37.3919331), toRad(-122.043751));
-
-		//Creation and GPS parsing
-		GpsCoord c = GpsCoord(GpsCoord.Unit.GPS, "37 23.516 -122 02.625");
-		assert(abs(c.longitude-cRef.longitude)<0.001 && abs(c.latitude-cRef.latitude)<0.001);
-
-		//Haversine test
-		assert(abs(cRef.GetDistanceTo(GpsCoord(toRad(37.3919331), toRad(-121.043751)))-88344)<1);
-
-		//Parsing tests
-		c = GpsCoord(GpsCoord.Unit.DecDeg, "37.3919331 -122.043751");
-		assert(c.latitude == toRad(37.3919331) && c.longitude == toRad(-122.043751));
-		c = GpsCoord(GpsCoord.Unit.DegMinSec, "13 37 42 13 07 04");
-		assert(abs(c.latitude-toRad(13.628333))<0.001 && abs(c.longitude-toRad(13.117778))<0.001);
-		c = GpsCoord(GpsCoord.Unit.GPS, "37 23.516 -122 02.625");
-		assert(abs(c.latitude-toRad(37.391933))<0.001 && abs(c.longitude+toRad(122.04375))<0.001);
-
-		//Format/parse tests using haversine
-		assert(abs(GpsCoord(GpsCoord.Unit.DecDeg, cRef.To(GpsCoord.Unit.DecDeg)).GetDistanceTo(cRef))<1);
-		assert(abs(GpsCoord(GpsCoord.Unit.DegMinSec, cRef.To(GpsCoord.Unit.DegMinSec)).GetDistanceTo(cRef))<1);
-		assert(abs(GpsCoord(GpsCoord.Unit.GPS, cRef.To(GpsCoord.Unit.GPS)).GetDistanceTo(cRef))<1);
-
-		//Bearing checks
-		GpsCoord cOrig = GpsCoord(0, 0);
-		assert(cOrig.GetBearingTo(GpsCoord(1, 0))==0.0);
-		assert(cOrig.GetBearingTo(GpsCoord(0, 1))==90.0);
-		assert(cOrig.GetBearingTo(GpsCoord(-1, 0))==180.0);
-		assert(cOrig.GetBearingTo(GpsCoord(0, -1))==270.0);
-		assert(abs(GpsCoord(toRad(12), toRad(23)).GetBearingTo(GpsCoord(toRad(1), toRad(91)))-93.7525)<0.001);
-		assert(abs(GpsCoord(toRad(50.066389), toRad(-5.714722)).GetBearingTo(GpsCoord(toRad(58.643889), toRad(-3.07)))-9.119722)<0.001);
-
-
-		//Destination points
-		assert(abs(cOrig.GetDestinationPoint(0, 111195)		.GetDistanceTo(GpsCoord(toRad(1),	toRad(0))))	<0.1);
-		assert(abs(cOrig.GetDestinationPoint(360, 111195)	.GetDistanceTo(GpsCoord(toRad(1),	toRad(0))))	<0.1);
-		assert(abs(cOrig.GetDestinationPoint(90, 111195)	.GetDistanceTo(GpsCoord(toRad(0), 	toRad(1))))	<0.1);
-		assert(abs(cOrig.GetDestinationPoint(180, 111195)	.GetDistanceTo(GpsCoord(toRad(-1), 	toRad(0))))	<0.1);
-		assert(abs(cOrig.GetDestinationPoint(270, 111195)	.GetDistanceTo(GpsCoord(toRad(0), 	toRad(-1))))<0.1);
-		assert(abs(cOrig.GetDestinationPoint(-90, 111195)	.GetDistanceTo(GpsCoord(toRad(0), 	toRad(-1))))<0.1);
-
-
-		//Distance to route checks
-		GpsCoord cA = GpsCoord(toRad(-5), 0);
-		GpsCoord cB = GpsCoord(toRad(+5), 0);
-		assert(abs(GpsCoord(0, toRad(1)).GetDistanceToRoute(cA, cB)-GpsCoord(0, 0).GetDistanceTo(GpsCoord(0, toRad(1))))<0.1);
-		assert(abs(GpsCoord(0, toRad(-1)).GetDistanceToRoute(cA, cB)+GpsCoord(0, 0).GetDistanceTo(GpsCoord(0, toRad(1))))<0.1);
-
-
-		SailLog.Notify("GpsCoord unittest done");
-	}
-
 	/*!
 		@brief Constructor for radians
 	*/
@@ -328,5 +274,67 @@ private:
 
 	//In radians
 	double m_lat, m_long;
+
+
+
+
+
+
+
+
+
+	unittest {
+		import std.exception;
+
+		GpsCoord cRef = GpsCoord(toRad(37.3919331), toRad(-122.043751));
+
+		//Creation and GPS parsing
+		GpsCoord c = GpsCoord(GpsCoord.Unit.GPS, "37 23.516 -122 02.625");
+		assert(abs(c.longitude-cRef.longitude)<0.001 && abs(c.latitude-cRef.latitude)<0.001);
+
+		//Haversine test
+		assert(abs(cRef.GetDistanceTo(GpsCoord(toRad(37.3919331), toRad(-121.043751)))-88344)<1);
+
+		//Parsing tests
+		c = GpsCoord(GpsCoord.Unit.DecDeg, "37.3919331 -122.043751");
+		assert(c.latitude == toRad(37.3919331) && c.longitude == toRad(-122.043751));
+		c = GpsCoord(GpsCoord.Unit.DegMinSec, "13 37 42 13 07 04");
+		assert(abs(c.latitude-toRad(13.628333))<0.001 && abs(c.longitude-toRad(13.117778))<0.001);
+		c = GpsCoord(GpsCoord.Unit.GPS, "37 23.516 -122 02.625");
+		assert(abs(c.latitude-toRad(37.391933))<0.001 && abs(c.longitude+toRad(122.04375))<0.001);
+
+		//Format/parse tests using haversine
+		assert(abs(GpsCoord(GpsCoord.Unit.DecDeg, cRef.To(GpsCoord.Unit.DecDeg)).GetDistanceTo(cRef))<1);
+		assert(abs(GpsCoord(GpsCoord.Unit.DegMinSec, cRef.To(GpsCoord.Unit.DegMinSec)).GetDistanceTo(cRef))<1);
+		assert(abs(GpsCoord(GpsCoord.Unit.GPS, cRef.To(GpsCoord.Unit.GPS)).GetDistanceTo(cRef))<1);
+
+		//Bearing checks
+		GpsCoord cOrig = GpsCoord(0, 0);
+		assert(cOrig.GetBearingTo(GpsCoord(1, 0))==0.0);
+		assert(cOrig.GetBearingTo(GpsCoord(0, 1))==90.0);
+		assert(cOrig.GetBearingTo(GpsCoord(-1, 0))==180.0);
+		assert(cOrig.GetBearingTo(GpsCoord(0, -1))==270.0);
+		assert(abs(GpsCoord(toRad(12), toRad(23)).GetBearingTo(GpsCoord(toRad(1), toRad(91)))-93.7525)<0.001);
+		assert(abs(GpsCoord(toRad(50.066389), toRad(-5.714722)).GetBearingTo(GpsCoord(toRad(58.643889), toRad(-3.07)))-9.119722)<0.001);
+
+
+		//Destination points
+		assert(abs(cOrig.GetDestinationPoint(0, 111195)		.GetDistanceTo(GpsCoord(toRad(1),	toRad(0))))	<0.1);
+		assert(abs(cOrig.GetDestinationPoint(360, 111195)	.GetDistanceTo(GpsCoord(toRad(1),	toRad(0))))	<0.1);
+		assert(abs(cOrig.GetDestinationPoint(90, 111195)	.GetDistanceTo(GpsCoord(toRad(0), 	toRad(1))))	<0.1);
+		assert(abs(cOrig.GetDestinationPoint(180, 111195)	.GetDistanceTo(GpsCoord(toRad(-1), 	toRad(0))))	<0.1);
+		assert(abs(cOrig.GetDestinationPoint(270, 111195)	.GetDistanceTo(GpsCoord(toRad(0), 	toRad(-1))))<0.1);
+		assert(abs(cOrig.GetDestinationPoint(-90, 111195)	.GetDistanceTo(GpsCoord(toRad(0), 	toRad(-1))))<0.1);
+
+
+		//Distance to route checks
+		GpsCoord cA = GpsCoord(toRad(-5), 0);
+		GpsCoord cB = GpsCoord(toRad(+5), 0);
+		assert(abs(GpsCoord(0, toRad(1)).GetDistanceToRoute(cA, cB)-GpsCoord(0, 0).GetDistanceTo(GpsCoord(0, toRad(1))))<0.1);
+		assert(abs(GpsCoord(0, toRad(-1)).GetDistanceToRoute(cA, cB)+GpsCoord(0, 0).GetDistanceTo(GpsCoord(0, toRad(1))))<0.1);
+
+
+		SailLog.Notify("GpsCoord unittest done");
+	}
 
 }
