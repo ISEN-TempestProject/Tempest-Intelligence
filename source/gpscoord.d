@@ -38,6 +38,8 @@ unittest {
 	assert(cOrig.GetBearingTo(GpsCoord(0, 1))==90.0);
 	assert(cOrig.GetBearingTo(GpsCoord(-1, 0))==180.0);
 	assert(cOrig.GetBearingTo(GpsCoord(0, -1))==270.0);
+	assert(abs(GpsCoord(12, 23).GetBearingTo(GpsCoord(1, 91))-93.7525)<0.001);
+	assert(abs(GpsCoord(50.066389, -5.714722).GetBearingTo(GpsCoord(58.643889, -3.07))-9.119722)<0.001);
 
 
 	//Destination points
@@ -48,14 +50,15 @@ unittest {
 	assert(abs(cOrig.GetDestinationPoint(270, 111195).GetDistanceTo(GpsCoord(0, -1)))<0.1);
 	assert(abs(cOrig.GetDestinationPoint(-90, 111195).GetDistanceTo(GpsCoord(0, -1)))<0.1);
 
+
 	//Distance to route checks
 	GpsCoord cA = GpsCoord(-5, 0);
 	GpsCoord cB = GpsCoord(+5, 0);
-	SailLog.Warning("===================Distance to route checks");
-	SailLog.Warning("Should be: ", GpsCoord(0, 0).GetDistanceTo(GpsCoord(0, 1)));
-	SailLog.Warning("Calculated: ", GpsCoord(0, 1).GetDistanceToRoute(cA, cB)/1000.0);
+	assert(abs(GpsCoord(0, 1).GetDistanceToRoute(cA, cB)-GpsCoord(0, 0).GetDistanceTo(GpsCoord(0, 1)))<0.1);
+	assert(abs(GpsCoord(0, -1).GetDistanceToRoute(cA, cB)+GpsCoord(0, 0).GetDistanceTo(GpsCoord(0, 1)))<0.1);
 
-	SailLog.Post("GpsCoord unittest done");
+
+	SailLog.Notify("GpsCoord unittest done");
 }
 
 /**
@@ -197,7 +200,7 @@ struct GpsCoord {
 	*/
 	double GetDistanceTo(GpsCoord point)const{
 
-		//Haversine formula
+		//Using Haversine formula
 		// http://www.movable-type.co.uk/scripts/latlong.html
 		double dLat = toRad(point.m_lat - m_lat);
 		double dLon = toRad(point.m_long - m_long);
@@ -211,14 +214,33 @@ struct GpsCoord {
 
 		return d;
 	}
+
+	double GetDistanceToCos(GpsCoord point){
+		//Using spherical law of cosines
+
+		return acos( sin(toRad(this.m_lat))*sin(toRad(point.m_lat)) +
+                   cos(toRad(this.m_lat))*cos(toRad(point.m_lat)) * cos(toRad(point.m_long-this.m_long)) ) * EARTH_RADIUS_M;
+	}
+
+	double GetDistanceToPyth(GpsCoord point){
+		//Using Pythagore (correct for short distances)
+		double x = toRad(point.m_long-m_long) * cos(toRad(point.m_lat+m_lat)/2);
+		double y = toRad(point.m_lat-m_lat);
+		return sqrt(x*x + y*y) * EARTH_RADIUS_M;
+	}
 	
 	/**
 		Gets the Bearing (compass direction, in degrees) to reach the given point
 	*/
 	double GetBearingTo(GpsCoord point)const{
 		// http://www.movable-type.co.uk/scripts/latlong.html @ Bearing
-		double y = sin(point.m_long-m_long)*cos(point.m_lat);
-		double x = cos(m_lat)*sin(point.m_lat) - sin(m_lat)*cos(point.m_lat)*cos(point.m_long-m_long);
+
+		double rLat1 = toRad(m_lat);
+		double rLat2 = toRad(point.m_lat);
+		double rDLon = toRad(point.m_long-m_long);
+
+		double y = sin(rDLon)*cos(rLat2);
+		double x = cos(rLat1)*sin(rLat2) - sin(rLat1)*cos(rLat2)*cos(rDLon);
 
 		return (toDeg(atan2(y, x))+360.0)%360.0;
 	}
@@ -228,16 +250,7 @@ struct GpsCoord {
 		The distance is signed, wether if the point is on the left/right side.
 	*/
 	double GetDistanceToRoute(GpsCoord A, GpsCoord B)const{
-		// http://www.movable-type.co.uk/scripts/latlong.html @ Cross-track distance
-		double fBearAToC = toRad(A.GetBearingTo(this));
-		double fBearAToB = toRad(A.GetBearingTo(B));
-		SailLog.Post("DistanceAC=", A.GetDistanceTo(this));
-
-		return asin( sin(toRad(A.GetDistanceTo(this)*1000))*sin(fBearAToC-fBearAToB) )*EARTH_RADIUS_M;
-		
-		//double fBearAToC = toRad(A.GetBearingTo(this));
-		//double fBearAToB = toRad(A.GetBearingTo(B));
-		//return asin( sin(A.GetDistanceTo(this)/EARTH_RADIUS_M)*sin(fBearAToC-fBearAToB) )*EARTH_RADIUS_M;
+		return asin(sin(toRad(A.GetBearingTo(this)-A.GetBearingTo(B))) * sin(GetDistanceTo(A)/EARTH_RADIUS_M))*EARTH_RADIUS_M;
 	}
 
 	//static GpsCoord GetRoutesIntersecton(GpsCoord a, GpsCoord b, GpsCoord A, GpsCoord B){
