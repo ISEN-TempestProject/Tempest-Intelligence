@@ -80,7 +80,6 @@ private:
 				case "DecDeg": unit=GpsCoord.Unit.DecDeg; break;
 				case "DegMinSec": unit=GpsCoord.Unit.DegMinSec; break;
 				case "GPS": unit=GpsCoord.Unit.GPS; break;
-				case "UTM": unit=GpsCoord.Unit.UTM; break;
 				default: unit=GpsCoord.Unit.DecDeg;	break;
 			}
 			m_route~=GpsCoord(unit, json["value"].str);
