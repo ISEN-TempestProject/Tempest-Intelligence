@@ -31,6 +31,10 @@ struct GpsCoord {
 		Set(u, expr);
 	}
 
+	string toString() const{
+		return format("(%.6f|%.6f)", toDeg(m_lat), toDeg(m_long));
+	}
+
 	/**
 		Sets the gps coordinates by parsing an expression
 	*/
