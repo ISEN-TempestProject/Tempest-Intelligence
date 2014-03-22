@@ -72,17 +72,25 @@ private:
 
 		//Route parsing
 		string sFile = Config.Get!string("DecisionCenter", "Route");
-		JSONValue jsonFile = parseJSON(readText(sFile).removechars("\n\r\t"));
+		try{
+			JSONValue jsonFile = parseJSON(readText(sFile).removechars("\n\r\t"));
 
-		GpsCoord.Unit unit;
-		foreach(ref json ; jsonFile.array){
-			switch(json["unit"].str){
-				case "DecDeg": unit=GpsCoord.Unit.DecDeg; break;
-				case "DegMinSec": unit=GpsCoord.Unit.DegMinSec; break;
-				case "GPS": unit=GpsCoord.Unit.GPS; break;
-				default: unit=GpsCoord.Unit.DecDeg;	break;
+			GpsCoord.Unit unit;
+			foreach(ref json ; jsonFile.array){
+				try{
+					switch(json["unit"].str){
+						case "DecDeg": unit=GpsCoord.Unit.DecDeg; break;
+						case "DegMinSec": unit=GpsCoord.Unit.DegMinSec; break;
+						case "GPS": unit=GpsCoord.Unit.GPS; break;
+						default: unit=GpsCoord.Unit.DecDeg;	break;
+					}
+					m_route~=GpsCoord(unit, json["value"].str);
+				}catch(Exception e){
+					SailLog.Warning("Ignoring route Waypoint: ", e);
+				}
 			}
-			m_route~=GpsCoord(unit, json["value"].str);
+		}catch(Exception e){
+			SailLog.Critical("Unable to read Route (",sFile,"): ", e);
 		}
 		m_route = (Hardware.Get!Gps(DeviceID.Gps).value)~m_route;
 
