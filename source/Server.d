@@ -11,15 +11,10 @@ class Server
 
 	this(string[] adresses=[], ushort port=8080)
 	{
-		//Get IP Addresses
-		auto ip = executeShell("/sbin/ifconfig | grep 'inet ad' | cut -d: -f2 | awk '{ print $1}'");
-		string[] autoip =  ip.output.splitLines()[0..$];
-
 		/************************
 		*	SERVER SETTINGS
 		*************************/
 		m_Settings = new HTTPServerSettings;
-		m_Settings.bindAddresses = autoip~adresses;
 		m_Settings.port = port;
 
 
