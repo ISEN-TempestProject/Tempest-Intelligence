@@ -2,7 +2,7 @@
 # export PATH=$PATH:/opt/arm-unknown-linux-gnueabi/bin/
 
 all: 
-	dub build --compiler=gdc --nodeps
+	dub build --nodeps
 
 deps:
 	dub build --compiler=gdc
