@@ -108,7 +108,7 @@ class HWSens(T) : HWElement!T {
 
 protected:
 	this(size_t fifoSize){
-		m_values = new Fifo!T(fifoSize);
+		m_values = Fifo!T(fifoSize);
 	}
 
 	/**

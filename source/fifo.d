@@ -5,7 +5,7 @@ import std.container;
 /**
 	Basic fifo class
 */
-class Fifo(T) {
+struct Fifo(T) {
 	this(size_t size) {
 		m_nMaxSize = size;
 	}
