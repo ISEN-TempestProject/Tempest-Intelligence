@@ -115,9 +115,7 @@ sailControllers.controller('dcCtrl', ['$scope', '$rootScope', '$http', '$log',
 		$rootScope.getDC = function(){	
 		    $http.get('/api/dc')
 			    .success(function(data, status, headers, config) {
-			        $scope.dc = data;
-			  		console.log("ZOUZOU" + data.enabled);
-			        console.log("ZOUZOUZOU " + $scope.dc.enabled);
+			        $rootScope.dc = data;
 			    })
 			    .error(function(data, status, headers, config) {
 			        $log.error('Can\'t reach decision center.');
@@ -125,7 +123,7 @@ sailControllers.controller('dcCtrl', ['$scope', '$rootScope', '$http', '$log',
 		}
 
 	    $scope.toggleDC = function() {
-	    	var dc = $scope.dc;
+	    	var dc = $rootScope.dc;
 	    	dc.enabled = !dc.enabled;
 	    	$http.post('/api/dc', {"status" : dc.enabled})
 			    		.success(function(data, status, headers, config) {
@@ -137,8 +135,15 @@ sailControllers.controller('dcCtrl', ['$scope', '$rootScope', '$http', '$log',
 					    });   
 		}
 
+		$rootScope.getDC();
+	}
+]);
+
+sailControllers.controller('dcModulesCtrl', ['$scope', '$rootScope', '$http', '$log',
+	function($scope, $rootScope, $http, $log) {
+
 		$scope.setTargetPosition = function() {
-	    	var data = '{"longitude" : '+$scope.dc.targetPosition.longitude+', "latitude" : '+$scope.dc.targetPosition.latitude+'}';
+	    	var data = '{"longitude" : '+$rootScope.dc.targetPosition.longitude+', "latitude" : '+$scope.dc.targetPosition.latitude+'}';
 
 	    	$http.post('/api/targetposition', data)
     		.success(function(data, status, headers, config) {
@@ -163,7 +168,6 @@ sailControllers.controller('dcCtrl', ['$scope', '$rootScope', '$http', '$log',
 		    });
 		}  
 
-		$rootScope.getDC();
 	}
 ]);
 
