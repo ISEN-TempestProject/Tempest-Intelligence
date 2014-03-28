@@ -26,7 +26,7 @@ struct Fifo(T) {
 
 	@property const nothrow{
 		bool empty(){return m_list.empty;}
-		size_t size(){return m_nSize;}
+		size_t length(){return m_nSize;}
 	}
 
 	@property nothrow{
@@ -38,7 +38,7 @@ struct Fifo(T) {
 		Returns the contained elements
 	*/
 	@property{
-		DList!T elements(){
+		ref DList!T elements(){
 			return m_list;
 		}
 	}

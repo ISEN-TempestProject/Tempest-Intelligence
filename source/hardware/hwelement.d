@@ -4,6 +4,7 @@ import saillog;
 import hardware.hardware;
 import hardware.devices;
 import fifo;
+import filter;
 
 /**
 	Abstract class to represent a hardware element/device
@@ -108,7 +109,7 @@ class HWSens(T) : HWElement!T {
 
 protected:
 	this(size_t fifoSize){
-		m_values = Fifo!T(fifoSize);
+		m_values = Fifo!(TimestampedValue!T)(fifoSize);
 	}
 
 	/**
@@ -116,14 +117,7 @@ protected:
 	*/
 	abstract void CheckIsOutOfService();
 
-	/**
-		Default filter : gets the front value. Override it to customize
-	*/
-	void ExecFilter(){
-		m_lastvalue = m_values.front();
-	}
-
-	Fifo!T m_values;
+	Fifo!(TimestampedValue!T) m_values;
 }
 
 //==============================================================================
