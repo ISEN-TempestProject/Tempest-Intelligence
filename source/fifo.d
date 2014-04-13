@@ -6,9 +6,16 @@ import std.container;
 	Basic fifo class
 */
 struct Fifo(T) {
+	/**
+		Creates an empty fifo
+	*/
 	this(size_t size) {
 		m_nMaxSize = size;
 	}
+
+	/**
+		Creates a fifo with content
+	*/
 	this(size_t size, ref DList!T list) {
 		m_nMaxSize = size;
 

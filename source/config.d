@@ -50,8 +50,8 @@ private:
 
 public:
 	/**
-		@brief Gets the value of the given entry
-		@throw if the entry does not exists
+		Gets the value of the given entry
+		Throws: if the entry does not exists
 	*/
 	static T Get(T)(string sHeader, string sName){
 		if(m_inst is null)m_inst = new Config();

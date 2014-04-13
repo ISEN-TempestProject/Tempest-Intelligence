@@ -140,7 +140,7 @@ private:
 
 	void CheckIsDestinationReached(){
 		GpsCoord currPos = Hardware.Get!Gps(DeviceID.Gps).value;
-		float fDistance = m_fDistanceToTarget+1;//todo: use currPos.GetDistanceTo(m_route[m_nDestinationIndex]);
+		float fDistance = currPos.GetDistanceTo(m_route[m_nDestinationIndex]);
 		if(fDistance<=m_fDistanceToTarget){
 			m_nDestinationIndex++;
 			SailLog.Notify("Set new target to ",m_route[m_nDestinationIndex].To(GpsCoord.Unit.DecDeg)," (index=",m_nDestinationIndex,")");

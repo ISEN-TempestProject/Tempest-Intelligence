@@ -70,21 +70,34 @@ class Gps : HWSens!GpsCoord {
 		m_lastvalue=m_init;
 	}
 
-	override void ParseValue(ulong[2] data)
-	out{
-		assert(m_min.longitude<=m_values.front.value.longitude && m_values.front.value.longitude<=m_max.longitude);
-		assert(m_min.latitude<=m_values.front.value.latitude && m_values.front.value.latitude<=m_max.latitude);
-	}body{
-		GpsCoord coord = GpsCoord(
-			to!double((m_max.longitude-m_min.longitude)*data[0]/ulong.max),
-			to!double((m_max.latitude-m_min.latitude)*data[0]/ulong.max)
-			);
-		m_values.Append(TimestampedValue!GpsCoord(Clock.currAppTick(), coord));
-		m_lastvalue = Filter.Raw!GpsCoord(m_values);
+	override{
+
+		void ParseValue(ulong[2] data)
+		out{
+			assert(m_min.longitude<=m_values.front.value.longitude && m_values.front.value.longitude<=m_max.longitude);
+			assert(m_min.latitude<=m_values.front.value.latitude && m_values.front.value.latitude<=m_max.latitude);
+		}body{
+			GpsCoord coord = GpsCoord(
+				to!double((m_max.longitude-m_min.longitude)*data[0]/ulong.max),
+				to!double((m_max.latitude-m_min.latitude)*data[0]/ulong.max)
+				);
+			m_values.Append(TimestampedValue!GpsCoord(Clock.currAppTick(), coord));
+			m_lastvalue = Filter.Raw!GpsCoord(m_values);
+		}
+
+		void CheckIsOutOfService(){
+			//May be wise to check if values are coherent
+		}
+
+		ulong[2] FormatValue(in GpsCoord value){
+			return [cast(ulong)(value.latitude), cast(ulong)(value.longitude)];
+		}
 	}
 
-	override void CheckIsOutOfService(){
-		//May be wise to check if values are coherent
+	unittest {
+		auto pos = GpsCoord(GpsCoord.toRad(37.3919331), GpsCoord.toRad(-122.043751));
+		auto val = FormatValue(pos);
+		assert(val[0]==cast(ulong)(pos.latitude) && val[1]==cast(ulong)(pos.longitude));
 	}
 }
 

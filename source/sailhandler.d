@@ -103,4 +103,7 @@ unittest {
 	wind.value = wind.min;
 	sh.AdjustSail();
 	assert(sail.value==sail.min);
+
+
+	SailLog.Notify("SailHandler unittest done");
 }

@@ -135,7 +135,7 @@ class HWAct(T) : HWElement!T {
 
 		override void value(T val){
 			if(!m_isemulated){
-				Hardware.GetClass().SendEvent(m_id, FormatLastValue(val));
+				Hardware.GetClass().SendEvent(m_id, FormatValue(val));
 			}
 			m_lastvalue = val;
 		}
@@ -145,7 +145,7 @@ protected:
 	/**
 		Formats the values to send into the socket
 	*/
-	ulong[2] FormatLastValue(in T value){
-		return [cast(ulong)(value), cast(ulong)(0)];
+	ulong[2] FormatValue(in T value){
+		return [cast(ulong)(value), 0];
 	}
 }

@@ -28,7 +28,6 @@ public:
 				SailLog.Critical("Trying to cast "~(m_inst.m_hwlist[id].classinfo.name)~" to type "~id);
 				throw new Exception("Trying to cast "~(m_inst.m_hwlist[id].classinfo.name)~" to type "~id);
 			}
-			//return cast(T)(m_inst.m_hwlist[id]);
 		}
 		else{
 			SailLog.Critical("Hardware element not found : ", id);
@@ -51,8 +50,8 @@ package:
 		Sends and event into the socket
 	*/
 	void SendEvent(DeviceID id, ulong[2] data){
-		//TODO impl that
-		HWEvent ev = {id, data};
+		//TODO Check this
+		m_socket.send([id, data[0], data[1]]);
 	}
 
 
@@ -110,8 +109,6 @@ private:
 			if(nReceived>0){
 				SailLog.Post("Received: [",buffer[0].id,"|",buffer[0].data,"]");
 
-
-				//@TODO clean this: ParseValue should be called on HWSens
 				switch(buffer[0].id){
 					case DeviceID.Gps:
 						(cast(Gps)(m_hwlist[buffer[0].id])).ParseValue(buffer[0].data); 
