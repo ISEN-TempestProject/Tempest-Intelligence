@@ -88,16 +88,6 @@ class Gps : HWSens!GpsCoord {
 		void CheckIsOutOfService(){
 			//May be wise to check if values are coherent
 		}
-
-		ulong[2] FormatValue(in GpsCoord value){
-			return [cast(ulong)(value.latitude), cast(ulong)(value.longitude)];
-		}
-	}
-
-	unittest {
-		auto pos = GpsCoord(GpsCoord.toRad(37.3919331), GpsCoord.toRad(-122.043751));
-		auto val = FormatValue(pos);
-		assert(val[0]==cast(ulong)(pos.latitude) && val[1]==cast(ulong)(pos.longitude));
 	}
 }
 

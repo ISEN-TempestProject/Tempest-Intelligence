@@ -51,7 +51,11 @@ package:
 	*/
 	void SendEvent(DeviceID id, ulong[2] data){
 		//TODO Check this
-		m_socket.send([id, data[0], data[1]]);
+		if(m_connected){
+			synchronized(this.classinfo){
+				m_socket.send([id, data[0], data[1]]);
+			}
+		}
 	}
 
 
@@ -75,6 +79,8 @@ private:
 				SailLog.Critical("Error when trying to connect socket: ",e.msg,"\n",e.file,":",e.line);
 				return;
 			}
+
+			m_connected = true;
 
 			//Start network thread
 			m_thread = new Thread(&NetworkThread);
@@ -154,6 +160,7 @@ private:
 	UnixAddress m_addr;
 	Socket m_socket;
 	Thread m_thread;
+	bool m_connected = false;
 
 	Object[DeviceID] m_hwlist;
 
