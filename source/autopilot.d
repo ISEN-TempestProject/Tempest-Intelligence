@@ -46,11 +46,11 @@ private:
 				if(m_bEnabled)
 					AdjustHelm();
 
-				m_thread.sleep(dur!("msecs")(m_nLoopTimeMS));
-
 			}catch(Throwable t){
 				SailLog.Critical("In thread ",m_thread.name,": ",t.toString);
 			}
+
+			Thread.sleep(dur!("msecs")(m_nLoopTimeMS));
 		}
 	}
 
