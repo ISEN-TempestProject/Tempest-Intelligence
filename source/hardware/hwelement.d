@@ -145,7 +145,5 @@ protected:
 	/**
 		Formats the values to send into the socket
 	*/
-	ulong[2] FormatValue(in T value){
-		return [cast(ulong)(value), 0];
-	}
+	abstract ulong[2] FormatValue(in T value);
 }

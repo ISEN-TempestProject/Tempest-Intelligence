@@ -2,13 +2,16 @@
 # export PATH=$PATH:/opt/arm-unknown-linux-gnueabi/bin/
 
 all: 
-	dub build --nodeps
+	dub build --compiler=gdc --nodeps
 
 deps:
 	dub build --compiler=gdc
 
 unittest:
 	dub build --compiler=gdc --build=unittest
+
+cov:
+	dub build --compiler=gdc --build=unittest-cov
 
 cross:
 	dub build --compiler=arm-unknown-linux-gnueabi-gdc

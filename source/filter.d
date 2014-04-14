@@ -59,23 +59,26 @@ static class Filter {
 			Returns the time-weighted average of all values stored in data
 		*/
 		T TimedAvg(T)(ref Fifo!(TimestampedValue!T) data){
+			T ret = 0;
+
 			auto rng = data.elements.opSlice();
 			if(!rng.empty){
-				T ret = 0;
-
 				TickDuration dt = rng.back.time-rng.front.time;
-
 				TimestampedValue!T last = rng.front;
 				rng.popFront();
 
-				for( ; !rng.empty ; rng.popFront()){
-					ret += last.value*(rng.front.time - last.time).length;
-					last = rng.front;
+				if(!rng.empty){
+					for( ; !rng.empty ; rng.popFront()){
+						ret += last.value*(rng.front.time - last.time).length;
+						last = rng.front;
+					}
+					ret /= dt.length;
 				}
-
-				return ret/dt.length;
+				else{
+					return last.value;
+				}
 			}
-			return 0;
+			return ret;
 
 		}
 

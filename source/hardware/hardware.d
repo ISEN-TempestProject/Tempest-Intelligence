@@ -70,7 +70,7 @@ private:
 
 		version(unittest){}else{
 			//Open Socket
-			m_addr = new UnixAddress("/tmp/socket");
+			m_addr = new UnixAddress("/tmp/hwsocket");
 			m_socket = new Socket(AddressFamily.UNIX, SocketType.SEQPACKET, ProtocolType.ICMP);
 			m_socket.blocking(true);
 			try{
@@ -89,6 +89,16 @@ private:
 			m_thread.start();
 		}
 		SailLog.Success(typeof(this).stringof~" instantiated in ",Thread.getThis().name," thread");
+	}
+	~this(){
+		if(m_thread !is null){
+			m_stopthread = true;
+			m_thread.join();
+		}
+		if(m_connected){
+			m_socket.shutdown(SocketShutdown.BOTH);
+			m_socket.close();
+		}
 	}
 
 	/**
@@ -109,31 +119,40 @@ private:
 	*/
 	void NetworkThread(){
 
-		while(true){
-			HWEvent buffer[1];
-			long nReceived = m_socket.receive(buffer);
-			if(nReceived>0){
-				SailLog.Post("Received: [",buffer[0].id,"|",buffer[0].data,"]");
+		while(!m_stopthread && m_socket.isAlive){
+			try{
+				HWEvent buffer[1];
+				long nReceived = m_socket.receive(buffer);
+				if(nReceived>0){
+					//SailLog.Post("Received: [",buffer[0].id,"|",buffer[0].data,"]");
 
-				switch(buffer[0].id){
-					case DeviceID.Gps:
-						(cast(Gps)(m_hwlist[buffer[0].id])).ParseValue(buffer[0].data); 
-						break;
-					case DeviceID.Roll:
-						(cast(Roll)(m_hwlist[buffer[0].id])).ParseValue(buffer[0].data); 
-						break;
-					case DeviceID.WindDir:
-						(cast(WindDir)(m_hwlist[buffer[0].id])).ParseValue(buffer[0].data); 
-						break;
-					case DeviceID.Compass:
-						(cast(Compass)(m_hwlist[buffer[0].id])).ParseValue(buffer[0].data); 
-						break;
+					switch(buffer[0].id){
+						case DeviceID.Gps:
+							(cast(Gps)(m_hwlist[buffer[0].id])).ParseValue(buffer[0].data);
+							break;
+						case DeviceID.Roll:
+							(cast(Roll)(m_hwlist[buffer[0].id])).ParseValue(buffer[0].data);
+							break;
+						case DeviceID.WindDir:
+							(cast(WindDir)(m_hwlist[buffer[0].id])).ParseValue(buffer[0].data);
+							break;
+						case DeviceID.Compass:
+							(cast(Compass)(m_hwlist[buffer[0].id])).ParseValue(buffer[0].data);
+							break;
 
-					default:
-						SailLog.Warning("NetworkThread: ",buffer[0].id," is not a handled HWSensor");
+						default:
+							SailLog.Critical("NetworkThread: ",buffer[0].id," is not a handled HWSensor");
+					}
 				}
+				else
+					break;
+
+			}catch(Throwable t){
+				SailLog.Critical("In thread ",m_thread.name,": ",t.toString);
 			}
 		}
+		SailLog.Critical("Exiting ",m_thread.name," thread ! Communication with HWDaemon is dropped");
+
 	}
 
 
@@ -149,18 +168,12 @@ private:
 		ulong data[2];
 	}
 
-	/**
-		Callback for parsing received events
-	*/
-	void OnEventReceived(T)(HWEvent ev){
-		//store data in the correct device
-	}
-
 
 	UnixAddress m_addr;
 	Socket m_socket;
 	Thread m_thread;
 	bool m_connected = false;
+	bool m_stopthread = false;
 
 	Object[DeviceID] m_hwlist;
 

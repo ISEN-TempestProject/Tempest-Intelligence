@@ -31,14 +31,20 @@ class Sail : HWAct!ubyte {
 	}
 
 	invariant(){
-		assert(m_min<=m_lastvalue && m_lastvalue<=m_max);
+		assert(m_min<=m_lastvalue && m_lastvalue<=m_max, "Value is out of bound");
+	}
+
+
+protected:
+	override ulong[2] FormatValue(in ubyte value){
+		return [cast(ulong)(value), 0];
 	}
 }
 
 /**
 	Handles the helm orientation
 */
-class Helm : HWAct!double {
+class Helm : HWAct!float {
 	this(){
 		m_id = DeviceID.Helm;
 		m_min = -45;
@@ -48,7 +54,13 @@ class Helm : HWAct!double {
 	}
 
 	invariant(){
-		assert(m_min<=m_lastvalue && m_lastvalue<=m_max);
+		assert(m_min<=m_lastvalue && m_lastvalue<=m_max, "Value is out of bound");
+	}
+
+
+protected:
+	override ulong[2] FormatValue(in float value){
+		return [cast(ulong)((value+45.0)*(ulong.max/90.0)), 0];
 	}
 }
 
@@ -61,27 +73,35 @@ class Gps : HWSens!GpsCoord {
 	this(){
 		super(50);
 		m_id = DeviceID.Gps;
-		m_min.longitude = -180;
 		m_min.latitude = -90;
-		m_max.longitude = 180;
 		m_max.latitude = 90;
-		m_init.longitude = 0;
+		m_min.longitude = -180;
+		m_max.longitude = 180;
 		m_init.latitude = 0;
+		m_init.longitude = 0;
 		m_lastvalue=m_init;
+	}
+
+	invariant(){
+		assert(m_min.latitude<=m_lastvalue.latitude && m_lastvalue.latitude<=m_max.latitude, "Value is out of bound");
+		assert(m_min.longitude<=m_lastvalue.longitude && m_lastvalue.longitude<=m_max.longitude, "Value is out of bound");
 	}
 
 	override{
 
 		void ParseValue(ulong[2] data)
 		out{
-			assert(m_min.longitude<=m_values.front.value.longitude && m_values.front.value.longitude<=m_max.longitude);
-			assert(m_min.latitude<=m_values.front.value.latitude && m_values.front.value.latitude<=m_max.latitude);
+			assert(m_min.latitude<=m_values.front.value.latitude && m_values.front.value.latitude<=m_max.latitude, "Value is out of bound");
+			assert(m_min.longitude<=m_values.front.value.longitude && m_values.front.value.longitude<=m_max.longitude, "Value is out of bound");
 		}body{
 			GpsCoord coord = GpsCoord(
-				to!double((m_max.longitude-m_min.longitude)*data[0]/ulong.max),
-				to!double((m_max.latitude-m_min.latitude)*data[0]/ulong.max)
+				GpsCoord.toRad(((m_max.latitude-m_min.latitude)*data[0]/ulong.max)+m_min.latitude),
+				GpsCoord.toRad(((m_max.longitude-m_min.longitude)*data[1]/ulong.max)+m_min.longitude)
 				);
-			m_values.Append(TimestampedValue!GpsCoord(Clock.currAppTick(), coord));
+			m_values.Append(TimestampedValue!GpsCoord(
+				Clock.currAppTick(),
+				coord
+			));
 			m_lastvalue = Filter.Raw!GpsCoord(m_values);
 		}
 
@@ -105,14 +125,17 @@ class Roll : HWSens!float {
 	}
 
 	invariant(){
-		assert(m_min<=m_lastvalue && m_lastvalue<=m_max);
+		assert(m_min<=m_lastvalue && m_lastvalue<=m_max, "Value is out of bound");
 	}
 
 	override void ParseValue(ulong[2] data)
 	out{
-		assert(m_min<=m_values.front.value && m_values.front.value<=m_max);
+		assert(m_min<=m_values.front.value && m_values.front.value<=m_max, "Value is out of bound");
 	}body{
-		m_values.Append(TimestampedValue!float(Clock.currAppTick(),   to!float((m_max-m_min)*data[0]/ulong.max+m_min)  ));
+		m_values.Append(TimestampedValue!float(
+			Clock.currAppTick(),
+			to!float((m_max-m_min)*data[0]/ulong.max)+m_min
+		));
 		m_lastvalue = Filter.TimedAvg!float(m_values);
 	}
 
@@ -135,17 +158,21 @@ class WindDir : HWSens!float {
 	}
 
 	invariant(){
-		assert(m_min<=m_lastvalue && m_lastvalue<=m_max);
+		assert(m_min<=m_lastvalue && m_lastvalue<=m_max, "Value is out of bound");
 	}
 
 	override void ParseValue(ulong[2] data)
 	out{
-		assert(m_min<=m_values.front.value && m_values.front.value<=m_max);
+		assert(m_min<=m_values.front.value && m_values.front.value<=m_max, "Value is out of bound");
 	}body{
-		float fValue = to!float((m_max-m_min)*data[0]/ulong.max);
+		float fValue = to!float((m_max-m_min)*data[0]/ulong.max)+m_min;
 		if(fValue>180)
-			fValue = 360-fValue;
-		m_values.Append(TimestampedValue!float(Clock.currAppTick(),   fValue  ));
+			fValue = 360.0-fValue;
+
+		m_values.Append(TimestampedValue!float(
+			Clock.currAppTick(),
+			fValue
+		));
 		m_lastvalue = Filter.TimedAvg!float(m_values);
 	}
 
@@ -178,14 +205,17 @@ class Compass : HWSens!float {
 	}
 
 	invariant(){
-		assert(m_min<=m_lastvalue && m_lastvalue<=m_max);
+		assert(m_min<=m_lastvalue && m_lastvalue<=m_max, "Value is out of bound");
 	}
 
 	override void ParseValue(ulong[2] data)
 	out{
-		assert(m_min<=m_values.front.value && m_values.front.value<=m_max);
+		assert(m_min<=m_values.front.value && m_values.front.value<=m_max, "Value is out of bound");
 	}body{
-		m_values.Append(TimestampedValue!float(Clock.currAppTick(),   to!float((m_max-m_min)*data[0]/ulong.max)  ));
+		m_values.Append(TimestampedValue!float(
+			Clock.currAppTick(),
+			to!float((m_max-m_min)*data[0]/ulong.max)+m_min
+		));
 		m_lastvalue = Filter.TimedAvg!float(m_values);
 	}
 

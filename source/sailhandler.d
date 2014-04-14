@@ -37,13 +37,17 @@ private:
 
 	void ThreadFunction(){
 		while(true){
-			debug{
-				SailLog.Post("Running "~typeof(this).stringof~" thread");
-			}
-			if(m_bEnabled)
-				AdjustSail();
+			try{
+				debug{
+					SailLog.Post("Running "~typeof(this).stringof~" thread");
+				}
+				if(m_bEnabled)
+					AdjustSail();
 
-			m_thread.sleep(dur!("msecs")(m_nLoopTimeMS));
+				m_thread.sleep(dur!("msecs")(m_nLoopTimeMS));
+			}catch(Throwable t){
+				SailLog.Critical("In thread ",m_thread.name,": ",t.toString);
+			}
 		}
 	}
 
