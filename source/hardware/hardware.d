@@ -71,16 +71,8 @@ private:
 		version(unittest){}else{
 			//Open Socket
 			m_addr = new UnixAddress("/tmp/hwsocket");
-			m_socket = new Socket(AddressFamily.UNIX, SocketType.SEQPACKET, ProtocolType.ICMP);
-			m_socket.blocking(true);
-			try{
-				m_socket.connect(m_addr);
-			}catch(Exception e){
-				SailLog.Critical("Error when trying to connect socket: ",e.msg,"\n",e.file,":",e.line);
-				return;
-			}
+			
 
-			m_connected = true;
 
 			//Start network thread
 			m_thread = new Thread(&NetworkThread);
@@ -118,40 +110,58 @@ private:
 		Handles socket communications
 	*/
 	void NetworkThread(){
+		while(!m_stopthread){
 
-		while(!m_stopthread && m_socket.isAlive){
 			try{
-				HWEvent buffer[1];
-				long nReceived = m_socket.receive(buffer);
-				if(nReceived>0){
-					//SailLog.Post("Received: [",buffer[0].id,"|",buffer[0].data,"]");
+				//Connection to socket
+				m_socket = new Socket(AddressFamily.UNIX, SocketType.SEQPACKET, ProtocolType.ICMP);
+				m_socket.blocking(true);
+				m_socket.connect(m_addr);
+				m_connected = true;
 
-					switch(buffer[0].id){
-						case DeviceID.Gps:
-							(cast(Gps)(m_hwlist[buffer[0].id])).ParseValue(buffer[0].data);
-							break;
-						case DeviceID.Roll:
-							(cast(Roll)(m_hwlist[buffer[0].id])).ParseValue(buffer[0].data);
-							break;
-						case DeviceID.WindDir:
-							(cast(WindDir)(m_hwlist[buffer[0].id])).ParseValue(buffer[0].data);
-							break;
-						case DeviceID.Compass:
-							(cast(Compass)(m_hwlist[buffer[0].id])).ParseValue(buffer[0].data);
-							break;
+				//Handle communications
+				while(!m_stopthread && m_socket.isAlive){
+					HWEvent buffer[1];
+					long nReceived = m_socket.receive(buffer);
+					if(nReceived>0){
+						//SailLog.Post("Received: [",buffer[0].id,"|",buffer[0].data,"]");
 
-						default:
-							SailLog.Critical("NetworkThread: ",buffer[0].id," is not a handled HWSensor");
+						switch(buffer[0].id){
+							case DeviceID.Gps:
+								(cast(Gps)(m_hwlist[buffer[0].id])).ParseValue(buffer[0].data);
+								break;
+							case DeviceID.Roll:
+								(cast(Roll)(m_hwlist[buffer[0].id])).ParseValue(buffer[0].data);
+								break;
+							case DeviceID.WindDir:
+								(cast(WindDir)(m_hwlist[buffer[0].id])).ParseValue(buffer[0].data);
+								break;
+							case DeviceID.Compass:
+								(cast(Compass)(m_hwlist[buffer[0].id])).ParseValue(buffer[0].data);
+								break;
+
+							default:
+								SailLog.Critical("NetworkThread: ",buffer[0].id," is not a handled HWSensor");
+						}
 					}
+					else
+						break;
 				}
-				else
-					break;
-
-			}catch(Throwable t){
+				SailLog.Critical("Exiting ",m_thread.name," thread ! Communication with HWDaemon is dropped");
+				m_socket.shutdown(SocketShutdown.BOTH);
+				m_socket.close();
+				m_socket.destroy();
+				m_connected = false;
+				
+			}
+			catch(Exception e){
+				SailLog.Critical("Error when trying to connect socket: ",e.msg);
+				Thread.sleep(dur!("seconds")(2));
+			}
+			catch(Throwable t){
 				SailLog.Critical("In thread ",m_thread.name,": ",t.toString);
 			}
 		}
-		SailLog.Critical("Exiting ",m_thread.name," thread ! Communication with HWDaemon is dropped");
 
 	}
 
