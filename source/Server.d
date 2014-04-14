@@ -9,7 +9,7 @@ class Server
 	HTTPServerSettings m_Settings;
 	URLRouter m_Router;
 
-	this(string[] adresses=[], ushort port=8080)
+	this(string[] adresses=[], ushort port=1337)
 	{
 		/************************
 		*	SERVER SETTINGS

@@ -19,3 +19,6 @@ doc/*
 
 #Notes
 *.notes
+
+#Editor configuration related
+.zedstate
