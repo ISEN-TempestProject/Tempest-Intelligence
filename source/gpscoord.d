@@ -35,6 +35,15 @@ struct GpsCoord {
 		return format("(%.6f|%.6f)", toDeg(m_lat), toDeg(m_long));
 	}
 
+	GpsCoord opBinary(string op)(GpsCoord sec) {
+		static if (op == "+") return GpsCoord(m_lat+sec.m_lat, m_long+sec.m_long);
+		static if (op == "-") return GpsCoord(m_lat-sec.m_lat, m_long-sec.m_long);
+		static if (op == "*") return GpsCoord(m_lat*sec.m_lat, m_long*sec.m_long);
+		static if (op == "/") return GpsCoord(m_lat/sec.m_lat, m_long/sec.m_long);
+		else static assert(0, "Operator "~op~" not implemented");
+	}
+
+
 	/**
 		Sets the gps coordinates by parsing an expression
 	*/

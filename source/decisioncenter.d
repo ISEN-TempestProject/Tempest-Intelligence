@@ -129,13 +129,17 @@ private:
 	Thread m_thread;
 	void DecisionThread(){
 		while(true){
-			debug{
-				SailLog.Post("Running "~typeof(this).stringof~" thread");
-			}
-			if(m_bEnabled)
-				MakeDecision();
+			try{
+				debug{
+					SailLog.Post("Running "~typeof(this).stringof~" thread");
+				}
+				if(m_bEnabled)
+					MakeDecision();
 
-			m_thread.sleep(dur!("msecs")(m_nLoopTimeMS));
+				m_thread.sleep(dur!("msecs")(m_nLoopTimeMS));
+			}catch(Throwable t){
+				SailLog.Critical("In thread ",m_thread.name,": ",t.toString);
+			}
 		}
 	}
 
@@ -152,7 +156,7 @@ private:
 
 	void CheckIsDestinationReached(){
 		GpsCoord currPos = Hardware.Get!Gps(DeviceID.Gps).value;
-		float fDistance = m_fDistanceToTarget+1;//todo: use currPos.GetDistanceTo(m_route[m_nDestinationIndex]);
+		float fDistance = currPos.GetDistanceTo(m_route[m_nDestinationIndex]);
 		if(fDistance<=m_fDistanceToTarget){
 			m_nDestinationIndex++;
 			SailLog.Notify("Set new target to ",m_route[m_nDestinationIndex].To(GpsCoord.Unit.DecDeg)," (index=",m_nDestinationIndex,")");

@@ -10,6 +10,9 @@ deps:
 unittest:
 	dub build --compiler=gdc --build=unittest
 
+cov:
+	dub build --compiler=gdc --build=unittest-cov
+
 cross:
 	dub build --compiler=arm-unknown-linux-gnueabi-gdc
 

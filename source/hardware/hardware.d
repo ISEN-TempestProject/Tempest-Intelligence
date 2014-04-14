@@ -28,7 +28,6 @@ public:
 				SailLog.Critical("Trying to cast "~(m_inst.m_hwlist[id].classinfo.name)~" to type "~id);
 				throw new Exception("Trying to cast "~(m_inst.m_hwlist[id].classinfo.name)~" to type "~id);
 			}
-			//return cast(T)(m_inst.m_hwlist[id]);
 		}
 		else{
 			SailLog.Critical("Hardware element not found : ", id);
@@ -51,7 +50,12 @@ package:
 		Sends and event into the socket
 	*/
 	void SendEvent(DeviceID id, ulong[2] data){
-		HWEvent ev = {id, data};
+		//TODO Check this
+		if(m_connected){
+			synchronized(this.classinfo){
+				m_socket.send([id, data[0], data[1]]);
+			}
+		}
 	}
 
 
@@ -66,15 +70,9 @@ private:
 
 		version(unittest){}else{
 			//Open Socket
-			m_addr = new UnixAddress("/tmp/socket");
-			m_socket = new Socket(AddressFamily.UNIX, SocketType.SEQPACKET, ProtocolType.ICMP);
-			m_socket.blocking(true);
-			try{
-				m_socket.connect(m_addr);
-			}catch(Exception e){
-				SailLog.Critical("Error when trying to connect socket: ",e.msg,"\n",e.file,":",e.line);
-				return;
-			}
+			m_addr = new UnixAddress("/tmp/hwsocket");
+			
+
 
 			//Start network thread
 			m_thread = new Thread(&NetworkThread);
@@ -83,6 +81,16 @@ private:
 			m_thread.start();
 		}
 		SailLog.Success(typeof(this).stringof~" instantiated in ",Thread.getThis().name," thread");
+	}
+	~this(){
+		if(m_thread !is null){
+			m_stopthread = true;
+			m_thread.join();
+		}
+		if(m_connected){
+			m_socket.shutdown(SocketShutdown.BOTH);
+			m_socket.close();
+		}
 	}
 
 	/**
@@ -102,34 +110,59 @@ private:
 		Handles socket communications
 	*/
 	void NetworkThread(){
+		while(!m_stopthread){
 
-		while(true){
-			HWEvent buffer[1];
-			long nReceived = m_socket.receive(buffer);
-			if(nReceived>0){
-				SailLog.Post("Received: [",buffer[0].id,"|",buffer[0].data,"]");
+			try{
+				//Connection to socket
+				m_socket = new Socket(AddressFamily.UNIX, SocketType.SEQPACKET, ProtocolType.ICMP);
+				m_socket.blocking(true);
+				m_socket.connect(m_addr);
+				m_connected = true;
 
+				//Handle communications
+				while(!m_stopthread && m_socket.isAlive){
+					HWEvent buffer[1];
+					long nReceived = m_socket.receive(buffer);
+					if(nReceived>0){
+						//SailLog.Post("Received: [",buffer[0].id,"|",buffer[0].data,"]");
 
-				//@TODO clean this: ParseValue should be called on HWSens
-				switch(buffer[0].id){
-					case DeviceID.Gps:
-						(cast(Gps)(m_hwlist[buffer[0].id])).ParseValue(buffer[0].data); 
-						break;
-					case DeviceID.Roll:
-						(cast(Roll)(m_hwlist[buffer[0].id])).ParseValue(buffer[0].data); 
-						break;
-					case DeviceID.WindDir:
-						(cast(WindDir)(m_hwlist[buffer[0].id])).ParseValue(buffer[0].data); 
-						break;
-					case DeviceID.Compass:
-						(cast(Compass)(m_hwlist[buffer[0].id])).ParseValue(buffer[0].data); 
-						break;
+						switch(buffer[0].id){
+							case DeviceID.Gps:
+								(cast(Gps)(m_hwlist[buffer[0].id])).ParseValue(buffer[0].data);
+								break;
+							case DeviceID.Roll:
+								(cast(Roll)(m_hwlist[buffer[0].id])).ParseValue(buffer[0].data);
+								break;
+							case DeviceID.WindDir:
+								(cast(WindDir)(m_hwlist[buffer[0].id])).ParseValue(buffer[0].data);
+								break;
+							case DeviceID.Compass:
+								(cast(Compass)(m_hwlist[buffer[0].id])).ParseValue(buffer[0].data);
+								break;
 
-					default:
-						SailLog.Warning("NetworkThread: ",buffer[0].id," is not a handled HWSensor");
+							default:
+								SailLog.Critical("NetworkThread: ",buffer[0].id," is not a handled HWSensor");
+						}
+					}
+					else
+						break;
 				}
+				SailLog.Critical("Exiting ",m_thread.name," thread ! Communication with HWDaemon is dropped");
+				m_socket.shutdown(SocketShutdown.BOTH);
+				m_socket.close();
+				m_socket.destroy();
+				m_connected = false;
+				
+			}
+			catch(Exception e){
+				SailLog.Critical("Error when trying to connect socket: ",e.msg);
+				Thread.sleep(dur!("seconds")(2));
+			}
+			catch(Throwable t){
+				SailLog.Critical("In thread ",m_thread.name,": ",t.toString);
 			}
 		}
+
 	}
 
 
@@ -145,17 +178,12 @@ private:
 		ulong data[2];
 	}
 
-	/**
-		Callback for parsing received events
-	*/
-	void OnEventReceived(T)(HWEvent ev){
-		//store data in the correct device
-	}
-
 
 	UnixAddress m_addr;
 	Socket m_socket;
 	Thread m_thread;
+	bool m_connected = false;
+	bool m_stopthread = false;
 
 	Object[DeviceID] m_hwlist;
 
