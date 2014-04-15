@@ -23,7 +23,7 @@ int main(int argc, char const *argv[])
 				case 1:
 					value = 23.254 + rand()%20;
 					printf("Sending Roll=%f\n", value);
-					SocketSendCompass(value); 
+					SocketSendRoll(value); 
 					break;
 				case 2:
 					value = 90.3456 + rand()%20;
