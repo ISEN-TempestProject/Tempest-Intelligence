@@ -1,6 +1,6 @@
 module polar;
 
-/*import saillog;
+import saillog;
 
 import std.string;
 import std.file;
@@ -73,9 +73,9 @@ struct Polar {
         coef_val = val_next - val_prev;
         coef_key = key_next - key_prev;
         
-        float scale = (key_next - key) / coef_key;
+        float scale = (key - key_prev) / coef_key;
         
-        value =  coef_val * scale;
+        value =  (coef_val * scale) + val_prev;
         
         //return value
         return value;
@@ -88,6 +88,8 @@ private :
     
     
     unittest {
+        import std.math;
+    
         float[float] values = [0.0:0.0, 90.0:0.5, 180.0:1.0];    
         Polar p = Polar(values);
         
@@ -97,11 +99,11 @@ private :
         assert(p.getValue(180.0) == 1.0);
         
         //Extrapolated values
-        assert(p.getValue(22.5) == 0.125);
-        assert(p.getValue(45.0) == 0.25);
-        assert(p.getValue(135.0) == 0.75);
+        assert(abs(p.getValue(22.5) - 0.125) <0.001);
+        assert(abs(p.getValue(45.0) - 0.25) <0.001);
+        assert(abs(p.getValue(135.0) - 0.75) <0.001);
         
         SailLog.Notify("Polar unittest done");
     }
 
-}*/
+}
