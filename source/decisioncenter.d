@@ -105,6 +105,9 @@ private:
 
 		m_autopilot = new Autopilot();
 		m_sailhandler = new SailHandler();
+		
+		m_polarWind = Polar("./res/polar_wind.json");
+		m_polarHeading = Polar("./res/polar_heading.json");
 
 		m_thread = new Thread(&DecisionThread);
 		m_thread.name(typeof(this).stringof);
@@ -162,5 +165,7 @@ private:
 
 	ushort m_nDestinationIndex;
 	GpsCoord[] m_route;
+	
+	Polar m_polarWind, m_polarHeading;
 
 }
