@@ -155,6 +155,27 @@ private:
 
 		CheckIsDestinationReached();
 	}
+	
+	float getHeadingAngle(){
+        //Reading fixed values (references)
+            //Target heading 
+            //Wind direction
+            
+        //Result vector = 0
+        float result = 0.0;
+        
+        //Solve "equation" on polars
+            //Move wind ruler (cap ruler is fixed at time t) from min (0 or -180, to decide -> TODO) to max (180). For each position :
+                //get boat heading vector (== pos 0 of wind ruler)
+                //get wind vector (position fixed)
+                //apply coefs on those 2 vectors and sum them
+                //is the vector greater than result vector ?
+                    //YES : result vector = this new vector
+                    //NO : do nothing
+            
+        //Return result vector (== heading angle)
+        return result;
+	}
 
 	void CheckIsDestinationReached(){
 		GpsCoord currPos = Hardware.Get!Gps(DeviceID.Gps).value;
