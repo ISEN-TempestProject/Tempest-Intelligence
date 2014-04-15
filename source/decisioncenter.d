@@ -116,10 +116,11 @@ private:
 	~this(){
 		SailLog.Critical("Destroying ",typeof(this).stringof);
 		m_stop = true;
-		m_thread.join();
 
 		m_autopilot.destroy;
 		m_sailhandler.destroy;
+		
+		m_thread.join();
 	}
 
 	Thread m_thread;
