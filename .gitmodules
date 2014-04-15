@@ -1,0 +1,3 @@
+[submodule "tools/HWDaemon"]
+	path = tools/HWDaemon
+	url = https://github.com/CromFr/SailHWDaemonExample.git
