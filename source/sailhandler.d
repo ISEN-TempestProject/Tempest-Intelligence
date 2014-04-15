@@ -24,6 +24,11 @@ class SailHandler {
 
 		SailLog.Success(typeof(this).stringof~" instantiated in ",Thread.getThis().name," thread");
 	}
+	~this(){
+		SailLog.Critical("Destroying ",typeof(this).stringof);
+		m_stop = true;
+		m_thread.join();
+	}
 
 
 	@property{
@@ -33,10 +38,11 @@ class SailHandler {
 
 private:
 	Thread m_thread;
+	bool m_stop = false;
 	bool m_bEnabled;
 
 	void ThreadFunction(){
-		while(true){
+		while(!m_stop){
 			try{
 				debug{
 					SailLog.Post("Running "~typeof(this).stringof~" thread");
@@ -44,10 +50,11 @@ private:
 				if(m_bEnabled)
 					AdjustSail();
 
-				m_thread.sleep(dur!("msecs")(m_nLoopTimeMS));
 			}catch(Throwable t){
 				SailLog.Critical("In thread ",m_thread.name,": ",t.toString);
 			}
+
+			Thread.sleep(dur!("msecs")(m_nLoopTimeMS));
 		}
 	}
 
@@ -107,7 +114,6 @@ unittest {
 	wind.value = wind.min;
 	sh.AdjustSail();
 	assert(sail.value==sail.min);
-
 
 	SailLog.Notify("SailHandler unittest done");
 }
