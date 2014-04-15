@@ -1,9 +1,10 @@
 module polar;
 
-import saillog;
+/*import saillog;
 
 import std.string;
 import std.file;
+import std.algorithm;
 
 import vibe.data.json;
 
@@ -46,10 +47,10 @@ struct Polar {
     
     float extrapolate(float key){
         
-        float key_prev = min(m_curve.keys);
+        float key_prev = minPos(m_curve.keys)[0];
         float val_prev = m_curve[key_prev];
         
-        float key_next = max(m_curve.keys);
+        float key_next = minPos!("a > b")(m_curve.keys)[0];
         float val_next = m_curve[key_next];
         
         foreach(index, value ; m_curve){
@@ -72,7 +73,7 @@ struct Polar {
         coef_val = val_next - val_prev;
         coef_key = key_next - key_prev;
         
-        scale = (key_next - key) / coef_key;
+        float scale = (key_next - key) / coef_key;
         
         value =  coef_val * scale;
         
@@ -103,4 +104,4 @@ private :
         SailLog.Notify("Polar unittest done");
     }
 
-}
+}*/

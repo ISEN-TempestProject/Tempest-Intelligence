@@ -2,7 +2,7 @@ module decisioncenter;
 
 import core.thread;
 import std.json, std.file, std.conv, std.string;
-import hardware.hardware, gpscoord, config, saillog;
+import hardware.hardware, gpscoord, config, saillog, polar;
 
 public import autopilot, sailhandler;
 
