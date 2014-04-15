@@ -113,10 +113,19 @@ private:
 
 		SailLog.Success(typeof(this).stringof~" instantiated in ",Thread.getThis().name," thread");
 	}
+	~this(){
+		SailLog.Critical("Destroying ",typeof(this).stringof);
+		m_stop = true;
+		m_thread.join();
+
+		m_autopilot.destroy;
+		m_sailhandler.destroy;
+	}
 
 	Thread m_thread;
+	bool m_stop = false;
 	void DecisionThread(){
-		while(true){
+		while(!m_stop){
 			try{
 				debug{
 					SailLog.Post("Running "~typeof(this).stringof~" thread");
