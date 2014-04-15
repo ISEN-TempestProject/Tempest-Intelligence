@@ -35,7 +35,6 @@ public:
 		}
 	}
 
-package:
 	/**
 		Simple getter, not used outside the package
 	*/
@@ -45,6 +44,8 @@ package:
 		}
 		return m_inst;
 	}
+
+package:
 
 	/**
 		Sends and event into the socket
@@ -72,8 +73,6 @@ private:
 			//Open Socket
 			m_addr = new UnixAddress("/tmp/hwsocket");
 			
-
-
 			//Start network thread
 			m_thread = new Thread(&NetworkThread);
 			m_thread.name(typeof(this).stringof~"-Network");
@@ -83,6 +82,7 @@ private:
 		SailLog.Success(typeof(this).stringof~" instantiated in ",Thread.getThis().name," thread");
 	}
 	~this(){
+		SailLog.Critical("Destroying ",typeof(this).stringof);
 		if(m_thread !is null){
 			m_stopthread = true;
 			m_thread.join();

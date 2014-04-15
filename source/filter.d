@@ -8,25 +8,6 @@ import std.range;
 public import std.datetime;
 public import fifo;
 
-// TickDuration date = Clock.currAppTick();
-
-unittest {
-	import saillog;
-
-	alias Tsvf = TimestampedValue!float;
-
-	auto list = DList!Tsvf([Tsvf(TickDuration(10), 1), Tsvf(TickDuration(30), 2), Tsvf(TickDuration(60), 3), Tsvf(TickDuration(80), 4)]);
-	auto fifo = Fifo!(Tsvf)(4, list);
-
-	assert(Filter.Raw!float(fifo)==1);
-	assert(Filter.DumbAvg!float(fifo)==2.5);
-	assert(Filter.TimedAvg!float(fifo)==2.0);
-
-
-	SailLog.Notify("Filter unittest done");
-}
-
-
 alias TimestampedValue(T) = Tuple!(TickDuration,"time", T,"value");
 
 static class Filter {
@@ -93,4 +74,22 @@ static class Filter {
 		}
 
 	}
+}
+
+
+
+unittest {
+	import saillog;
+
+	alias Tsvf = TimestampedValue!float;
+
+	auto list = DList!Tsvf([Tsvf(TickDuration(10), 1), Tsvf(TickDuration(30), 2), Tsvf(TickDuration(60), 3), Tsvf(TickDuration(80), 4)]);
+	auto fifo = Fifo!(Tsvf)(4, list);
+
+	assert(Filter.Raw!float(fifo)==1);
+	assert(Filter.DumbAvg!float(fifo)==2.5);
+	assert(Filter.TimedAvg!float(fifo)==2.0);
+
+
+	SailLog.Notify("Filter unittest done");
 }
