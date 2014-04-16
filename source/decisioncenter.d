@@ -149,32 +149,50 @@ private:
 		THIS IS WHERE DECISIONS ARE TAKEN
 	*/
 	void MakeDecision(){
-		/*
-		THIS IS WHERE DECISIONS ARE TAKEN
-		*/
+	    m_targetheading = getHeadingAngle();
+	    //TODO : update m_targetposition;
 
 		CheckIsDestinationReached();
 	}
 	
+	
+	//Factors applied on each polar vector (among its importance)
+	enum PolarFactor : float {
+	    Wind = 1.0,
+	    Heading = 1.0
+	}
+	
 	float getHeadingAngle(){
         //Reading fixed values (references)
-            //Target heading 
+            //Target heading
+        float _targetDirection = to!float(Hardware.Get!Gps(DeviceID.Gps).value.GetBearingTo(targetposition()));
+        float heading_angle = targetheading() - _targetDirection;
             //Wind direction
+        float wind_angle = Hardware.Get!WindDir(DeviceID.WindDir).value(); //TODO : adapt values (use min & max)
             
         //Result vector = 0
         float result = 0.0;
-        
+        float h_vect, w_vect, s_vector;
         //Solve "equation" on polars
-            //Move wind ruler (cap ruler is fixed at time t) from min (0 or -180, to decide -> TODO) to max (180). For each position :
+            //Move wind ruler (cap ruler is fixed at time t) from min (0) to max (360). For each position :
+        for(float i=0.0 ; i<=360.0 ; i=i+1.0){        
                 //get boat heading vector (== pos 0 of wind ruler)
+            h_vect = m_polarWind.getValue(i);
                 //get wind vector (position fixed)
+            w_vect = m_polarWind.getValue(wind_angle-i);
                 //apply coefs on those 2 vectors and sum them
+            s_vector  = h_vect * PolarFactor.Heading + w_vect * PolarFactor.Wind;
                 //is the vector greater than result vector ?
+            if(s_vector > result){
                     //YES : result vector = this new vector
+                result = s_vector;
+            }
                     //NO : do nothing
+
+        }
             
-        //Return result vector (== heading angle)
-        return result;
+        //Return result vector (== heading angle) 
+        return result - _targetDirection;
 	}
 
 	void CheckIsDestinationReached(){

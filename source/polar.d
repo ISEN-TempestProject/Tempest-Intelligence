@@ -37,10 +37,11 @@ struct Polar {
     }
     
     float getValue(float key){
-        float value = m_curve.get(key, -1.0);
+        float _key = key % 360.0;
+        float value = m_curve.get(_key, -1.0);
         //If value isn't in the table, we extrapolate it
         if(value == -1.0){
-            value = extrapolate(key);
+            value = extrapolate(_key);
         }
         return value;
     }
@@ -81,10 +82,13 @@ struct Polar {
         return value;
     }
     
-private : 
+    void setValue(float key, float value){
+        float _key = key % 360.0;
+        m_curve[_key] = value;
+    }
+    
+private :
     float m_curve[float];
-    
-    
     
     
     unittest {
@@ -102,6 +106,12 @@ private :
         assert(abs(p.getValue(22.5) - 0.125) <0.001);
         assert(abs(p.getValue(45.0) - 0.25) <0.001);
         assert(abs(p.getValue(135.0) - 0.75) <0.001);
+        
+        p.setValue(45.0, 0.0);
+        
+        assert(abs(p.getValue(22.42) - 0) <0.0001);
+        assert(abs(p.getValue(67.5) - 0.25) <0.001);
+        
         
         SailLog.Notify("Polar unittest done");
     }
