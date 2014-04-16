@@ -100,14 +100,17 @@ private:
 		m_nDestinationIndex = 1;
 		SailLog.Notify("Route set to: ",m_route);
 		
+		SailLog.Notify("Setting up polars...");
+		m_polarWind = Polar("./res/polar_wind.json");
+		SailLog.Notify("Wind polar [DONE]");
+        m_polarHeading = Polar("./res/polar_heading.json");
+        SailLog.Notify("Heading polar [DONE]");
+		
 		//	fill first cell with actual GPS position
 		MakeDecision();//Will update m_targetposition and m_targetheading
 
 		m_autopilot = new Autopilot();
 		m_sailhandler = new SailHandler();
-		
-		m_polarWind = Polar("./res/polar_wind.json");
-		m_polarHeading = Polar("./res/polar_heading.json");
 
 		m_thread = new Thread(&DecisionThread);
 		m_thread.name(typeof(this).stringof);
@@ -150,6 +153,7 @@ private:
 	*/
 	void MakeDecision(){
 	    m_targetheading = getHeadingAngle();
+	    SailLog.Post("TH : ", m_targetheading);
 	    //TODO : update m_targetposition;
 
 		CheckIsDestinationReached();
@@ -192,7 +196,7 @@ private:
         }
             
         //Return result vector (== heading angle) 
-        return result - _targetDirection;
+        return (result - _targetDirection + 360.0) % 360.0;
 	}
 
 	void CheckIsDestinationReached(){

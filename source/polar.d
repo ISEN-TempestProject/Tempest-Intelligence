@@ -14,6 +14,7 @@ struct Polar {
 
     this(float[float] curve){
         m_curve = curve;
+        SailLog.Post("New polar : ", m_curve);
     }
     
     this(string filename){
@@ -37,7 +38,7 @@ struct Polar {
     }
     
     float getValue(float key){
-        float _key = key % 360.0;
+        float _key = (key + 360.0) % 360.0;
         float value = m_curve.get(_key, -1.0);
         //If value isn't in the table, we extrapolate it
         if(value == -1.0){
@@ -47,8 +48,8 @@ struct Polar {
     }
     
     float extrapolate(float key){
-        
-        float key_prev = minPos(m_curve.keys)[0];
+
+        float key_prev = minPos(m_curve.keys)[0]; //TODO : buggy line. curve is []
         float val_prev = m_curve[key_prev];
         
         float key_next = minPos!("a > b")(m_curve.keys)[0];
@@ -83,7 +84,7 @@ struct Polar {
     }
     
     void setValue(float key, float value){
-        float _key = key % 360.0;
+        float _key = (key + 360.0) % 360.0;
         m_curve[_key] = value;
     }
     
