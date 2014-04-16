@@ -73,7 +73,7 @@ private:
 			sail.value = to!(typeof(sail.value))(sail.max-(sail.max-sail.min)*(fWind-25)/(180-25));
 		}
 
-
+		//TODO: Release sail when the roll is dangerous
 
 	}
 
