@@ -34,7 +34,7 @@ interface ISailAPI
 	void postDc(bool status);
 
 	// POST /targetposition
-	void postTargetposition(float longitude, float latitude);
+	void postTargetposition(float latitude, float longitude);
 
 	// POST /targetheading
 	void postTargetheading(float angle);
@@ -260,8 +260,8 @@ class API : ISailAPI
 		SailLog.Notify("Decision center is now ", DecisionCenter.Get().enabled() ? "Enabled" : "Disbaled");
 	}
 
-	void postTargetposition(float longitude, float latitude){
-		DecisionCenter.Get().targetposition(GpsCoord(to!double(longitude), to!double(latitude)));
+	void postTargetposition(float latitude, float longitude){
+		DecisionCenter.Get().targetposition(GpsCoord(to!double(latitude), to!double(longitude)));
 	}
 
 	void postTargetheading(float angle){

@@ -143,7 +143,7 @@ sailControllers.controller('dcModulesCtrl', ['$scope', '$rootScope', '$http', '$
 	function($scope, $rootScope, $http, $log) {
 
 		$scope.setTargetPosition = function() {
-	    	var data = '{"longitude" : '+$rootScope.dc.targetPosition.longitude+', "latitude" : '+$scope.dc.targetPosition.latitude+'}';
+	    	var data = '{"latitude" : '+$scope.dc.targetPosition.latitude+'"longitude" : '+$rootScope.dc.targetPosition.longitude+'}';
 
 	    	$http.post('/api/targetposition', data)
     		.success(function(data, status, headers, config) {
