@@ -171,12 +171,12 @@ private:
         float _targetDirection = (to!float(Hardware.Get!Gps(DeviceID.Gps).value.GetBearingTo(targetposition())) + 360.0 ) % 360.0;
         float heading_angle = _targetDirection - (to!float(Hardware.Get!Compass(DeviceID.Compass).value)) ;
         if(isNaN(heading_angle)) heading_angle = 0;
-        SailLog.Post("Boat angle : ", (to!float(Hardware.Get!Compass(DeviceID.Compass).value)));
-        SailLog.Post("Heading angle : ", heading_angle);
+        //DBG : SailLog.Post("Boat angle : ", (to!float(Hardware.Get!Compass(DeviceID.Compass).value)));
+        //DBG : SailLog.Post("Heading angle : ", heading_angle);
         
             //Wind direction
-        float wind_angle = 312;//Hardware.Get!WindDir(DeviceID.WindDir).value();
-        SailLog.Post("Wind angle : ", wind_angle);    
+        float wind_angle = Hardware.Get!WindDir(DeviceID.WindDir).value();
+        //DBG : SailLog.Post("Wind angle : ", wind_angle);    
             
         //Result vector = 0
         float result = 0.0, res_sum = 0.0;
@@ -191,7 +191,7 @@ private:
             w_vect = m_polarWind.getValue(wind_angle - i);
                 //apply coefs on those 2 vectors and sum them
             s_vector  = h_vect * PolarFactor.Heading + w_vect * PolarFactor.Wind;
-            SailLog.Post("s_vector (",i,") : ", s_vector , "[w", w_vect, ";h", h_vect,"]");
+            //DBG : SailLog.Post("s_vector (",i,") : ", s_vector , "[w", w_vect, ";h", h_vect,"]");
                 //is the vector greater than result vector ?
             if(s_vector > res_sum){
                     //YES : result vector = this new vector position
@@ -202,7 +202,7 @@ private:
 
         }
             
-        SailLog.Post("Result (",result,") : ", (result + _targetDirection + 360.0) % 360.0);    
+        //DBG : SailLog.Post("Result (",result,") : ", (result + (to!float(Hardware.Get!Compass(DeviceID.Compass).value)) + 360.0) % 360.0);    
             
         //Return result vector (== heading angle) 
         return (result - _targetDirection + 360.0) % 360.0;
