@@ -23,6 +23,21 @@ struct Polar {
         this(getDataFromFile(filename));
     }
     
+    /**
+        Get points of the curve from Json file.
+        Format : 
+            [
+                {
+                    "key": float_key_1,
+                    "value" : float_value_2
+                },
+                ...
+                {
+                    "key" : float_key_N,
+                    "value" : float_value_N
+                }
+            ]
+    */
     float[float] getDataFromFile(string filename){
         float curve[float];
         try{
@@ -39,6 +54,9 @@ struct Polar {
         return curve;
     }
     
+    /**
+        Get value asssociated to a key. If value doesn't exist, extrapolate the value.
+    */
     float getValue(float key){
         float _key = (key + 360.0) % 360.0;
         
@@ -55,6 +73,9 @@ struct Polar {
         return 0;
     }
     
+    /**
+        Extrapolate a value associatied to the given key
+    */
     float extrapolate(float key){
 
         float key_prev = minPos(m_curve.keys)[0]; //TODO : buggy line. curve is []
@@ -91,11 +112,18 @@ struct Polar {
         return value;
     }
     
+    /**
+        Add new value if the key doesn't exist. Change the value if the key altready exist.
+    */
     void setValue(float key, float value){
         float _key = (key + 360.0) % 360.0;
         m_curve[_key] = value;
     }
     
+    /**
+        Enable and/or disable sides of the curve.
+        Doesn't override curve value.
+    */
     void setSide(bool left = true, bool right = true){
         m_left = left;
         m_right = right;
