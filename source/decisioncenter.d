@@ -69,6 +69,7 @@ private:
 		m_bEnabled = true;
 
 		m_fDistanceToTarget = Config.Get!float("DecisionCenter", "DistanceToTarget");
+		m_fDistanceToRoute = Config.Get!float("DecisionCenter", "DistanceToRoute");
 
 		//Route parsing
 		string sFile = Config.Get!string("DecisionCenter", "Route");
@@ -152,19 +153,24 @@ private:
 		THIS IS WHERE DECISIONS ARE TAKEN
 	*/
 	void MakeDecision(){
+	    checkDistanceToRoute();
 	    m_targetheading = getHeadingAngle();
-	    //TODO : update m_targetposition;
-
-		CheckIsDestinationReached();
+		CheckIsDestinationReached(); //Updates m_targetposition
 	}
 	
 	
-	//Factors applied on each polar vector (among its importance)
+	/**
+	    Factors applied on each polar vector (among its importance)
+	*/
 	enum PolarFactor : float {
 	    Wind = 1.0,
 	    Heading = 1.0
 	}
 	
+	/**
+	    Get an optimized heading angle using polars.
+	    Using AIUR.
+	*/
 	float getHeadingAngle(){
         //Reading fixed values (references)
             //Target heading
@@ -207,6 +213,27 @@ private:
         //Return result vector (== heading angle) 
         return (result - _targetDirection + 360.0) % 360.0;
 	}
+	
+	/**
+	    Checks if the distance to the route is not too important.
+	    Forces the boat to turn by disablig a side of the polars.
+	*/
+	void checkDistanceToRoute(){
+	    float distanceToRoute = to!float(Hardware.Get!Gps(DeviceID.Gps).value.GetDistanceToRoute(m_route[m_nDestinationIndex - 1], m_route[m_nDestinationIndex] ));
+	    
+	    if(distanceToRoute > m_fDistanceToRoute){
+	        //Right : disable right side
+	        m_polarHeading.setSide(true, false);
+	    }
+	    else if( -distanceToRoute > m_fDistanceToRoute){
+	        //Left : disable left side
+	        m_polarHeading.setSide(false, true);
+	    }
+	    else{
+	        //Enable both sides
+	        m_polarHeading.setSide();
+	    }
+	}
 
 	void CheckIsDestinationReached(){
 		GpsCoord currPos = Hardware.Get!Gps(DeviceID.Gps).value;
@@ -225,6 +252,7 @@ private:
 	SailHandler m_sailhandler;
 
 	float m_fDistanceToTarget;
+	float m_fDistanceToRoute;
 
 	ushort m_nDestinationIndex;
 	GpsCoord[] m_route;

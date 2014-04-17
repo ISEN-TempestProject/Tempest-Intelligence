@@ -14,6 +14,8 @@ struct Polar {
 
     this(float[float] curve){
         m_curve = curve;
+        m_left = true;
+        m_right = true;
         SailLog.Post("New polar : ", m_curve);
     }
     
@@ -39,12 +41,18 @@ struct Polar {
     
     float getValue(float key){
         float _key = (key + 360.0) % 360.0;
-        float value = m_curve.get(_key, -1.0);
-        //If value isn't in the table, we extrapolate it
-        if(value == -1.0){
-            value = extrapolate(_key);
+        
+        //Return value only if this side is allowed
+        if( (_key<180.0 && m_right) || (_key>=180 && m_left) ){
+            float value = m_curve.get(_key, -1.0);
+            //If value isn't in the table, we extrapolate it
+            if(value == -1.0){
+                value = extrapolate(_key);
+            }
+            return value;
         }
-        return value;
+        
+        return 0;
     }
     
     float extrapolate(float key){
@@ -88,8 +96,16 @@ struct Polar {
         m_curve[_key] = value;
     }
     
+    void setSide(bool left = true, bool right = true){
+        m_left = left;
+        m_right = right;
+    }
+    
 private :
     float m_curve[float];
+    
+    bool m_left;
+    bool m_right;
     
     
     unittest {
