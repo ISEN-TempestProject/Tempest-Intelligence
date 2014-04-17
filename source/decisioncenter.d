@@ -1,7 +1,7 @@
 module decisioncenter;
 
 import core.thread;
-import std.json, std.file, std.conv, std.string;
+import std.json, std.file, std.conv, std.string, std.math;
 import hardware.hardware, gpscoord, config, saillog, polar;
 
 public import autopilot, sailhandler;
@@ -153,7 +153,6 @@ private:
 	*/
 	void MakeDecision(){
 	    m_targetheading = getHeadingAngle();
-	    SailLog.Post("TH : ", m_targetheading);
 	    //TODO : update m_targetposition;
 
 		CheckIsDestinationReached();
@@ -169,31 +168,41 @@ private:
 	float getHeadingAngle(){
         //Reading fixed values (references)
             //Target heading
-        float _targetDirection = to!float(Hardware.Get!Gps(DeviceID.Gps).value.GetBearingTo(targetposition()));
-        float heading_angle = targetheading() - _targetDirection;
+        float _targetDirection = (to!float(Hardware.Get!Gps(DeviceID.Gps).value.GetBearingTo(targetposition())) + 360.0 ) % 360.0;
+        float heading_angle = _targetDirection - (to!float(Hardware.Get!Compass(DeviceID.Compass).value)) ;
+        if(isNaN(heading_angle)) heading_angle = 0;
+        SailLog.Post("Boat angle : ", (to!float(Hardware.Get!Compass(DeviceID.Compass).value)));
+        SailLog.Post("Heading angle : ", heading_angle);
+        
             //Wind direction
-        float wind_angle = Hardware.Get!WindDir(DeviceID.WindDir).value(); //TODO : adapt values (use min & max)
+        float wind_angle = 312;//Hardware.Get!WindDir(DeviceID.WindDir).value();
+        SailLog.Post("Wind angle : ", wind_angle);    
             
         //Result vector = 0
-        float result = 0.0;
+        float result = 0.0, res_sum = 0.0;
         float h_vect, w_vect, s_vector;
+        
         //Solve "equation" on polars
             //Move wind ruler (cap ruler is fixed at time t) from min (0) to max (360). For each position :
         for(float i=0.0 ; i<=360.0 ; i=i+1.0){        
                 //get boat heading vector (== pos 0 of wind ruler)
-            h_vect = m_polarWind.getValue(i);
+            h_vect = m_polarHeading.getValue(i - heading_angle);
                 //get wind vector (position fixed)
-            w_vect = m_polarWind.getValue(wind_angle-i);
+            w_vect = m_polarWind.getValue(wind_angle - i);
                 //apply coefs on those 2 vectors and sum them
             s_vector  = h_vect * PolarFactor.Heading + w_vect * PolarFactor.Wind;
+            SailLog.Post("s_vector (",i,") : ", s_vector , "[w", w_vect, ";h", h_vect,"]");
                 //is the vector greater than result vector ?
-            if(s_vector > result){
-                    //YES : result vector = this new vector
-                result = s_vector;
+            if(s_vector > res_sum){
+                    //YES : result vector = this new vector position
+                res_sum = s_vector;
+                result = i;
             }
                     //NO : do nothing
 
         }
+            
+        SailLog.Post("Result (",result,") : ", (result + _targetDirection + 360.0) % 360.0);    
             
         //Return result vector (== heading angle) 
         return (result - _targetDirection + 360.0) % 360.0;
