@@ -7,7 +7,7 @@ var sailControllers = angular.module('sailControllers', []);
 
 sailControllers.controller('mainCtrl', ['$rootScope', '$scope', '$interval', '$http',
 	function($rootScope, $scope, $interval, $http) {
-		$scope.refreshPeriod = 1000;
+		$scope.refreshPeriod = -1;
 
 		$scope.refresh = function(){
 			if($scope.refreshing !== undefined) $interval.cancel($scope.refreshing);
