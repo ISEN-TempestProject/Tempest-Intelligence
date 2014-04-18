@@ -47,6 +47,7 @@ sailControllers.controller('deviceCtrl', ['$scope', '$rootScope', '$http', '$log
 		    $http.get('/api/devices')
 			    .success(function(data, status, headers, config) {
 			        $scope.devices = data;
+			        $scope.gps = $scope.devices[2].value;
 			    })
 			    .error(function(data, status, headers, config) {
 			        $log.error('Can\'t reach devices.');
@@ -74,6 +75,17 @@ sailControllers.controller('deviceCtrl', ['$scope', '$rootScope', '$http', '$log
 			    .error(function(data, status, headers, config) {
 			        $log.error('Can\'t reach device with id ' + id);
 			    });
+		}
+		
+		$scope.setGPS = function(latitude, longitude){
+            var data = '{"latitude" : '+latitude+', "longitude" : '+longitude+'}';
+		    $http.post('/api/gps', data)
+            .success(function(data, status, headers, config) {
+                $scope.getDevices();
+            })
+            .error(function(data, status, headers, config) {
+                $log.error('Can\'t post GPS coordinates.');
+            });  
 		}
 
 		$scope.toogleEmulation = function(id, isEmulated) {
@@ -143,7 +155,7 @@ sailControllers.controller('dcModulesCtrl', ['$scope', '$rootScope', '$http', '$
 	function($scope, $rootScope, $http, $log) {
 
 		$scope.setTargetPosition = function() {
-	    	var data = '{"latitude" : '+$scope.dc.targetPosition.latitude+'"longitude" : '+$rootScope.dc.targetPosition.longitude+'}';
+	    	var data = '{"latitude" : '+$scope.dc.targetPosition.latitude+', "longitude" : '+$rootScope.dc.targetPosition.longitude+'}';
 
 	    	$http.post('/api/targetposition', data)
     		.success(function(data, status, headers, config) {

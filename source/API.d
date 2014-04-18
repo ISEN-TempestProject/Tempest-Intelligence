@@ -20,6 +20,9 @@ interface ISailAPI
 
 	// POST /:id/value
 	void postValue(string data);
+	
+	// POSt /gps
+	void postGps(float latitude, float longitude);
 
 	// POST /:id/emulation
 	void postEmulation(string data);
@@ -76,13 +79,13 @@ class API : ISailAPI
 	Json getDevices()
 	{
 		Json devices = Json.emptyArray;
-		foreach(device; DeviceID.min+1 .. DeviceID.max)
+		foreach(device; DeviceID.min+1 .. DeviceID.max+1)
 		{
 				devices ~= getDevices(device);
 		}
-
 		return devices;
 	}	
+
 
 	Json getDevices(int id_)
 	{
@@ -147,6 +150,13 @@ class API : ISailAPI
 
 		
 	}
+	
+	void postGps(float latitude, float longitude){
+	    Gps gps = Hardware.Get!Gps(DeviceID.Gps);
+	    
+	    gps.value(GpsCoord(latitude, longitude));
+        SailLog.Notify("GPS set to [",gps.value().latitude(),";",gps.value().longitude(),"]");
+	}
 
 	void postEmulation(string data){
 		Json device = parseJsonString(data);
@@ -207,8 +217,7 @@ class API : ISailAPI
 				break;
 			case DeviceID.Gps:
 				Gps gps = Hardware.Get!Gps(cast(DeviceID) to!ubyte(device.id));
-				gps.value().longitude(to!double(device.value.longitude));
-				gps.value().latitude(to!double(device.value.latitude));
+				gps.value(GpsCoord(to!double(device.value.latitude), to!double(device.value.longitude)));
 				break;
 			default:
 				SailLog.Warning("Called unknown Device ID. No device set.");
@@ -261,6 +270,7 @@ class API : ISailAPI
 	}
 
 	void postTargetposition(float latitude, float longitude){
+	    SailLog.Notify("[DBG] ", latitude,";" , longitude);
 		DecisionCenter.Get().targetposition(GpsCoord(to!double(latitude), to!double(longitude)));
 	}
 

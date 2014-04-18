@@ -24,7 +24,7 @@
 		<li class="row">
 			<div class="col-sm-3">
 				<div class="emulswitch">
-					<input type="checkbox" name="emulswitch" class="emulswitch-checkbox" id="device-emul-GPS" ng-checked="device.emulated" ng-click="toggleDevice(device.id);">
+					<input type="checkbox" name="emulswitch" class="emulswitch-checkbox" id="device-emul-GPS" ng-checked="devices[2].emulated" ng-click="toggleDevice(devices[2].id);">
 					<label class="emulswitch-label" for="device-emul-GPS">
 				        <div class="emulswitch-inner"></div>
 				        <div class="emulswitch-switch"></div>
@@ -34,24 +34,22 @@
 			<div class="col-sm-3">GPS</div>
 		</li>
 		<li class="row">
+            <div class="col-sm-3">Latitude</div>
+            <div class="col-sm-6">
+                <input type="text" name="value" value="{{devices[2].value.latitude}}" ng-model="gps.latitude" ng-disabled="!devices[2].emulated">
+            </div>
+        </li>
+		<li class="row">
 			<div class="col-sm-3">Longitude</div>
-			<div class="col-sm-6 row">
-				<button class="col-xs-3" type="button" ng-click="deltaDevice(devices.gps.longitude, -device.delta.longitude)" ng-disabled="!devices.gps.emulated">{{devices.gps.lowCaption}}</button>
-
-				<input type="text" class="col-xs-6" name="value" value="{{devices.gps.longitude.value}}" ng-disabled="!device.emulated">
-
-				<button class="col-xs-3" type="button" ng-click="deltaDevice(devices.gps.longitude, device.delta.longitude)" ng-disabled="!device.emulated">{{devices.gps.highCaption}}</button>
-			</div>
+			<div class="col-sm-6">
+				<input type="text" name="value" value="{{devices[2].value.longitude}}"ng-model="gps.longitude"  ng-disabled="!devices[2].emulated">
+        	</div>
 		</li>
 		<li class="row">
-			<div class="col-sm-3">Latitude</div>
-			<div class="col-sm-6 row">
-				<button class="col-xs-3" type="button" ng-click="deltaDevice(devices.gps.latitude, -device.delta.latitude)" ng-disabled="!devices.gps.emulated">{{devices.gps.lowCaption}}</button>
-
-				<input type="text" class="col-xs-6" name="value" value="{{devices.gps.latitude.value}}" ng-disabled="!device.emulated">
-
-				<button class="col-xs-3" type="button" ng-click="deltaDevice(devices.gps.latitude, device.delta.latitude)" ng-disabled="!device.emulated">{{devices.gps.highCaption}}</button>
-			</div>
-		</li>
+            <div class="col-sm-6">
+                <button class="col-xs-3" type="button" ng-click="setGPS(gps.latitude, gps.longitude)" ng-hide="!devices[2].emulated">Set</button>
+        
+            </div>
+        </li>
 	</ul>
 </div>
