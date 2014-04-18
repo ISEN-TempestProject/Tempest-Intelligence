@@ -22,4 +22,13 @@ sailFilters.filter('logLevelCSS', function() {
 				return "list-group-item-default";
 		}
 	};
-});
+})
+.filter('removeGPS', [function(){
+    return function(input){
+        var ret = [];
+        for(var i = 0 ; i<input.length ; i++){
+            if(input[i].id != 3) ret.push(input[i]);
+        }
+        return ret;
+    };
+}]);

@@ -1,7 +1,7 @@
 <div class="panel panel-default">
   <div class="panel-heading"><h2>Devices</h2></div>
 	<ul class="panel-body list-unstyled">
-		<li class="row" ng-repeat="device in devices">
+		<li class="row" ng-repeat="device in devices | removeGPS">
 			<div class="col-sm-3">
 				<div class="emulswitch">
 					<input type="checkbox" name="emulswitch" class="emulswitch-checkbox" id="device-emul-{{device.id}}" ng-checked="device.emulated" ng-click="toggleDevice(device.id);">
@@ -34,19 +34,19 @@
 			<div class="col-sm-3">GPS</div>
 		</li>
 		<li class="row">
-            <div class="col-sm-3">Latitude</div>
+            <div class="col-md-offset-3 col-sm-3">Latitude</div>
             <div class="col-sm-6">
                 <input type="text" name="value" value="{{devices[2].value.latitude}}" ng-model="gps.latitude" ng-disabled="!devices[2].emulated">
             </div>
         </li>
 		<li class="row">
-			<div class="col-sm-3">Longitude</div>
+			<div class="col-md-offset-3 col-sm-3">Longitude</div>
 			<div class="col-sm-6">
 				<input type="text" name="value" value="{{devices[2].value.longitude}}"ng-model="gps.longitude"  ng-disabled="!devices[2].emulated">
         	</div>
 		</li>
 		<li class="row">
-            <div class="col-sm-6">
+            <div class="col-md-offset-3 col-sm-6">
                 <button class="col-xs-3" type="button" ng-click="setGPS(gps.latitude, gps.longitude)" ng-hide="!devices[2].emulated">Set</button>
         
             </div>
