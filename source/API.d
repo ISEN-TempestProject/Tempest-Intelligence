@@ -310,7 +310,7 @@ class API : ISailAPI
 		postAutopilot(false);
 
 		//Emulate sensors and actuators
-		for(int i = 1 ; i<DeviceID.max ; i++){
+		for(int i = 1 ; i<=DeviceID.max ; i++){
 			postEmulation("{\"id\":"~to!string(i)~",\"emulated\":true}");
 
 		}
