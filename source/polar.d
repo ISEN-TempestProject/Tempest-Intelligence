@@ -14,12 +14,30 @@ struct Polar {
 
     this(float[float] curve){
         m_curve = curve;
+        m_left = true;
+        m_right = true;
+        SailLog.Post("New polar : ", m_curve);
     }
     
     this(string filename){
         this(getDataFromFile(filename));
     }
     
+    /**
+        Get points of the curve from Json file.
+        Format : 
+            [
+                {
+                    "key": float_key_1,
+                    "value" : float_value_2
+                },
+                ...
+                {
+                    "key" : float_key_N,
+                    "value" : float_value_N
+                }
+            ]
+    */
     float[float] getDataFromFile(string filename){
         float curve[float];
         try{
@@ -36,18 +54,31 @@ struct Polar {
         return curve;
     }
     
+    /**
+        Get value asssociated to a key. If value doesn't exist, extrapolate the value.
+    */
     float getValue(float key){
-        float value = m_curve.get(key, -1.0);
-        //If value isn't in the table, we extrapolate it
-        if(value == -1.0){
-            value = extrapolate(key);
+        float _key = (key + 360.0) % 360.0;
+        
+        //Return value only if this side is allowed
+        if( (_key<180.0 && m_right) || (_key>=180 && m_left) ){
+            float value = m_curve.get(_key, -1.0);
+            //If value isn't in the table, we extrapolate it
+            if(value == -1.0){
+                value = extrapolate(_key);
+            }
+            return value;
         }
-        return value;
+        
+        return 0;
     }
     
+    /**
+        Extrapolate a value associatied to the given key
+    */
     float extrapolate(float key){
-        
-        float key_prev = minPos(m_curve.keys)[0];
+
+        float key_prev = minPos(m_curve.keys)[0]; //TODO : buggy line. curve is []
         float val_prev = m_curve[key_prev];
         
         float key_next = minPos!("a > b")(m_curve.keys)[0];
@@ -81,10 +112,28 @@ struct Polar {
         return value;
     }
     
-private : 
+    /**
+        Add new value if the key doesn't exist. Change the value if the key altready exist.
+    */
+    void setValue(float key, float value){
+        float _key = (key + 360.0) % 360.0;
+        m_curve[_key] = value;
+    }
+    
+    /**
+        Enable and/or disable sides of the curve.
+        Doesn't override curve value.
+    */
+    void setSide(bool left = true, bool right = true){
+        m_left = left;
+        m_right = right;
+    }
+    
+private :
     float m_curve[float];
     
-    
+    bool m_left;
+    bool m_right;
     
     
     unittest {
@@ -102,6 +151,12 @@ private :
         assert(abs(p.getValue(22.5) - 0.125) <0.001);
         assert(abs(p.getValue(45.0) - 0.25) <0.001);
         assert(abs(p.getValue(135.0) - 0.75) <0.001);
+        
+        p.setValue(45.0, 0.0);
+        
+        assert(abs(p.getValue(22.42) - 0) <0.0001);
+        assert(abs(p.getValue(67.5) - 0.25) <0.001);
+        
         
         SailLog.Notify("Polar unittest done");
     }

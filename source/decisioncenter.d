@@ -1,7 +1,7 @@
 module decisioncenter;
 
 import core.thread;
-import std.json, std.file, std.conv, std.string;
+import std.json, std.file, std.conv, std.string, std.math;
 import hardware.hardware, gpscoord, config, saillog, polar;
 
 public import autopilot, sailhandler;
@@ -69,6 +69,7 @@ private:
 		m_bEnabled = true;
 
 		m_fDistanceToTarget = Config.Get!float("DecisionCenter", "DistanceToTarget");
+		m_fDistanceToRoute = Config.Get!float("DecisionCenter", "DistanceToRoute");
 
 		//Route parsing
 		string sFile = Config.Get!string("DecisionCenter", "Route");
@@ -100,14 +101,17 @@ private:
 		m_nDestinationIndex = 1;
 		SailLog.Notify("Route set to: ",m_route);
 		
+		SailLog.Notify("Setting up polars...");
+		m_polarWind = Polar("./res/polar_wind.json");
+		SailLog.Notify("Wind polar [DONE]");
+        m_polarHeading = Polar("./res/polar_heading.json");
+        SailLog.Notify("Heading polar [DONE]");
+		
 		//	fill first cell with actual GPS position
 		MakeDecision();//Will update m_targetposition and m_targetheading
 
 		m_autopilot = new Autopilot();
 		m_sailhandler = new SailHandler();
-		
-		m_polarWind = Polar("./res/polar_wind.json");
-		m_polarHeading = Polar("./res/polar_heading.json");
 
 		m_thread = new Thread(&DecisionThread);
 		m_thread.name(typeof(this).stringof);
@@ -149,32 +153,86 @@ private:
 		THIS IS WHERE DECISIONS ARE TAKEN
 	*/
 	void MakeDecision(){
-		/*
-		THIS IS WHERE DECISIONS ARE TAKEN
-		*/
-
-		CheckIsDestinationReached();
+	    checkDistanceToRoute();
+	    m_targetheading = getHeadingAngle();
+		CheckIsDestinationReached(); //Updates m_targetposition
 	}
 	
+	
+	/**
+	    Factors applied on each polar vector (among its importance)
+	*/
+	enum PolarFactor : float {
+	    Wind = 1.0,
+	    Heading = 1.0
+	}
+	
+	/**
+	    Get an optimized heading angle using polars.
+	    Using AIUR.
+	*/
 	float getHeadingAngle(){
         //Reading fixed values (references)
-            //Target heading 
+            //Target heading
+        float _targetDirection = (to!float(Hardware.Get!Gps(DeviceID.Gps).value.GetBearingTo(targetposition())) + 360.0 ) % 360.0;
+        float heading_angle = _targetDirection - (to!float(Hardware.Get!Compass(DeviceID.Compass).value)) ;
+        if(isNaN(heading_angle)) heading_angle = 0;
+        //DBG : SailLog.Post("Boat angle : ", (to!float(Hardware.Get!Compass(DeviceID.Compass).value)));
+        //DBG : SailLog.Post("Heading angle : ", heading_angle);
+        
             //Wind direction
+        float wind_angle = Hardware.Get!WindDir(DeviceID.WindDir).value();
+        //DBG : SailLog.Post("Wind angle : ", wind_angle);    
             
         //Result vector = 0
-        float result = 0.0;
+        float result = 0.0, res_sum = 0.0;
+        float h_vect, w_vect, s_vector;
         
         //Solve "equation" on polars
-            //Move wind ruler (cap ruler is fixed at time t) from min (0 or -180, to decide -> TODO) to max (180). For each position :
+            //Move wind ruler (cap ruler is fixed at time t) from min (0) to max (360). For each position :
+        for(float i=0.0 ; i<=360.0 ; i=i+1.0){        
                 //get boat heading vector (== pos 0 of wind ruler)
+            h_vect = m_polarHeading.getValue(i - heading_angle);
                 //get wind vector (position fixed)
+            w_vect = m_polarWind.getValue(wind_angle - i);
                 //apply coefs on those 2 vectors and sum them
+            s_vector  = h_vect * PolarFactor.Heading + w_vect * PolarFactor.Wind;
+            //DBG : SailLog.Post("s_vector (",i,") : ", s_vector , "[w", w_vect, ";h", h_vect,"]");
                 //is the vector greater than result vector ?
-                    //YES : result vector = this new vector
+            if(s_vector > res_sum){
+                    //YES : result vector = this new vector position
+                res_sum = s_vector;
+                result = i;
+            }
                     //NO : do nothing
+
+        }
             
-        //Return result vector (== heading angle)
-        return result;
+        //DBG : SailLog.Post("Result (",result,") : ", (result + (to!float(Hardware.Get!Compass(DeviceID.Compass).value)) + 360.0) % 360.0);    
+            
+        //Return result vector (== heading angle) 
+        return (result - _targetDirection + 360.0) % 360.0;
+	}
+	
+	/**
+	    Checks if the distance to the route is not too important.
+	    Forces the boat to turn by disablig a side of the polars.
+	*/
+	void checkDistanceToRoute(){
+	    float distanceToRoute = to!float(Hardware.Get!Gps(DeviceID.Gps).value.GetDistanceToRoute(m_route[m_nDestinationIndex - 1], m_route[m_nDestinationIndex] ));
+	    
+	    if(distanceToRoute > m_fDistanceToRoute){
+	        //Right : disable right side
+	        m_polarHeading.setSide(true, false);
+	    }
+	    else if( -distanceToRoute > m_fDistanceToRoute){
+	        //Left : disable left side
+	        m_polarHeading.setSide(false, true);
+	    }
+	    else{
+	        //Enable both sides
+	        m_polarHeading.setSide();
+	    }
 	}
 
 	void CheckIsDestinationReached(){
@@ -194,6 +252,7 @@ private:
 	SailHandler m_sailhandler;
 
 	float m_fDistanceToTarget;
+	float m_fDistanceToRoute;
 
 	ushort m_nDestinationIndex;
 	GpsCoord[] m_route;
