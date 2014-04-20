@@ -128,16 +128,24 @@ private:
 
 						switch(buffer[0].id){
 							case DeviceID.Gps:
-								(cast(Gps)(m_hwlist[buffer[0].id])).ParseValue(buffer[0].data);
+								auto dev = (cast(Gps)(m_hwlist[buffer[0].id]));
+								if(!dev.isemulated)
+									dev.ParseValue(buffer[0].data);
 								break;
 							case DeviceID.Roll:
-								(cast(Roll)(m_hwlist[buffer[0].id])).ParseValue(buffer[0].data);
+								auto dev = (cast(Roll)(m_hwlist[buffer[0].id]));
+								if(!dev.isemulated)
+									dev.ParseValue(buffer[0].data);
 								break;
 							case DeviceID.WindDir:
-								(cast(WindDir)(m_hwlist[buffer[0].id])).ParseValue(buffer[0].data);
+								auto dev = (cast(WindDir)(m_hwlist[buffer[0].id]));
+								if(!dev.isemulated)
+									dev.ParseValue(buffer[0].data);
 								break;
 							case DeviceID.Compass:
-								(cast(Compass)(m_hwlist[buffer[0].id])).ParseValue(buffer[0].data);
+								auto dev = (cast(Compass)(m_hwlist[buffer[0].id]));
+								if(!dev.isemulated)
+									dev.ParseValue(buffer[0].data);
 								break;
 
 							default:
