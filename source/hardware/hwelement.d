@@ -79,11 +79,7 @@ class HWSens(T) : HWElement!T {
 
 	@property{
 		override T value() const{
-			if(m_isemulated)
-				return m_lastvalue;
-			else{
-				return m_lastvalue;
-			}
+			return m_lastvalue;
 		}
 
 		/**
