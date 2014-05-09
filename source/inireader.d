@@ -21,7 +21,8 @@ public:
 		if(defValues !is null)
 			m_Data = defValues.dup;
 
-		Parse();
+		if(m_sPath!="")
+			Parse();
 	}
 
 	@property{

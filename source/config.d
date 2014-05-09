@@ -71,7 +71,13 @@ private:
 		assertThrown(m_ini.Get!string("", ""));
 	}
 	body{
-		m_ini = new INIReader(CONFIG_PATH, CONFIG_DEFAULT);
+		version(unittest){
+			//using default config for unittests
+			m_ini = new INIReader("", CONFIG_DEFAULT);
+		}
+		else{
+			m_ini = new INIReader(CONFIG_PATH, CONFIG_DEFAULT);
+		}
 		writeln("Config loaded: "~CONFIG_PATH);
 	}
 
