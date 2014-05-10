@@ -197,28 +197,28 @@ class API : ISailAPI
 		switch(to!ubyte(device.id)){
 			case DeviceID.Roll: 
 				Roll roll = Hardware.Get!Roll(cast(DeviceID) to!ubyte(device.id));
-				roll.value(to!float(device.value));
+				roll.value(device.value.to!float);
 				break;
 			case DeviceID.WindDir: 
 				WindDir wd = Hardware.Get!WindDir(cast(DeviceID) to!ubyte(device.id));
-				wd.value(to!float(device.value));
+				wd.value(device.value.to!float);
 				break;
 			case DeviceID.Compass: 
 				Compass compass = Hardware.Get!Compass(cast(DeviceID) to!ubyte(device.id));
-				compass.value(to!float(device.value));
+				compass.value(device.value.to!float);
 				break;
 			case DeviceID.Sail:
 				Sail sail = Hardware.Get!Sail(cast(DeviceID) to!ubyte(device.id));
-				sail.value(to!ubyte(device.value));
+				sail.value(device.value.to!ubyte);
 				break;	
 			case DeviceID.Helm:
 				Helm helm = Hardware.Get!Helm(cast(DeviceID) to!ubyte(device.id));
-				helm.value(to!double(device.value));
+				helm.value(device.value.to!float);
 				break;
 			case DeviceID.Gps:
 				Gps gps = Hardware.Get!Gps(cast(DeviceID) to!ubyte(device.id));
-				gps.value(GpsCoord(to!double(device.value.latitude), to!double(device.value.longitude)));
-				break;
+				gps.value(GpsCoord(device.value.latitude.to!double, device.value.longitude.to!double));
+				break/
 			default:
 				SailLog.Warning("Called unknown Device ID. No device set.");
 		}

@@ -63,7 +63,7 @@ sailControllers.controller('deviceCtrl', ['$scope', '$rootScope', '$http', '$log
 		$scope.deltaDevice = function(id, delta) {
 	    	$http.get('/api/' + id + '/devices')
 			    .success(function(data, status, headers, config) {
-			    	data.value += delta;
+			    	data.value = data.value + delta;
 			    	$http.post('/api/value', {"data" : JSON.stringify(data)})
 			    		.success(function(data, status, headers, config) {
 					        $scope.getDevices();
