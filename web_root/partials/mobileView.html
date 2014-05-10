@@ -1,3 +1,20 @@
-<div>
-	TODO : Mobile View
+<div class="row">
+
+    <div class="col-md-6" >
+        <div decisions></div>
+    </div>
+    
+    <div class="col-md-6">
+        <div devices ng-controller="deviceCtrl"></div>
+    </div>
+
+    <nav class="navbar navbar-default navbar-fixed-bottom" role="navigation">
+          <div class="container">
+            <div class="navbar-form">
+                <button class="btn btn-default" ng-click="backToStart()">Back to start position</button>
+                <button class="btn btn-danger" ng-click="emergencyStop()">Emergency stop</button>
+            </div>
+        </div>
+    </nav>
+
 </div>
