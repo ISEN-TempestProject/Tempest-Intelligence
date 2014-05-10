@@ -26,6 +26,7 @@ sailFilters.filter('logLevelCSS', function() {
 .filter('removeGPS', [function(){
     return function(input){
         var ret = [];
+        if(input === undefined) return ret; //Do not go further if not defined
         for(var i = 0 ; i<input.length ; i++){
             if(input[i].id != 3) ret.push(input[i]);
         }
