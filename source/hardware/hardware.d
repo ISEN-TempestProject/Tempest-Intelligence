@@ -103,6 +103,7 @@ private:
 		m_hwlist[DeviceID.Roll] = new Roll();
 		m_hwlist[DeviceID.WindDir] = new WindDir();
 		m_hwlist[DeviceID.Compass] = new Compass();
+		m_hwlist[DeviceID.Battery] = new Battery();
 	}
 
 
@@ -144,6 +145,11 @@ private:
 								break;
 							case DeviceID.Compass:
 								auto dev = (cast(Compass)(m_hwlist[buffer[0].id]));
+								if(!dev.isemulated)
+									dev.ParseValue(buffer[0].data);
+								break;
+							case DeviceID.Battery:
+								auto dev = (cast(Battery)(m_hwlist[buffer[0].id]));
 								if(!dev.isemulated)
 									dev.ParseValue(buffer[0].data);
 								break;

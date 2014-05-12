@@ -43,6 +43,10 @@ private:
 			"Pipe":"/tmp/pipe",
 			"ConstantWindValue":""
 		]),
+		"Battery" : ([
+			"LowVoltage":"4.5",
+			"CriticalVoltage":"3.6"
+		]),
 		"WebServer" : ([
 			"Port":"8080"
 		])
