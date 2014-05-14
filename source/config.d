@@ -20,7 +20,8 @@ private:
 	*/
 	enum string[string][string] CONFIG_DEFAULT = [
 		"Global" : ([
-			"LogFile":"logs"
+			"LogFile":"logs",
+			"GPSLogFile":"gpslogs"
 		]),
 		"DecisionCenter" : ([
 			"Route":"res/route.json",
@@ -32,7 +33,8 @@ private:
 		"Autopilot" : ([
 			"Period":"1000",
 			"Delta":"1.0",
-			"Tolerance":"3.0"
+			"Tolerance":"3.0",
+			"CommandRatio":"1.0"
 		]),
 		"SailHandler" : ([
 			"Period":"1000",
@@ -42,6 +44,10 @@ private:
 		"Hardware" : ([
 			"Pipe":"/tmp/pipe",
 			"ConstantWindValue":""
+		]),
+		"Battery" : ([
+			"LowVoltage":"4.5",
+			"CriticalVoltage":"3.6"
 		]),
 		"WebServer" : ([
 			"Port":"8080"
@@ -71,7 +77,13 @@ private:
 		assertThrown(m_ini.Get!string("", ""));
 	}
 	body{
-		m_ini = new INIReader(CONFIG_PATH, CONFIG_DEFAULT);
+		version(unittest){
+			//using default config for unittests
+			m_ini = new INIReader("", CONFIG_DEFAULT);
+		}
+		else{
+			m_ini = new INIReader(CONFIG_PATH, CONFIG_DEFAULT);
+		}
 		writeln("Config loaded: "~CONFIG_PATH);
 	}
 

@@ -68,9 +68,11 @@ private:
 		auto helm = Hardware.Get!Helm(DeviceID.Helm);
 
 		float fDeltaHead = (DecisionCenter.Get()).targetheading - comp.value;
-
+		
+		float fDiffRatio = (std.math.abs(fDeltaHead) - m_fTolerance) * Config.Get!float("Autopilot", "CommandRatio");
+		
 		if(fDeltaHead>m_fTolerance){
-			float fNewValue = helm.value + m_fDelta;
+			float fNewValue = helm.value + m_fDelta + fDiffRatio;
 
 			if(fNewValue>helm.max)
 				helm.value = helm.init;

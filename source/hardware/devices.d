@@ -1,9 +1,12 @@
 module hardware.devices;
 
 import std.conv;
+import std.stdio : File;
+import std.datetime;
 import hardware.hardware;
 import saillog, fifo, gpscoord;
 import filter;
+import config;
 
 public import hardware.hwelement;
 
@@ -15,7 +18,8 @@ enum DeviceID : ubyte{
 	Gps=3,
 	Roll=4,
 	WindDir=5,
-	Compass=6
+	Compass=6,
+	Battery=7
 }
 
 /**
@@ -80,6 +84,12 @@ class Gps : HWSens!GpsCoord {
 		m_init.latitude = 0;
 		m_init.longitude = 0;
 		m_lastvalue=m_init;
+
+		try{
+			m_logfile.open(Config.Get!string("General", "GPSLogFile"), "a");
+		}catch(Exception e){
+			SailLog.Critical("Unable to log GPS data: ",e);
+		}
 	}
 
 	invariant(){
@@ -102,13 +112,22 @@ class Gps : HWSens!GpsCoord {
 				Clock.currAppTick(),
 				coord
 			));
+
+			if(m_logfile.isOpen()){
+				m_logfile.writeln(Clock.currTime.toSimpleString() ,"\t",coord);
+			}
+
 			m_lastvalue = Filter.Raw!GpsCoord(m_values);
+
 		}
 
 		void CheckIsOutOfService(){
 			//May be wise to check if values are coherent
 		}
 	}
+
+private:
+	File m_logfile;
 }
 
 /**
@@ -217,6 +236,50 @@ class Compass : HWSens!float {
 			to!float((m_max-m_min)*data[0]/ulong.max)+m_min
 		));
 		m_lastvalue = Filter.TimedAvg!float(m_values);
+	}
+
+	override void CheckIsOutOfService(){
+		//May be wise to check if values are coherent
+	}
+}
+
+
+/**
+	Gets the battery voltage
+*/
+class Battery : HWSens!float {
+	this(){
+		super(10);
+		m_id = DeviceID.Compass;
+		m_min = 0;
+		m_max = 15;
+		m_init = 0;
+		m_lastvalue=m_init;
+	}
+
+	invariant(){
+		assert(m_min<=m_lastvalue && m_lastvalue<=m_max, "Value is out of bound");
+	}
+
+	override void ParseValue(ulong[2] data)
+	out{
+		assert(m_min<=m_values.front.value && m_values.front.value<=m_max, "Value is out of bound");
+	}body{
+		m_values.Append(TimestampedValue!float(
+			Clock.currAppTick(),
+			to!float((m_max-m_min)*data[0]/ulong.max)+m_min
+		));
+		m_lastvalue = Filter.Raw!float(m_values);
+
+		//Battery voltage check
+		if(m_lastvalue <= Config.Get!float("Battery", "CriticalVoltage"))
+		{
+			SailLog.Critical("Battery voltage is FAR TO LOW, you should rest : ",m_lastvalue,"v");
+		}
+		else if(m_lastvalue <= Config.Get!float("Battery", "LowVoltage"))
+		{
+			SailLog.Warning("Battery voltage is low : ",m_lastvalue,"v");
+		}
 	}
 
 	override void CheckIsOutOfService(){

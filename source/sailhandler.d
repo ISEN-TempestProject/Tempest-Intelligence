@@ -14,6 +14,8 @@ class SailHandler {
 		m_fDelta = Config.Get!float("SailHandler", "Delta");
 		m_fDanger = Config.Get!float("SailHandler", "Danger");
 
+		m_nMaxTension = Hardware.Get!Sail(DeviceID.Sail).max;
+
 		m_bEnabled = true;
 
 		//Start the thread
@@ -64,23 +66,31 @@ private:
 	void AdjustSail(){
 		float fWind = abs(Hardware.Get!WindDir(DeviceID.WindDir).value);
 		auto sail = Hardware.Get!Sail(DeviceID.Sail);
+		auto roll = Hardware.Get!Roll(DeviceID.Roll);
 
 		if(fWind<25){
-			sail.value = sail.max;
+			sail.value = m_nMaxTension;
 		}
 		else{
 			//Linear function
-			sail.value = to!(typeof(sail.value))(sail.max-(sail.max-sail.min)*(fWind-25)/(180-25));
+			sail.value = to!(typeof(sail.value))(m_nMaxTension-(m_nMaxTension-sail.min)*(fWind-25)/(180-25));
 		}
 
-		//TODO: Release sail when the roll is dangerous
-
+		//Handling m_nMaxTension (safety max tension)
+		if(abs(roll.value)>m_fDanger){
+			m_nMaxTension--;
+		}
+		else if(abs(roll.value)<m_fDanger/2.0 && m_nMaxTension<sail.max){
+			m_nMaxTension++;
+		}
 	}
 
 
 	uint m_nLoopTimeMS;
 	float m_fDelta;
 	float m_fDanger;
+
+	ubyte m_nMaxTension;
 }
 
 
