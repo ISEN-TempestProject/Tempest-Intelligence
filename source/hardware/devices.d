@@ -86,7 +86,7 @@ class Gps : HWSens!GpsCoord {
 		m_lastvalue=m_init;
 
 		try{
-			m_logfile.open(Config.Get!string("General", "GPSLogFile"), "a");
+			m_logfile.open(Config.Get!string("Global", "GPSLogFile"), "a");
 		}catch(Exception e){
 			SailLog.Critical("Unable to log GPS data: ",e);
 		}
