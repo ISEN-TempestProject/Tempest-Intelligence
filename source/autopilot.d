@@ -80,7 +80,7 @@ private:
 				helm.value = fNewValue;
 		}
 		else if(fDeltaHead<m_fTolerance){
-			float fNewValue = helm.value - m_fDelta;
+			float fNewValue = helm.value - m_fDelta - fDiffRatio;
 			
 			if(fNewValue<helm.min)
 				helm.value = helm.init;
@@ -110,10 +110,10 @@ private:
 		//Delta compensation
 		helm.value = helm.init;
 		ap.AdjustHelm();
-		assert(helm.value==helm.init+ap.m_fDelta);
+		assert(helm.value==helm.init+ap.m_fDelta+2);
 		ap.AdjustHelm();
 		ap.AdjustHelm();
-		assert(helm.value==helm.init+3*ap.m_fDelta);
+		assert(helm.value==helm.init+3*(ap.m_fDelta+2));
 
 		//return to init position
 		helm.value = helm.max - ap.m_fDelta/2;
@@ -123,6 +123,6 @@ private:
 		//-delta compensation
 		dec.targetheading = 15;
 		ap.AdjustHelm();
-		assert(helm.value == helm.init-ap.m_fDelta);
+		assert(helm.value == helm.init-ap.m_fDelta-2);
 	}
 }
