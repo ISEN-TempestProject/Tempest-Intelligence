@@ -4,6 +4,7 @@ import std.process;
 import std.socket;
 import core.thread;
 import saillog;
+import datalog;
 
 public import hardware.devices;
 
@@ -63,6 +64,7 @@ package:
 
 private:
 	static __gshared Hardware m_inst;
+	DataLog m_datalog;
 	this() {
 		SailLog.Notify("Starting ",typeof(this).stringof," instantiation in ",Thread.getThis().name," thread...");
 
@@ -80,8 +82,12 @@ private:
 			m_thread.start();
 		}
 		SailLog.Success(typeof(this).stringof~" instantiated in ",Thread.getThis().name," thread");
+	
+	    m_datalog = new DataLog();
 	}
 	~this(){
+	    delete m_datalog;
+	
 		SailLog.Critical("Destroying ",typeof(this).stringof);
 		if(m_thread !is null){
 			m_stopthread = true;

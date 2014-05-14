@@ -218,7 +218,7 @@ class API : ISailAPI
 			case DeviceID.Gps:
 				Gps gps = Hardware.Get!Gps(cast(DeviceID) to!ubyte(device.id));
 				gps.value(GpsCoord(device.value.latitude.to!double, device.value.longitude.to!double));
-				break/
+				break;
 			default:
 				SailLog.Warning("Called unknown Device ID. No device set.");
 		}
