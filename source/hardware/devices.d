@@ -1,6 +1,8 @@
 module hardware.devices;
 
 import std.conv;
+import std.stdio : File;
+import std.datetime;
 import hardware.hardware;
 import saillog, fifo, gpscoord;
 import filter;
@@ -82,6 +84,12 @@ class Gps : HWSens!GpsCoord {
 		m_init.latitude = 0;
 		m_init.longitude = 0;
 		m_lastvalue=m_init;
+
+		try{
+			m_logfile.open(Config.Get!string("General", "GPSLogFile"), "a");
+		}catch(Exception e){
+			SailLog.Critical("Unable to log GPS data: ",e);
+		}
 	}
 
 	invariant(){
@@ -104,13 +112,22 @@ class Gps : HWSens!GpsCoord {
 				Clock.currAppTick(),
 				coord
 			));
+
+			if(m_logfile.isOpen()){
+				m_logfile.writeln(Clock.currTime.toSimpleString() ,"\t",coord);
+			}
+
 			m_lastvalue = Filter.Raw!GpsCoord(m_values);
+
 		}
 
 		void CheckIsOutOfService(){
 			//May be wise to check if values are coherent
 		}
 	}
+
+private:
+	File m_logfile;
 }
 
 /**

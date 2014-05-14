@@ -20,7 +20,8 @@ private:
 	*/
 	enum string[string][string] CONFIG_DEFAULT = [
 		"Global" : ([
-			"LogFile":"logs"
+			"LogFile":"logs",
+			"GPSLogFile":"gpslogs"
 		]),
 		"DecisionCenter" : ([
 			"Route":"res/route.json",
