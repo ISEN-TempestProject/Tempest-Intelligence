@@ -33,7 +33,8 @@ private:
 		"Autopilot" : ([
 			"Period":"1000",
 			"Delta":"1.0",
-			"Tolerance":"3.0"
+			"Tolerance":"3.0",
+			"CommandRatio":"1.0"
 		]),
 		"SailHandler" : ([
 			"Period":"1000",
