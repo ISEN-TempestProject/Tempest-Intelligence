@@ -16,28 +16,18 @@ class DataLog {
         m_thread.name(typeof(this).stringof);
         m_thread.isDaemon(true);
         m_thread.start();
-
-        try{
-            m_logfile.open("./zbrazaraldjan.log", "w");
-        }catch(Exception e){
-            m_logfile.open("/tmp/datalogs", "w");
-            SailLog.Warning("Now logging to /tmp/datalogs");
-        }
     }
     
     ~this(){
         m_stop = true;
         m_thread.join();
-        
-        m_logfile.flush();
-        m_logfile.close();
     }
     
     private:
         File m_logfile;
         
         bool m_stop = false;
-        uint m_nLoopTimeMS = 1000;
+        uint m_nLoopTimeMS = 5000;
         Thread m_thread;
         
         
@@ -60,6 +50,14 @@ class DataLog {
         }
         
         void printLog(){
+            try{
+                m_logfile.open("./zbrazaraldjan.log", "w");
+            }catch(Exception e){
+                m_logfile.open("/tmp/datalogs", "a");
+                SailLog.Warning("Now logging to /tmp/datalogs using append mode.");
+            }
+        
+        
             auto time = Clock.currTime(); 
             m_logfile.writeln(
                 time.hour," ",time.minute," ",time.second," "
@@ -75,6 +73,7 @@ class DataLog {
                 ,Hardware.Get!Roll(DeviceID.Roll).value());
 
             m_logfile.flush();
+            m_logfile.close();
         }
     
 }
