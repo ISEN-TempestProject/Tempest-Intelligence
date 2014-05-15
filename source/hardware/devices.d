@@ -251,7 +251,7 @@ class Compass : HWSens!float {
 class Battery : HWSens!float {
 	this(){
 		super(10);
-		m_id = DeviceID.Compass;
+		m_id = DeviceID.Battery;
 		m_min = 0;
 		m_max = 15;
 		m_init = 0;

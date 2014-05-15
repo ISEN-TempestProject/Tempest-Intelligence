@@ -136,6 +136,13 @@ class API : ISailAPI
 				device.value.longitude = gps.value().longitude();
 				device.value.latitude = gps.value().latitude();
 				break;
+			case DeviceID.Battery:
+                Battery battery = Hardware.Get!Battery(id);
+                device.id = battery.id();
+                device.name = "Battery";
+                device.emulated = battery.isemulated();
+                device.value = battery.value();
+                break;
 			default:
 				SailLog.Warning("Called unknown Device ID. Sending empty object.");
 				return parseJsonString("{}");
@@ -185,6 +192,10 @@ class API : ISailAPI
 				Gps gps = Hardware.Get!Gps(cast(DeviceID) to!ubyte(device.id));
 				gps.isemulated(to!bool(device.emulated));
 				break;
+			case DeviceID.Battery:
+                Battery battery = Hardware.Get!Battery(cast(DeviceID) to!ubyte(device.id));
+                battery.isemulated(to!bool(device.emulated));
+                break;
 			default:
 				SailLog.Warning("Called unknown Device ID. No device set.");
 		}
@@ -219,6 +230,10 @@ class API : ISailAPI
 				Gps gps = Hardware.Get!Gps(cast(DeviceID) to!ubyte(device.id));
 				gps.value(GpsCoord(device.value.latitude.to!double, device.value.longitude.to!double));
 				break;
+			case DeviceID.Battery:
+                Battery battery = Hardware.Get!Battery(cast(DeviceID) to!ubyte(device.id));
+                battery.value(device.value.to!float);
+                break;
 			default:
 				SailLog.Warning("Called unknown Device ID. No device set.");
 		}

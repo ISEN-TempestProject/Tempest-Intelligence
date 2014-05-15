@@ -18,9 +18,9 @@ class DataLog {
         m_thread.start();
 
         try{
-            m_logfile.open("./zbrazaraldjan.log", "a");
+            m_logfile.open("./zbrazaraldjan.log", "w");
         }catch(Exception e){
-            m_logfile.open("/tmp/datalogs", "a");
+            m_logfile.open("/tmp/datalogs", "w");
             SailLog.Warning("Now logging to /tmp/datalogs");
         }
     }
