@@ -271,8 +271,8 @@ class API : ISailAPI
 		dc.enabled = DecisionCenter.Get().enabled();
 
 		dc.targetPosition = Json.emptyObject;
-		dc.targetPosition.longitude = DecisionCenter.Get().targetposition().longitude();
-		dc.targetPosition.latitude = DecisionCenter.Get().targetposition().latitude();
+		dc.targetPosition.longitude = GpsCoord.toDeg(DecisionCenter.Get().targetposition().longitude());
+		dc.targetPosition.latitude = GpsCoord.toDeg(DecisionCenter.Get().targetposition().latitude());
 
 		dc.targetHeading = DecisionCenter.Get().targetheading();
 
@@ -286,7 +286,7 @@ class API : ISailAPI
 
 	void postTargetposition(float latitude, float longitude){
 	    SailLog.Notify("[DBG] ", latitude,";" , longitude);
-		DecisionCenter.Get().targetposition(GpsCoord(to!double(latitude), to!double(longitude)));
+		DecisionCenter.Get().targetposition(GpsCoord(GpsCoord.toRad(to!double(latitude)), GpsCoord.toRad(to!double(longitude))));
 	}
 
 	void postTargetheading(float angle){
