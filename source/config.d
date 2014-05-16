@@ -34,7 +34,7 @@ private:
 			"Period":"1000",
 			"Delta":"1.0",
 			"Tolerance":"3.0",
-			"CommandRatio":"1.0"
+			"CommandRatio":"0.1"
 		]),
 		"SailHandler" : ([
 			"Period":"1000",
