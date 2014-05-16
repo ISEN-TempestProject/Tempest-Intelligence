@@ -66,7 +66,7 @@ static class Filter {
 		/**
 			Returns the time-weighted average of values stored in data for a specified time in milliseconds
 		*/
-		T TimedAvgOnPeriod(T)(ref Fifo!(TimestampedValue!T) data, long timemsec){
+		T TimedAvgFromDuration(T)(ref Fifo!(TimestampedValue!T) data, long timemsec){
 			T ret = 0;
 
 			auto rng = data.elements.opSlice();
@@ -74,7 +74,7 @@ static class Filter {
 				TickDuration dt = rng.back.time-rng.front.time;
 				TimestampedValue!T last = rng.front;
 
-				TickDuration timefront = last.time;
+				TickDuration timefront = Clock.currAppTick();
 				rng.popFront();
 
 				if(!rng.empty){

@@ -118,7 +118,7 @@ class Gps : HWSens!GpsCoord {
 				m_logfile.writeln(Clock.currTime.toSimpleString() ,"\t",coord);
 			}
 
-			m_lastvalue = Filter.TimedAvgOnPeriod!GpsCoord(m_values, 2000);
+			m_lastvalue = Filter.TimedAvgFromDuration!GpsCoord(m_values, 2000);
 
 		}
 
@@ -156,7 +156,7 @@ class Roll : HWSens!float {
 			Clock.currAppTick(),
 			to!float((m_max-m_min)*data[0]/ulong.max)+m_min
 		));
-		m_lastvalue = Filter.TimedAvgOnPeriod!float(m_values, 7500);
+		m_lastvalue = Filter.TimedAvgFromDuration!float(m_values, 7500);
 	}
 
 	override void CheckIsOutOfService(){
@@ -193,7 +193,7 @@ class WindDir : HWSens!float {
 			Clock.currAppTick(),
 			fValue
 		));
-		m_lastvalue = Filter.TimedAvgOnPeriod!float(m_values, 3500);
+		m_lastvalue = Filter.TimedAvgFromDuration!float(m_values, 3500);
 	}
 
 	override void CheckIsOutOfService(){
