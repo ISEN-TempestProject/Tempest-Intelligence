@@ -68,30 +68,56 @@ private:
 		auto helm = Hardware.Get!Helm(DeviceID.Helm);
 
 		float fDeltaHead = (DecisionCenter.Get()).targetheading - comp.value;
+		if(fDeltaHead>180.0)
+			fDeltaHead-=360.0;
 		
-		float fDiffRatio = (std.math.abs(fDeltaHead) - m_fTolerance) * Config.Get!float("Autopilot", "CommandRatio");
+		float fDiffRatio = 0;
+		if(std.math.abs(fDeltaHead)>m_fTolerance || std.math.abs(fDeltaHead)<m_fTolerance)
+			fDiffRatio = (std.math.abs(fDeltaHead) - m_fTolerance) * Config.Get!float("Autopilot", "CommandRatio");
 		
 		if(fDeltaHead>m_fTolerance){
 			float fNewValue = helm.value + m_fDelta + fDiffRatio;
 
-			if(fNewValue>helm.max)
-				helm.value = helm.init;
+			if(fNewValue>helm.max){
+				m_nCounter++;
+				if(m_nCounter>=5){
+					helm.value = helm.init;
+					m_nCounter = 0;
+				}
+				else
+					helm.value = helm.max;
+			}
 			else
+			{
 				helm.value = fNewValue;
+				m_nCounter = 0;
+			}
 		}
 		else if(fDeltaHead<m_fTolerance){
 			float fNewValue = helm.value - m_fDelta - fDiffRatio;
 			
-			if(fNewValue<helm.min)
-				helm.value = helm.init;
+			if(fNewValue<helm.min){
+				m_nCounter++;
+				if(m_nCounter>=5){
+					helm.value = helm.init;
+					m_nCounter = 0;
+				}
+				else
+					helm.value = helm.min;
+			}
 			else
+			{
+				m_nCounter = 0;
 				helm.value = fNewValue;
+			}
 		}
 	}
   
 	uint m_nLoopTimeMS;
 	float m_fDelta;
 	float m_fTolerance;
+
+	int m_nCounter = 0;
 
 	unittest {
 		auto dec = DecisionCenter.Get();
