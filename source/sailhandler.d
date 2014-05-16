@@ -77,7 +77,7 @@ private:
 		}
 
 		//Handling m_nMaxTension (safety max tension)
-		if(abs(roll.value)>m_fDanger){
+		if(abs(roll.value)>m_fDanger && m_nMaxTension>sail.max/4){
 			m_nMaxTension--;
 		}
 		else if(abs(roll.value)<m_fDanger/2.0 && m_nMaxTension<sail.max){
