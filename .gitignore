@@ -23,3 +23,7 @@ doc/*
 
 #Editor configuration related
 .zedstate
+
+#Miscellaneous
+*.log
+tags
