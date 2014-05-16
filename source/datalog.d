@@ -62,7 +62,7 @@ class DataLog {
             auto time = Clock.currTime(); 
             m_logfile.writeln(
                 time.hour," ",time.minute," ",time.second," "
-                ,GpsCoord.toDeg(Hardware.Get!Gps(DeviceID.Gps).value().longitude())," "
+                ,GpsCoord.toDeg(Hardware.Get!Gps(DeviceID.Gps).value().latitude())," "
                 ,GpsCoord.toDeg(Hardware.Get!Gps(DeviceID.Gps).value().longitude())," "
                 ,GpsCoord.toDeg(DecisionCenter.Get().targetposition().latitude())," "
                 ,GpsCoord.toDeg(DecisionCenter.Get().targetposition().longitude())," "
