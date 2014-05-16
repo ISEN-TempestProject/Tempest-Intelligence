@@ -1,6 +1,7 @@
 .obj/
 *.a
 logs
+gpslogs
 .dub/
 projetvoilier
 
