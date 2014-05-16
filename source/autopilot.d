@@ -136,19 +136,25 @@ private:
 		//Delta compensation
 		helm.value = helm.init;
 		ap.AdjustHelm();
-		assert(helm.value==helm.init+ap.m_fDelta+2);
+		assert(std.math.abs(helm.value-(helm.init+ap.m_fDelta+0.2))<0.01);
 		ap.AdjustHelm();
 		ap.AdjustHelm();
-		assert(helm.value==helm.init+3*(ap.m_fDelta+2));
+		assert(std.math.abs(helm.value-(helm.init+3*(ap.m_fDelta+0.2)))<0.01);
 
 		//return to init position
 		helm.value = helm.max - ap.m_fDelta/2;
 		ap.AdjustHelm();
+		assert(helm.value == helm.max);
+		ap.AdjustHelm();
+		ap.AdjustHelm();
+		ap.AdjustHelm();
+		ap.AdjustHelm();
 		assert(helm.value == helm.init);
 
 		//-delta compensation
+		helm.value = helm.init;
 		dec.targetheading = 15;
 		ap.AdjustHelm();
-		assert(helm.value == helm.init-ap.m_fDelta-2);
+		assert(std.math.abs(helm.value-(helm.init-(ap.m_fDelta+0.2)))<0.01);
 	}
 }
