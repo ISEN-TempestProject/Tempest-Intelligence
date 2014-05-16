@@ -133,8 +133,8 @@ class API : ISailAPI
 				device.name = "GPS";
 				device.emulated = gps.isemulated();
 				device.value = Json.emptyObject;
-				device.value.longitude = gps.value().longitude();
-				device.value.latitude = gps.value().latitude();
+				device.value.longitude = GpsCoord.toDeg(gps.value().longitude());
+				device.value.latitude = GpsCoord.toDeg(gps.value().latitude());
 				break;
 			case DeviceID.Battery:
                 Battery battery = Hardware.Get!Battery(id);
@@ -161,7 +161,7 @@ class API : ISailAPI
 	void postGps(float latitude, float longitude){
 	    Gps gps = Hardware.Get!Gps(DeviceID.Gps);
 	    
-	    gps.value(GpsCoord(latitude, longitude));
+	    gps.value(GpsCoord(GpsCoord.toRad(latitude), GpsCoord.toRad(longitude)));
         SailLog.Notify("GPS set to [",gps.value().latitude(),";",gps.value().longitude(),"]");
 	}
 
@@ -228,7 +228,7 @@ class API : ISailAPI
 				break;
 			case DeviceID.Gps:
 				Gps gps = Hardware.Get!Gps(cast(DeviceID) to!ubyte(device.id));
-				gps.value(GpsCoord(device.value.latitude.to!double, device.value.longitude.to!double));
+				gps.value(GpsCoord(GpsCoord.toRad(device.value.latitude.to!double), GpsCoord.toRad(device.value.longitude.to!double)));
 				break;
 			case DeviceID.Battery:
                 Battery battery = Hardware.Get!Battery(cast(DeviceID) to!ubyte(device.id));
