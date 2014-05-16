@@ -7,6 +7,7 @@ import hardware.hardware;
 import hardware.devices;
 import decisioncenter;
 import saillog;
+import gpscoord;
 
 
 class DataLog {
@@ -61,16 +62,17 @@ class DataLog {
             auto time = Clock.currTime(); 
             m_logfile.writeln(
                 time.hour," ",time.minute," ",time.second," "
-                ,Hardware.Get!Gps(DeviceID.Gps).value().longitude()," "
-                ,Hardware.Get!Gps(DeviceID.Gps).value().longitude()," "
-                ,DecisionCenter.Get().targetposition().latitude() ," "
-                ,DecisionCenter.Get().targetposition().longitude() ," "
+                ,GpsCoord.toDeg(Hardware.Get!Gps(DeviceID.Gps).value().longitude())," "
+                ,GpsCoord.toDeg(Hardware.Get!Gps(DeviceID.Gps).value().longitude())," "
+                ,GpsCoord.toDeg(DecisionCenter.Get().targetposition().latitude())," "
+                ,GpsCoord.toDeg(DecisionCenter.Get().targetposition().longitude())," "
                 ,Hardware.Get!Helm(DeviceID.Helm).value()," "
                 ,Hardware.Get!Sail(DeviceID.Sail).value()," " //Grand-voile
                 ,Hardware.Get!Sail(DeviceID.Sail).value()," " //Foc
                 ,Hardware.Get!WindDir(DeviceID.WindDir).value()," "
-                ,"Batterie "
-                ,Hardware.Get!Roll(DeviceID.Roll).value());
+                ,Hardware.Get!Battery(DeviceID.Battery).value()," "
+                ,Hardware.Get!Roll(DeviceID.Roll).value()," "
+                ,Hardware.Get!Compass(DeviceID.Compass).value());
 
             m_logfile.flush();
             m_logfile.close();
