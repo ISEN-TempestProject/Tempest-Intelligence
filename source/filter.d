@@ -50,10 +50,39 @@ static class Filter {
 
 				if(!rng.empty){
 					for( ; !rng.empty ; rng.popFront()){
-						ret += last.value*(rng.front.time - last.time).length;
+						ret = ret + (last.value*(rng.front.time - last.time).length);
 						last = rng.front;
 					}
-					ret /= dt.length;
+					ret = ret/dt.length;
+				}
+				else{
+					return last.value;
+				}
+			}
+			return ret;
+
+		}
+
+		/**
+			Returns the time-weighted average of values stored in data for a specified time in milliseconds
+		*/
+		T TimedAvgOnPeriod(T)(ref Fifo!(TimestampedValue!T) data, long timemsec){
+			T ret = 0;
+
+			auto rng = data.elements.opSlice();
+			if(!rng.empty){
+				TickDuration dt = rng.back.time-rng.front.time;
+				TimestampedValue!T last = rng.front;
+
+				TickDuration timefront = last.time;
+				rng.popFront();
+
+				if(!rng.empty){
+					for( ; !rng.empty && (rng.front.time-timefront).msecs()<=timemsec ; rng.popFront()){
+						ret = ret + (last.value*(rng.front.time - last.time).length);
+						last = rng.front;
+					}
+					ret = ret/dt.length;
 				}
 				else{
 					return last.value;

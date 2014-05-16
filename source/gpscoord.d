@@ -20,6 +20,14 @@ struct GpsCoord {
 		m_long = longitude;
 	}
 
+	/**
+		Simpliest constructor
+	*/
+	this(double init=0.0) {
+		m_lat = init;
+		m_long = init;
+	}
+
 	enum Unit{
 		DecDeg, DegMinSec, GPS
 	}
@@ -36,11 +44,11 @@ struct GpsCoord {
 	}
 
 	GpsCoord opBinary(string op)(GpsCoord sec) {
-		static if (op == "+") return GpsCoord(m_lat+sec.m_lat, m_long+sec.m_long);
-		static if (op == "-") return GpsCoord(m_lat-sec.m_lat, m_long-sec.m_long);
-		static if (op == "*") return GpsCoord(m_lat*sec.m_lat, m_long*sec.m_long);
-		static if (op == "/") return GpsCoord(m_lat/sec.m_lat, m_long/sec.m_long);
-		else static assert(0, "Operator "~op~" not implemented");
+		return GpsCoord(mixin("m_lat "~op~" sec.m_lat"), mixin("m_long "~op~" sec.m_long"));
+	}
+
+	GpsCoord opBinary(string op)(float sec) {
+		return GpsCoord(mixin("m_lat "~op~" sec"), mixin("m_long "~op~" sec"));
 	}
 
 

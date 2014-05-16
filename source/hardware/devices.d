@@ -75,7 +75,7 @@ protected:
 */
 class Gps : HWSens!GpsCoord {
 	this(){
-		super(50);
+		super(5);
 		m_id = DeviceID.Gps;
 		m_min.latitude = -90;
 		m_max.latitude = 90;
@@ -118,7 +118,7 @@ class Gps : HWSens!GpsCoord {
 				m_logfile.writeln(Clock.currTime.toSimpleString() ,"\t",coord);
 			}
 
-			m_lastvalue = Filter.Raw!GpsCoord(m_values);
+			m_lastvalue = Filter.TimedAvgOnPeriod!GpsCoord(m_values, 2000);
 
 		}
 
@@ -136,7 +136,7 @@ private:
 */
 class Roll : HWSens!float {
 	this(){
-		super(10);
+		super(75);
 		m_id = DeviceID.Roll;
 		m_min = -180.0;
 		m_max = 180.0;
@@ -156,7 +156,7 @@ class Roll : HWSens!float {
 			Clock.currAppTick(),
 			to!float((m_max-m_min)*data[0]/ulong.max)+m_min
 		));
-		m_lastvalue = Filter.TimedAvg!float(m_values);
+		m_lastvalue = Filter.TimedAvgOnPeriod!float(m_values, 7500);
 	}
 
 	override void CheckIsOutOfService(){
@@ -169,7 +169,7 @@ class Roll : HWSens!float {
 */
 class WindDir : HWSens!float {
 	this(){
-		super(10);
+		super(40);
 		m_id = DeviceID.WindDir;
 		m_min = -180;
 		m_max = 180;
@@ -193,7 +193,7 @@ class WindDir : HWSens!float {
 			Clock.currAppTick(),
 			fValue
 		));
-		m_lastvalue = Filter.TimedAvg!float(m_values);
+		m_lastvalue = Filter.TimedAvgOnPeriod!float(m_values, 3500);
 	}
 
 	override void CheckIsOutOfService(){
@@ -216,7 +216,7 @@ class WindDir : HWSens!float {
 */
 class Compass : HWSens!float {
 	this(){
-		super(10);
+		super(5);
 		m_id = DeviceID.Compass;
 		m_min = 0;
 		m_max = 360;
@@ -275,7 +275,7 @@ class Battery : HWSens!float {
 		//Battery voltage check
 		if(m_lastvalue <= Config.Get!float("Battery", "CriticalVoltage"))
 		{
-			SailLog.Critical("Battery voltage is FAR TO LOW, you should rest : ",m_lastvalue,"v");
+			SailLog.Critical("Battery voltage is FAR TOO LOW, you should rest : ",m_lastvalue,"v");
 		}
 		else if(m_lastvalue <= Config.Get!float("Battery", "LowVoltage"))
 		{
