@@ -203,14 +203,12 @@ private:
         //Reading fixed values (references)
             //Target heading
         float _targetDirection = (to!float(Hardware.Get!Gps(DeviceID.Gps).value.GetBearingTo(targetposition())) + 360.0 ) % 360.0;
-        float heading_angle = _targetDirection - (to!float(Hardware.Get!Compass(DeviceID.Compass).value)) ;
+        float compassAngle = (to!float(Hardware.Get!Compass(DeviceID.Compass).value));
+        float heading_angle = _targetDirection - compassAngle;
         if(isNaN(heading_angle)) heading_angle = 0;
-        //DBG : SailLog.Post("Boat angle : ", (to!float(Hardware.Get!Compass(DeviceID.Compass).value)));
-        //DBG : SailLog.Post("Heading angle : ", heading_angle);
         
             //Wind direction
         float wind_angle = Hardware.Get!WindDir(DeviceID.WindDir).value();
-        //DBG : SailLog.Post("Wind angle : ", wind_angle);    
             
         //Result vector = 0
         float result = 0.0, res_sum = 0.0;
@@ -236,10 +234,8 @@ private:
 
         }
             
-        //DBG : SailLog.Post("Result (",result,") : ", (result + (to!float(Hardware.Get!Compass(DeviceID.Compass).value)) + 360.0) % 360.0);    
-            
         //Return result vector (== heading angle) 
-        return (result - _targetDirection + 360.0) % 360.0;
+        return (result + compassAngle + 360.0) % 360.0;
 	}
 	
 	/**

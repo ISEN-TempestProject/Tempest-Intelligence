@@ -23,7 +23,7 @@ crossrelease:
 	dub build --compiler=arm-unknown-linux-gnueabi-gdc --build=release
 
 send: cross
-	tar cvfj - projetvoilier res | ssh root@172.18.2.36 'tar xvfj - -C /root/intel'
+	tar cvfj - projetvoilier res web_root | ssh root@172.18.2.36 'tar xvfj - -C /root/intel'
 
 #documentation generation
 .PHONY: doc
