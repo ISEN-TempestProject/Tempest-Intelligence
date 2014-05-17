@@ -18,6 +18,9 @@ static class Filter {
 			Returns the last value stored in the data
 		*/
 		T Raw(T)(ref Fifo!(TimestampedValue!T) data){
+			if(data.elements.empty)
+				return GetZero!T();
+			
 			return data.front().value;
 		}
 
@@ -25,7 +28,8 @@ static class Filter {
 			Returns the average of all values stored in data
 		*/
 		T DumbAvg(T)(ref Fifo!(TimestampedValue!T) data){
-			T ret = 0;
+			T ret = GetZero!T();
+
 			size_t nElements = 0;
 			foreach(ref cell ; data.elements){
 				nElements++;
@@ -40,7 +44,7 @@ static class Filter {
 			Returns the time-weighted average of all values stored in data
 		*/
 		T TimedAvg(T)(ref Fifo!(TimestampedValue!T) data){
-			T ret = 0;
+			T ret = GetZero!T();
 
 			auto rng = data.elements.opSlice();
 			if(!rng.empty){
@@ -67,18 +71,18 @@ static class Filter {
 			Returns the time-weighted average of values stored in data for a specified time in milliseconds
 		*/
 		T TimedAvgOnPeriod(T)(ref Fifo!(TimestampedValue!T) data, long timemsec){
-			T ret = 0;
+			T ret = GetZero!T();
 
 			auto rng = data.elements.opSlice();
 			if(!rng.empty){
 				TickDuration dt = rng.back.time-rng.front.time;
 				TimestampedValue!T last = rng.front;
 
-				TickDuration timefront = last.time;
+				TickDuration execDate = last.time;
 				rng.popFront();
 
 				if(!rng.empty){
-					for( ; !rng.empty && (rng.front.time-timefront).msecs()<=timemsec ; rng.popFront()){
+					for( ; !rng.empty && (rng.front.time-execDate).msecs()<=timemsec ; rng.popFront()){
 						ret = ret + (last.value*(rng.front.time - last.time).length);
 						last = rng.front;
 					}
@@ -102,6 +106,21 @@ static class Filter {
 			return Raw!T(data);
 		}
 
+	}
+
+	private static{
+
+		T GetZero(T)(){
+			import gpscoord;
+			static if(is(T : float) || is(T : double))
+				return 0.0;
+			else static if(is(T : cfloat))
+				return 0.0+0.0i;
+			else static if(is(T : GpsCoord))
+				return GpsCoord(0.0, 0.0);
+			else
+				return 0;
+		}
 	}
 }
 

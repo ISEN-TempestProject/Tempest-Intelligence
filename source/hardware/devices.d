@@ -117,9 +117,10 @@ class Gps : HWSens!GpsCoord {
 			if(m_logfile.isOpen()){
 				m_logfile.writeln(Clock.currTime.toSimpleString() ,"\t",coord);
 			}
+		}
 
+		void ExecFilter(){
 			m_lastvalue = Filter.TimedAvgOnPeriod!GpsCoord(m_values, 2000);
-
 		}
 
 		void CheckIsOutOfService(){
@@ -148,19 +149,25 @@ class Roll : HWSens!float {
 		assert(m_min<=m_lastvalue && m_lastvalue<=m_max, "Value is out of bound");
 	}
 
-	override void ParseValue(ulong[2] data)
-	out{
-		assert(m_min<=m_values.front.value && m_values.front.value<=m_max, "Value is out of bound");
-	}body{
-		m_values.Append(TimestampedValue!float(
-			Clock.currAppTick(),
-			to!float((m_max-m_min)*data[0]/ulong.max)+m_min
-		));
-		m_lastvalue = Filter.TimedAvgOnPeriod!float(m_values, 7500);
-	}
+	override{
 
-	override void CheckIsOutOfService(){
-		//May be wise to check if values are coherent
+		void ParseValue(ulong[2] data)
+		out{
+			assert(m_min<=m_values.front.value && m_values.front.value<=m_max, "Value is out of bound");
+		}body{
+			m_values.Append(TimestampedValue!float(
+				Clock.currAppTick(),
+				to!float((m_max-m_min)*data[0]/ulong.max)+m_min
+			));
+		}
+
+		void ExecFilter(){
+			m_lastvalue = Filter.TimedAvgOnPeriod!float(m_values, 7500);
+		}
+
+		void CheckIsOutOfService(){
+			//May be wise to check if values are coherent
+		}
 	}
 }
 
@@ -181,23 +188,28 @@ class WindDir : HWSens!float {
 		assert(m_min<=m_lastvalue && m_lastvalue<=m_max, "Value is out of bound");
 	}
 
-	override void ParseValue(ulong[2] data)
-	out{
-		assert(m_min<=m_values.front.value && m_values.front.value<=m_max, "Value is out of bound");
-	}body{
-		float fValue = to!float((m_max-m_min)*data[0]/ulong.max)+m_min;
-		if(fValue>180)
-			fValue = 360.0-fValue;
+	override{
+		void ParseValue(ulong[2] data)
+		out{
+			assert(m_min<=m_values.front.value && m_values.front.value<=m_max, "Value is out of bound");
+		}body{
+			float fValue = to!float((m_max-m_min)*data[0]/ulong.max)+m_min;
+			if(fValue>180)
+				fValue = 360.0-fValue;
 
-		m_values.Append(TimestampedValue!float(
-			Clock.currAppTick(),
-			fValue
-		));
-		m_lastvalue = Filter.TimedAvgOnPeriod!float(m_values, 3500);
-	}
+			m_values.Append(TimestampedValue!float(
+				Clock.currAppTick(),
+				fValue
+			));
+		}
 
-	override void CheckIsOutOfService(){
-		//May be wise to check if values are coherent
+		void ExecFilter(){
+			m_lastvalue = Filter.TimedAvgOnPeriod!float(m_values, 3500);
+		}
+
+		void CheckIsOutOfService(){
+			//May be wise to check if values are coherent
+		}
 	}
 
 	float CalcAbsoluteWind(){
@@ -228,19 +240,25 @@ class Compass : HWSens!float {
 		assert(m_min<=m_lastvalue && m_lastvalue<=m_max, "Value is out of bound");
 	}
 
-	override void ParseValue(ulong[2] data)
-	out{
-		assert(m_min<=m_values.front.value && m_values.front.value<=m_max, "Value is out of bound");
-	}body{
-		m_values.Append(TimestampedValue!float(
-			Clock.currAppTick(),
-			to!float((m_max-m_min)*data[0]/ulong.max)+m_min
-		));
-		m_lastvalue = Filter.TimedAvg!float(m_values);
-	}
+	override{
+		void ParseValue(ulong[2] data)
+		out{
+			assert(m_min<=m_values.front.value && m_values.front.value<=m_max, "Value is out of bound");
+		}body{
+			m_values.Append(TimestampedValue!float(
+				Clock.currAppTick(),
+				to!float((m_max-m_min)*data[0]/ulong.max)+m_min
+			));
+			m_lastvalue = Filter.TimedAvg!float(m_values);
+		}
 
-	override void CheckIsOutOfService(){
-		//May be wise to check if values are coherent
+		void ExecFilter(){
+			m_lastvalue = Filter.TimedAvgOnPeriod!float(m_values, 3500);
+		}
+
+		void CheckIsOutOfService(){
+			//May be wise to check if values are coherent
+		}
 	}
 }
 
@@ -262,28 +280,23 @@ class Battery : HWSens!float {
 		assert(m_min<=m_lastvalue && m_lastvalue<=m_max, "Value is out of bound");
 	}
 
-	override void ParseValue(ulong[2] data)
-	out{
-		assert(m_min<=m_values.front.value && m_values.front.value<=m_max, "Value is out of bound");
-	}body{
-		m_values.Append(TimestampedValue!float(
-			Clock.currAppTick(),
-			to!float((m_max-m_min)*data[0]/ulong.max)+m_min
-		));
-		m_lastvalue = Filter.Raw!float(m_values);
-
-		//Battery voltage check
-		if(m_lastvalue <= Config.Get!float("Battery", "CriticalVoltage"))
-		{
-			SailLog.Critical("Battery voltage is FAR TOO LOW, you should rest : ",m_lastvalue,"v");
+	override{
+		void ParseValue(ulong[2] data)
+		out{
+			assert(m_min<=m_values.front.value && m_values.front.value<=m_max, "Value is out of bound");
+		}body{
+			m_values.Append(TimestampedValue!float(
+				Clock.currAppTick(),
+				to!float((m_max-m_min)*data[0]/ulong.max)+m_min
+			));
 		}
-		else if(m_lastvalue <= Config.Get!float("Battery", "LowVoltage"))
-		{
-			SailLog.Warning("Battery voltage is low : ",m_lastvalue,"v");
-		}
-	}
 
-	override void CheckIsOutOfService(){
-		//May be wise to check if values are coherent
+		void ExecFilter(){
+			m_lastvalue = Filter.Raw!float(m_values);
+		}
+
+		void CheckIsOutOfService(){
+			//May be wise to check if values are coherent
+		}
 	}
 }

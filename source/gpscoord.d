@@ -20,14 +20,6 @@ struct GpsCoord {
 		m_long = longitude;
 	}
 
-	/**
-		Simpliest constructor
-	*/
-	this(double init=0.0) {
-		m_lat = init;
-		m_long = init;
-	}
-
 	enum Unit{
 		DecDeg, DegMinSec, GPS
 	}

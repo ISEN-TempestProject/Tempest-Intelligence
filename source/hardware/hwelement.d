@@ -47,7 +47,7 @@ abstract class HWElement(T) {
 		Value of the device, must be between min and max
 	*/
 	@property{
-		abstract T value() const;
+		abstract T value();
 		abstract void value(T val);
 	}
 
@@ -78,7 +78,8 @@ protected:
 class HWSens(T) : HWElement!T {
 
 	@property{
-		override T value() const{
+		override T value(){
+			ExecFilter();
 			return m_lastvalue;
 		}
 
@@ -112,6 +113,8 @@ protected:
 	*/
 	abstract void CheckIsOutOfService();
 
+	abstract void ExecFilter();
+
 	Fifo!(TimestampedValue!T) m_values;
 }
 
@@ -124,7 +127,7 @@ protected:
 class HWAct(T) : HWElement!T {
 
 	@property{
-		override T value() const{
+		override T value(){
 			return m_lastvalue;
 		}
 
