@@ -165,9 +165,25 @@ private:
 		THIS IS WHERE DECISIONS ARE TAKEN
 	*/
 	void MakeDecision(){
+
+	    //Check if target is reached
+		CheckIsDestinationReached(); //Updates m_targetposition
+
+		//Heading
 	    checkDistanceToRoute();
 	    m_targetheading = getHeadingAngle();
-		CheckIsDestinationReached(); //Updates m_targetposition
+
+
+		//Battery voltage check
+		float fBatteryVoltage = Hardware.Get!Battery(DeviceID.Battery).value;
+		if(fBatteryVoltage <= Config.Get!float("Battery", "CriticalVoltage"))
+		{
+			SailLog.Critical("Battery voltage is FAR TOO LOW, you should rest : ",fBatteryVoltage,"v");
+		}
+		else if(fBatteryVoltage <= Config.Get!float("Battery", "LowVoltage"))
+		{
+			SailLog.Warning("Battery voltage is low : ",fBatteryVoltage,"v");
+		}
 	}
 	
 	
