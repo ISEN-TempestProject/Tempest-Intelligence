@@ -146,8 +146,11 @@ private:
 		ap.AdjustHelm();
 		assert(helm.value == helm.max);
 		ap.AdjustHelm();
+		assert(helm.value == helm.max);
 		ap.AdjustHelm();
+		assert(helm.value == helm.max);
 		ap.AdjustHelm();
+		assert(helm.value == helm.max);
 		ap.AdjustHelm();
 		assert(helm.value == helm.init);
 
