@@ -50,7 +50,12 @@ private:
 			"CriticalVoltage":"3.6"
 		]),
 		"WebServer" : ([
-			"Port":"8080"
+			"Port":"1337"
+		]),
+		"Polars": ([
+			"Wind":"res/polar_wind_basic.json",
+			"Heading":"res/polar_heading_basic.json",
+			"Sail":"res/polar_sail_basic.json"
 		])
 	];
 

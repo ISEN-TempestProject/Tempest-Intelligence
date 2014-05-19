@@ -114,9 +114,9 @@ private:
 		SailLog.Notify("Route set to: ",m_route);
 		
 		SailLog.Notify("Setting up polars...");
-		m_polarWind = Polar("./res/polar_wind.json");
+		m_polarWind = Polar(Config.Get!string("Polars", "Wind"));
 		SailLog.Notify("Wind polar [DONE]");
-        m_polarHeading = Polar("./res/polar_heading.json");
+        m_polarHeading = Polar(Config.Get!string("Polars", "Heading"));
         SailLog.Notify("Heading polar [DONE]");
 		
 		//	fill first cell with actual GPS position
