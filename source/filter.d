@@ -4,6 +4,7 @@ import core.time;
 import std.typecons;
 import std.container;
 import std.range;
+import std.math;
 
 public import std.datetime;
 public import fifo;
@@ -106,6 +107,51 @@ static class Filter {
 
 			return ret / totalduration.length;
 		}
+		
+		/**
+            Returns the time-weighted average of priodic angle in degrees values stored in data for a specified time in milliseconds
+        */
+        T TimedAvgOnDurationAngle(T)(ref Fifo!(TimestampedValue!T) data, TickDuration dur){
+            T ret = GetZero!T(), cosAvg = GetZero!T(), sinAvg = GetZero!T();
+
+            auto rng = data.elements.opSlice();
+            if(rng.empty)
+                return ret;
+
+            TickDuration now = Clock.currAppTick();
+
+            TickDuration prevdate=now;
+            
+            while(!rng.empty && (now-rng.front.time)<=dur){
+
+                cosAvg += rng.front.value * (prevdate-rng.front.time).length;
+                sinAvg += rng.front.value * (prevdate-rng.front.time).length;
+
+                //Update values
+                prevdate = rng.front.time;
+                rng.popFront();
+            }
+
+            TickDuration totalduration;
+
+            //Calculation on the total duration = dur
+            if(!rng.empty){
+                totalduration = dur;
+                TickDuration notcalculatedtime = dur - (now-prevdate);
+                cosAvg += cos(rng.front.value * notcalculatedtime.length);
+                sinAvg += sin(rng.front.value * notcalculatedtime.length);
+
+            }
+            //Calculation on the elements duration
+            else{
+                totalduration = now - prevdate;
+            }
+            
+            sinAvg = sinAvg / totalduration.length;
+            cosAvg = cosAvg / totalduration.length;
+
+            return atan2(sinAvg, cosAvg);
+        }
 
 		/**
 			Executes a kalman filter on the stored values
