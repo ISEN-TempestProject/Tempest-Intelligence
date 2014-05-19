@@ -204,7 +204,7 @@ class WindDir : HWSens!float {
 		}
 
 		void ExecFilter(){
-			m_lastvalue = Filter.TimedAvgOnDuration!float(m_values, TickDuration.from!"seconds"(3));
+			m_lastvalue = Filter.TimedAvgOnDurationAngle!float(m_values, TickDuration.from!"seconds"(3));
 		}
 
 		void CheckIsOutOfService(){
@@ -253,7 +253,7 @@ class Compass : HWSens!float {
 		}
 
 		void ExecFilter(){
-			m_lastvalue = Filter.TimedAvgOnDuration!float(m_values, TickDuration.from!"seconds"(3));
+			m_lastvalue = Filter.TimedAvgOnDurationAngle!float(m_values, TickDuration.from!"seconds"(3));
 		}
 
 		void CheckIsOutOfService(){
