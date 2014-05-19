@@ -79,7 +79,8 @@ class HWSens(T) : HWElement!T {
 
 	@property{
 		override T value(){
-			ExecFilter();
+			if(!m_isemulated)
+				ExecFilter();
 			return m_lastvalue;
 		}
 

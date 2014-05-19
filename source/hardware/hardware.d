@@ -233,7 +233,6 @@ unittest
 	assert(r.value == 2.5);
 
 	r.isemulated = false;
-	assert(r.value == 2.5);
 	assertThrown(r.value = 12.3);//Throw exception
 
 	SailLog.Notify("Hardware unittest done");
