@@ -70,30 +70,41 @@ static class Filter {
 		/**
 			Returns the time-weighted average of values stored in data for a specified time in milliseconds
 		*/
-		T TimedAvgOnDuration(T)(ref Fifo!(TimestampedValue!T) data, long timemsec){
+		T TimedAvgOnDuration(T)(ref Fifo!(TimestampedValue!T) data, TickDuration dur){
 			T ret = GetZero!T();
 
 			auto rng = data.elements.opSlice();
-			if(!rng.empty){
-				TickDuration dt = rng.back.time-rng.front.time;
-				TimestampedValue!T last = rng.front;
+			if(rng.empty)
+				return ret;
 
-				TickDuration execDate = Clock.currAppTick();
+			TickDuration now = Clock.currAppTick();
+
+			TickDuration prevdate=now;
+			
+			while(!rng.empty && (now-rng.front.time)<=dur){
+
+				ret += rng.front.value * (prevdate-rng.front.time).length;
+
+				//Update values
+				prevdate = rng.front.time;
 				rng.popFront();
-
-				if(!rng.empty){
-					for( ; !rng.empty && (rng.front.time-execDate).msecs()<=timemsec ; rng.popFront()){
-						ret = ret + (last.value*(rng.front.time - last.time).length);
-						last = rng.front;
-					}
-					ret = ret/dt.length;
-				}
-				else{
-					return last.value;
-				}
 			}
-			return ret;
 
+			TickDuration totalduration;
+
+			//Calculation on the total duration = dur
+			if(!rng.empty){
+				totalduration = dur;
+				TickDuration notcalculatedtime = dur - (now-prevdate);
+				ret += rng.front.value * notcalculatedtime.length;
+
+			}
+			//Calculation on the elements duration
+			else{
+				totalduration = now - prevdate;
+			}
+
+			return ret / totalduration.length;
 		}
 
 		/**
@@ -138,6 +149,17 @@ unittest {
 	assert(Filter.DumbAvg!float(fifo)==2.5);
 	assert(Filter.TimedAvg!float(fifo)==2.0);
 
+	auto now = Clock.currAppTick();
+	list = DList!Tsvf([
+		Tsvf(now-TickDuration.from!"msecs"(50), 20),
+		Tsvf(now-TickDuration.from!"msecs"(70), 15),
+		Tsvf(now-TickDuration.from!"msecs"(90), 5),
+		Tsvf(now-TickDuration.from!"msecs"(100), 10)
+			]);
+	fifo = Fifo!(Tsvf)(4, list);
+	assert(std.math.abs(Filter.TimedAvgOnDuration!float(fifo, TickDuration.from!"msecs"(100)) - 15.0)<0.1);
+	assert(std.math.abs(Filter.TimedAvgOnDuration!float(fifo, TickDuration.from!"msecs"(70)) - 18.57)<0.1);
+	assert(std.math.abs(Filter.TimedAvgOnDuration!float(fifo, TickDuration.from!"msecs"(80)) - 16.87)<0.1);
 
 	SailLog.Notify("Filter unittest done");
 }

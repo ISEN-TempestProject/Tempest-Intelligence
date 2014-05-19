@@ -43,6 +43,12 @@ struct GpsCoord {
 		return GpsCoord(mixin("m_lat "~op~" sec"), mixin("m_long "~op~" sec"));
 	}
 
+	ref GpsCoord opOpAssign(string op)(GpsCoord sec) {
+		mixin("this.m_lat "~op~"= sec.m_lat;");
+		mixin("this.m_long "~op~"= sec.m_long;");
+		return this;
+	}
+
 
 	/**
 		Sets the gps coordinates by parsing an expression

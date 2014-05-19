@@ -120,7 +120,7 @@ class Gps : HWSens!GpsCoord {
 		}
 
 		void ExecFilter(){
-			m_lastvalue = Filter.TimedAvgOnDuration!GpsCoord(m_values, 2000);
+			m_lastvalue = Filter.TimedAvgOnDuration!GpsCoord(m_values, TickDuration.from!"seconds"(2));
 		}
 
 		void CheckIsOutOfService(){
@@ -162,7 +162,7 @@ class Roll : HWSens!float {
 		}
 
 		void ExecFilter(){
-			m_lastvalue = Filter.TimedAvgOnDuration!float(m_values, 7500);
+			m_lastvalue = Filter.TimedAvgOnDuration!float(m_values, TickDuration.from!"seconds"(7));
 		}
 
 		void CheckIsOutOfService(){
@@ -204,7 +204,7 @@ class WindDir : HWSens!float {
 		}
 
 		void ExecFilter(){
-			m_lastvalue = Filter.TimedAvgOnDuration!float(m_values, 3500);
+			m_lastvalue = Filter.TimedAvgOnDuration!float(m_values, TickDuration.from!"seconds"(3));
 		}
 
 		void CheckIsOutOfService(){
@@ -253,7 +253,7 @@ class Compass : HWSens!float {
 		}
 
 		void ExecFilter(){
-			m_lastvalue = Filter.TimedAvgOnDuration!float(m_values, 3500);
+			m_lastvalue = Filter.TimedAvgOnDuration!float(m_values, TickDuration.from!"seconds"(3));
 		}
 
 		void CheckIsOutOfService(){
