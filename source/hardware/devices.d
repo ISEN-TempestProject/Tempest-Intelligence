@@ -278,7 +278,7 @@ class Battery : HWSens!float {
 		super(10);
 		m_id = DeviceID.Battery;
 		m_min = 0;
-		m_max = 15;
+		m_max = 10;
 		m_init = 0;
 		m_lastvalue=m_init;
 	}
