@@ -47,8 +47,8 @@ private:
 			"ConstantWindValue":""
 		]),
 		"Battery" : ([
-			"LowVoltage":"4.5",
-			"CriticalVoltage":"3.6"
+			"LowVoltage":"7.4",
+			"CriticalVoltage":"7.0"
 		]),
 		"WebServer" : ([
 			"Port":"1337"

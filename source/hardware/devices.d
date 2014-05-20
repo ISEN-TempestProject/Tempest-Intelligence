@@ -292,10 +292,19 @@ class Battery : HWSens!float {
 		out{
 			assert(m_min<=m_values.front.value && m_values.front.value<=m_max, "Value is out of bound");
 		}body{
+			float fBattery = to!float((m_max-m_min)*data[0]/ulong.max)+m_min;
 			m_values.Append(TimestampedValue!float(
 				Clock.currAppTick(),
-				to!float((m_max-m_min)*data[0]/ulong.max)+m_min
+				fBattery
 			));
+
+			//Battery voltage check
+			if(fBattery <= Config.Get!float("Battery", "CriticalVoltage")){
+				SailLog.Critical("Battery voltage is FAR TOO LOW, you should rest : ",fBattery,"v");
+			}
+			else if(fBattery <= Config.Get!float("Battery", "LowVoltage")){
+				SailLog.Warning("Battery voltage is low : ",fBattery,"v");
+			}
 		}
 
 		void ExecFilter(){

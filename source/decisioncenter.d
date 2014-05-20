@@ -189,18 +189,6 @@ private:
 		//Heading
 	    checkDistanceToRoute();
 	    m_targetheading = getHeadingAngle();
-
-
-		//Battery voltage check
-		float fBatteryVoltage = Hardware.Get!Battery(DeviceID.Battery).value;
-		if(fBatteryVoltage <= Config.Get!float("Battery", "CriticalVoltage"))
-		{
-			SailLog.Critical("Battery voltage is FAR TOO LOW, you should rest : ",fBatteryVoltage,"v");
-		}
-		else if(fBatteryVoltage <= Config.Get!float("Battery", "LowVoltage"))
-		{
-			SailLog.Warning("Battery voltage is low : ",fBatteryVoltage,"v");
-		}
 	}
 	
 	
