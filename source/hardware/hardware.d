@@ -52,7 +52,6 @@ package:
 		Sends and event into the socket
 	*/
 	void SendEvent(DeviceID id, ulong[2] data){
-		//TODO Check this
 		if(m_connected){
 			synchronized(this.classinfo){
 				m_socket.send([id, data[0], data[1]]);
@@ -83,10 +82,10 @@ private:
 		}
 		SailLog.Success(typeof(this).stringof~" instantiated in ",Thread.getThis().name," thread");
 	
-	    m_datalog = new DataLog();
+	    //m_datalog = new DataLog();
 	}
 	~this(){
-	    delete m_datalog;
+	    //delete m_datalog;
 	
 		SailLog.Critical("Destroying ",typeof(this).stringof);
 		if(m_thread !is null){
@@ -125,6 +124,8 @@ private:
 				m_socket.blocking(true);
 				m_socket.connect(m_addr);
 				m_connected = true;
+
+				SailLog.Success("Connected to hwdaemon");
 
 				//Handle communications
 				while(!m_stopthread && m_socket.isAlive){

@@ -75,7 +75,7 @@ class DecisionCenter {
 			m_route = startpoint~m_route;
 
 			if(Config.Get!bool("DecisionCenter", "ReturnToOrigin"))
-				m_route~=m_route[0];
+				m_route~=startpoint;
 
 			SailLog.Success("The complete route is: ",m_route);
 
@@ -143,6 +143,9 @@ private:
 		m_polarWind = Polar(sPolWind);
         m_polarHeading = Polar(sPolHeading);
 		SailLog.Notify("Using polars: ",sPolWind,", ",sPolHeading);
+
+		//Instanciate hardware class
+		Hardware.GetClass();
 
 		SailLog.Success(typeof(this).stringof~" instantiated in ",Thread.getThis().name," thread");
 	}
@@ -284,7 +287,7 @@ private:
 
 	bool m_bEnabled;
 	bool m_bStartedWithGPS = false;
-	double m_targetheading = 0; //TODO : remove assignation once DC can handle TH
+	double m_targetheading = 0;
 	uint m_nLoopTimeMS;
 
 	Autopilot m_autopilot;
