@@ -117,6 +117,12 @@ class Gps : HWSens!GpsCoord {
 			if(m_logfile.isOpen()){
 				m_logfile.writeln(Clock.currTime.toSimpleString() ,"\t",coord);
 			}
+
+			import decisioncenter;
+			if(!m_bFirstReceived){
+				DecisionCenter.Get.StartWithGPS(coord);
+				m_bFirstReceived = true;
+			}
 		}
 
 		void ExecFilter(){
@@ -130,6 +136,7 @@ class Gps : HWSens!GpsCoord {
 
 private:
 	File m_logfile;
+	bool m_bFirstReceived = false;
 }
 
 /**

@@ -67,6 +67,35 @@ class DecisionCenter {
 		m_nDestinationIndex = 0;
 	}
 
+	void StartWithGPS(in GpsCoord startpoint){
+		if(!m_bStartedWithGPS){
+			m_bStartedWithGPS = true;
+			enabled(true);
+
+			m_route = startpoint~m_route;
+
+			if(Config.Get!bool("DecisionCenter", "ReturnToOrigin"))
+				m_route~=m_route[0];
+
+			SailLog.Success("The complete route is: ",m_route);
+
+			//	fill first cell with actual GPS position
+			MakeDecision();//Will update m_targetposition and m_targetheading
+
+			m_autopilot = new Autopilot();
+			m_sailhandler = new SailHandler();
+
+			m_thread = new Thread(&DecisionThread);
+			m_thread.name(typeof(this).stringof);
+			m_thread.isDaemon(true);
+			m_thread.start();
+
+			SailLog.Success("First GPS Coordinate received (",startpoint,") ! You RRRRRR ready to sail !");
+		}
+		else
+			SailLog.Warning("Called DecisionCenter.StartWithGPS when already started with GPS previously");
+	}
+
 
 
 private:
@@ -78,7 +107,7 @@ private:
 		SailLog.Notify("Starting ",typeof(this).stringof," instantiation in ",Thread.getThis().name," thread...");
 
 		m_nLoopTimeMS = Config.Get!uint("DecisionCenter", "Period");
-		m_bEnabled = true;
+		m_bEnabled = false;//Will be enabled by GPS device on first coordinate
 
 		m_fDistanceToTarget = Config.Get!float("DecisionCenter", "DistanceToTarget");
 		m_fDistanceToRoute = Config.Get!float("DecisionCenter", "DistanceToRoute");
@@ -105,30 +134,15 @@ private:
 		}catch(Exception e){
 			SailLog.Critical("Unable to read Route (",sFile,"): ", e);
 		}
-		m_route = (Hardware.Get!Gps(DeviceID.Gps).value)~m_route;
-
-		if(Config.Get!bool("DecisionCenter", "ReturnToOrigin"))
-			m_route~=m_route[0];
 
 		m_nDestinationIndex = 1;
-		SailLog.Notify("Route set to: ",m_route);
+		SailLog.Notify("Route set to: ",m_route, ". Waiting for first GPS coordinate...");
 		
-		SailLog.Notify("Setting up polars...");
-		m_polarWind = Polar(Config.Get!string("Polars", "Wind"));
-		SailLog.Notify("Wind polar [DONE]");
-        m_polarHeading = Polar(Config.Get!string("Polars", "Heading"));
-        SailLog.Notify("Heading polar [DONE]");
-		
-		//	fill first cell with actual GPS position
-		MakeDecision();//Will update m_targetposition and m_targetheading
-
-		m_autopilot = new Autopilot();
-		m_sailhandler = new SailHandler();
-
-		m_thread = new Thread(&DecisionThread);
-		m_thread.name(typeof(this).stringof);
-		m_thread.isDaemon(true);
-		m_thread.start();
+		string sPolWind = Config.Get!string("Polars", "Wind");
+		string sPolHeading = Config.Get!string("Polars", "Heading");
+		m_polarWind = Polar(sPolWind);
+        m_polarHeading = Polar(sPolHeading);
+		SailLog.Notify("Using polars: ",sPolWind,", ",sPolHeading);
 
 		SailLog.Success(typeof(this).stringof~" instantiated in ",Thread.getThis().name," thread");
 	}
@@ -269,6 +283,7 @@ private:
 	}
 
 	bool m_bEnabled;
+	bool m_bStartedWithGPS = false;
 	double m_targetheading = 0; //TODO : remove assignation once DC can handle TH
 	uint m_nLoopTimeMS;
 
