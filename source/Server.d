@@ -1,6 +1,7 @@
 import vibe.d;
 import std.conv;
 import std.process;
+import config;
 import api;
 
 class Server
@@ -9,13 +10,13 @@ class Server
 	HTTPServerSettings m_Settings;
 	URLRouter m_Router;
 
-	this(string[] adresses=[], ushort port=1337)
+	this()
 	{
 		/************************
 		*	SERVER SETTINGS
 		*************************/
 		m_Settings = new HTTPServerSettings;
-		m_Settings.port = port;
+		m_Settings.port = config.Config.Get!ushort("WebServer","Port");
 
 
 
