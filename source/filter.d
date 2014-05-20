@@ -5,6 +5,7 @@ import std.typecons;
 import std.container;
 import std.range;
 import std.math;
+import gpscoord;
 
 public import std.datetime;
 public import fifo;
@@ -124,8 +125,8 @@ static class Filter {
             
             while(!rng.empty && (now-rng.front.time)<=dur){
 
-                cosAvg += rng.front.value * (prevdate-rng.front.time).length;
-                sinAvg += rng.front.value * (prevdate-rng.front.time).length;
+                cosAvg += cos(GpsCoord.toRad(rng.front.value)) * (prevdate-rng.front.time).length;
+                sinAvg += sin(GpsCoord.toRad(rng.front.value)) * (prevdate-rng.front.time).length;
 
                 //Update values
                 prevdate = rng.front.time;
@@ -138,8 +139,8 @@ static class Filter {
             if(!rng.empty){
                 totalduration = dur;
                 TickDuration notcalculatedtime = dur - (now-prevdate);
-                cosAvg += cos(rng.front.value * notcalculatedtime.length);
-                sinAvg += sin(rng.front.value * notcalculatedtime.length);
+                cosAvg += cos(GpsCoord.toRad(rng.front.value)) * notcalculatedtime.length;
+                sinAvg += sin(GpsCoord.toRad(rng.front.value)) * notcalculatedtime.length;
 
             }
             //Calculation on the elements duration
@@ -150,7 +151,7 @@ static class Filter {
             sinAvg = sinAvg / totalduration.length;
             cosAvg = cosAvg / totalduration.length;
 
-            return atan2(sinAvg, cosAvg);
+            return GpsCoord.toDeg(atan2(sinAvg, cosAvg));
         }
 
 		/**
@@ -197,7 +198,7 @@ unittest {
 
 	auto now = Clock.currAppTick();
 	list = DList!Tsvf([
-		Tsvf(now-TickDuration.from!"msecs"(50), 20),
+		Tsvf(now-TickDuration.from!"msecs"(50), 20), 
 		Tsvf(now-TickDuration.from!"msecs"(70), 15),
 		Tsvf(now-TickDuration.from!"msecs"(90), 5),
 		Tsvf(now-TickDuration.from!"msecs"(100), 10)
@@ -207,5 +208,14 @@ unittest {
 	assert(std.math.abs(Filter.TimedAvgOnDuration!float(fifo, TickDuration.from!"msecs"(70)) - 18.57)<0.1);
 	assert(std.math.abs(Filter.TimedAvgOnDuration!float(fifo, TickDuration.from!"msecs"(80)) - 16.87)<0.1);
 
+    now = Clock.currAppTick();
+    list = DList!Tsvf([
+        Tsvf(now-TickDuration.from!"msecs"(50), 179),
+        Tsvf(now-TickDuration.from!"msecs"(100), -179)
+            ]);
+    fifo = Fifo!(Tsvf)(2, list);
+    SailLog.Critical("AvgAngle is : ", Filter.TimedAvgOnDurationAngle!float(fifo, TickDuration.from!"msecs"(100)) );
+    assert(std.math.abs(Filter.TimedAvgOnDurationAngle!float(fifo, TickDuration.from!"msecs"(100)) - 180.0)<0.1);
+    
 	SailLog.Notify("Filter unittest done");
 }
