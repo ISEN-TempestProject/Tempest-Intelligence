@@ -80,7 +80,7 @@ private:
 
 			if(fNewValue>helm.max){
 				m_nCounter++;
-				if(m_nCounter>=5){
+				if(m_nCounter>=Config.Get!int("Autopilot", "EdgeLocks")){
 					helm.value = helm.init;
 					m_nCounter = 0;
 				}
@@ -98,7 +98,7 @@ private:
 			
 			if(fNewValue<helm.min){
 				m_nCounter++;
-				if(m_nCounter>=5){
+				if(m_nCounter>=Config.Get!int("Autopilot", "EdgeLocks")){
 					helm.value = helm.init;
 					m_nCounter = 0;
 				}
