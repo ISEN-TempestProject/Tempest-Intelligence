@@ -109,10 +109,12 @@ class Gps : HWSens!GpsCoord {
 				GpsCoord.toRad(((m_max.latitude-m_min.latitude)*data[0]/ulong.max)+m_min.latitude),
 				GpsCoord.toRad(((m_max.longitude-m_min.longitude)*data[1]/ulong.max)+m_min.longitude)
 				);
-			m_values.Append(TimestampedValue!GpsCoord(
-				Clock.currAppTick(),
-				coord
-			));
+			synchronized(this.classinfo){
+				m_values.Append(TimestampedValue!GpsCoord(
+					Clock.currAppTick(),
+					coord
+				));
+			}
 
 			if(m_logfile.isOpen()){
 				m_logfile.writeln(Clock.currTime.toSimpleString() ,"\t",coord);
@@ -162,10 +164,12 @@ class Roll : HWSens!float {
 		out{
 			assert(m_min<=m_values.front.value && m_values.front.value<=m_max, "Value is out of bound");
 		}body{
-			m_values.Append(TimestampedValue!float(
-				Clock.currAppTick(),
-				to!float((m_max-m_min)*data[0]/ulong.max)+m_min
-			));
+			synchronized(this.classinfo){
+				m_values.Append(TimestampedValue!float(
+					Clock.currAppTick(),
+					to!float((m_max-m_min)*data[0]/ulong.max)+m_min
+				));
+			}
 		}
 
 		void ExecFilter(){
@@ -204,10 +208,12 @@ class WindDir : HWSens!float {
 			if(fValue>180)
 				fValue = 360.0-fValue;
 
-			m_values.Append(TimestampedValue!float(
-				Clock.currAppTick(),
-				fValue
-			));
+			synchronized(this.classinfo){
+				m_values.Append(TimestampedValue!float(
+					Clock.currAppTick(),
+					fValue
+				));
+			}
 		}
 
 		void ExecFilter(){
@@ -252,11 +258,12 @@ class Compass : HWSens!float {
 		out{
 			assert(m_min<=m_values.front.value && m_values.front.value<=m_max, "Value is out of bound");
 		}body{
-			m_values.Append(TimestampedValue!float(
-				Clock.currAppTick(),
-				to!float((m_max-m_min)*data[0]/ulong.max)+m_min
-			));
-			m_lastvalue = Filter.TimedAvg!float(m_values);
+			synchronized(this.classinfo){
+				m_values.Append(TimestampedValue!float(
+					Clock.currAppTick(),
+					to!float((m_max-m_min)*data[0]/ulong.max)+m_min
+				));
+			}
 		}
 
 		void ExecFilter(){
@@ -293,10 +300,13 @@ class Battery : HWSens!float {
 			assert(m_min<=m_values.front.value && m_values.front.value<=m_max, "Value is out of bound");
 		}body{
 			float fBattery = to!float((m_max-m_min)*data[0]/ulong.max)+m_min;
-			m_values.Append(TimestampedValue!float(
-				Clock.currAppTick(),
-				fBattery
-			));
+			
+			synchronized(this.classinfo){
+				m_values.Append(TimestampedValue!float(
+					Clock.currAppTick(),
+					fBattery
+				));
+			}
 
 			//Battery voltage check
 			if(fBattery <= Config.Get!float("Battery", "CriticalVoltage")){
