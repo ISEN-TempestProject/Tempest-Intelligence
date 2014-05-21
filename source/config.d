@@ -25,10 +25,12 @@ private:
 		]),
 		"DecisionCenter" : ([
 			"Route":"res/route.json",
+			"RestoreRoute":"res/restoreRoute.json",
 			"DistanceToTarget":"10.0",
 			"DistanceToRoute":"50.0",
 			"Period":"5000",
-			"ReturnToOrigin":"true"
+			"ReturnToOrigin":"true", 
+			"StartWithoutGPS":"false"
 		]),
 		"Autopilot" : ([
 			"Period":"1000",

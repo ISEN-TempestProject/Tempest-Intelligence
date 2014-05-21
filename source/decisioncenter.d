@@ -113,27 +113,14 @@ private:
 		m_fDistanceToRoute = Config.Get!float("DecisionCenter", "DistanceToRoute");
 
 		//Route parsing
-		string sFile = Config.Get!string("DecisionCenter", "Route");
-		try{
-			JSONValue jsonFile = parseJSON(readText(sFile).removechars("\n\r\t"));
-
-			GpsCoord.Unit unit;
-			foreach(ref json ; jsonFile.array){
-				try{
-					switch(json["unit"].str){
-						case "DecDeg": unit=GpsCoord.Unit.DecDeg; break;
-						case "DegMinSec": unit=GpsCoord.Unit.DegMinSec; break;
-						case "GPS": unit=GpsCoord.Unit.GPS; break;
-						default: unit=GpsCoord.Unit.DecDeg;	break;
-					}
-					m_route~=GpsCoord(unit, json["value"].str);
-				}catch(Exception e){
-					SailLog.Warning("Ignoring route Waypoint: ", e);
-				}
-			}
-		}catch(Exception e){
-			SailLog.Critical("Unable to read Route (",sFile,"): ", e);
+		string sFile = Config.Get!string("DecisionCenter", "RestoreRoute");
+		if(exists(sFile)){
+            readRoute(sFile);
 		}
+		else {
+    		sFile = Config.Get!string("DecisionCenter", "Route");
+    		readRoute(sFile);
+    	}
 
 		m_nDestinationIndex = 1;
 		SailLog.Notify("Route set to: ",m_route, ". Waiting for first GPS coordinate...");
@@ -151,6 +138,9 @@ private:
 
 		version(unittest){
 			StartWithGPS(GpsCoord(0,0));
+		}
+		else{
+		    if(Config.Get!bool("DecisionCenter", "StartWithoutGPS")) StartWithGPS(GpsCoord(0,0));
 		}
 	}
 	~this(){
@@ -271,10 +261,46 @@ private:
 	void CheckIsDestinationReached(){
 		GpsCoord currPos = Hardware.Get!Gps(DeviceID.Gps).value;
 		float fDistance = currPos.GetDistanceTo(m_route[m_nDestinationIndex]);
+		SailLog.Warning("Distance : ", fDistance);
 		if(fDistance<=m_fDistanceToTarget){
 			m_nDestinationIndex++;
 			SailLog.Notify("Set new target to ",m_route[m_nDestinationIndex].To(GpsCoord.Unit.DecDeg)," (index=",m_nDestinationIndex,")");
+		    
+		    //Set RestoreRoute file
+		    string sFile = Config.Get!string("DecisionCenter", "RestoreRoute");
+		    File restoreFile;
+		    restoreFile.open(sFile, "w+");
+		    restoreFile.writeln("[");
+            for(int i = m_nDestinationIndex ; i < m_route.length-1 ; i++){
+                restoreFile.writeln("{\"unit\":\"DecDeg\", \"value\":\"", m_route[i].To(GpsCoord.Unit.DecDeg) ,"\"},");
+            }
+            restoreFile.writeln("]");
+            restoreFile.flush();
+            restoreFile.close();
 		}
+	}
+	
+	void readRoute(string sFile){
+        try{
+            JSONValue jsonFile = parseJSON(readText(sFile).removechars("\n\r\t"));
+    
+            GpsCoord.Unit unit;
+            foreach(ref json ; jsonFile.array){
+                try{
+                    switch(json["unit"].str){
+                        case "DecDeg": unit=GpsCoord.Unit.DecDeg; break;
+                        case "DegMinSec": unit=GpsCoord.Unit.DegMinSec; break;
+                        case "GPS": unit=GpsCoord.Unit.GPS; break;
+                        default: unit=GpsCoord.Unit.DecDeg;    break;
+                    }
+                    m_route~=GpsCoord(unit, json["value"].str);
+                }catch(Exception e){
+                    SailLog.Warning("Ignoring route Waypoint: ", e);
+                }
+            }
+        }catch(Exception e){
+            SailLog.Critical("Unable to read Route (",sFile,"): ", e);
+        }
 	}
 
 	bool m_bEnabled;

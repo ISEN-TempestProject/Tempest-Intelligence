@@ -296,7 +296,8 @@ class API : ISailAPI
 
 	Json getAutopilot(){
 		Json ap = Json.emptyObject;
-		ap.enabled = DecisionCenter.Get().autopilot().enabled();
+		if(DecisionCenter.Get().autopilot() !is null) ap.enabled = DecisionCenter.Get().autopilot().enabled();
+        else ap.enabled = false;
 
 		return ap;
 	}
@@ -308,7 +309,8 @@ class API : ISailAPI
 
 	Json getSh(){
 		Json sh = Json.emptyObject;
-		sh.enabled = DecisionCenter.Get().sailhandler().enabled();
+		if(DecisionCenter.Get().sailhandler() !is null) sh.enabled = DecisionCenter.Get().sailhandler().enabled();
+		else sh.enabled = false;
 
 		return sh;
 	}
