@@ -66,7 +66,7 @@ private:
 	void AdjustSail(){
 		float fWind = abs(Hardware.Get!WindDir(DeviceID.WindDir).value);
 		auto sail = Hardware.Get!Sail(DeviceID.Sail);
-		auto roll = Hardware.Get!Roll(DeviceID.Roll);
+		auto roll = Hardware.Get!Roll(DeviceID.Roll).value;
 
 		if(fWind<25){
 			sail.value = m_nMaxTension;
@@ -77,11 +77,27 @@ private:
 		}
 
 		//Handling m_nMaxTension (safety max tension)
-		if(abs(roll.value)>m_fDanger && m_nMaxTension>sail.max/4){
-			m_nMaxTension--;
+		if(abs(roll)>m_fDanger){
+			ubyte nDelta = Config.Get!ubyte("SailHandler", "Delta");
+
+			//Reduce max tension, minimum to sail.max/4
+			if(m_nMaxTension-sail.max/4 >= nDelta)
+				m_nMaxTension-=nDelta;
+			else
+				m_nMaxTension = sail.max/4;
+
+			SailLog.Warning("Roll is too dangerous (",roll,"°), reducing sail max tension to ",m_nMaxTension);
 		}
-		else if(abs(roll.value)<m_fDanger/2.0 && m_nMaxTension<sail.max){
-			m_nMaxTension++;
+		else if(m_nMaxTension!=sail.max && abs(roll)<m_fDanger/2.0){
+			ubyte nDelta = Config.Get!ubyte("SailHandler", "Delta");
+
+			//Reduce max tension, minimum to sail.max/4
+			if(sail.max - m_nMaxTension >= nDelta)
+				m_nMaxTension+=nDelta;
+			else
+				m_nMaxTension = sail.max;
+
+			SailLog.Notify("Roll seems safe (",roll,"°), raising sail max tension to ",m_nMaxTension);
 		}
 	}
 
