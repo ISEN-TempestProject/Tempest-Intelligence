@@ -42,6 +42,10 @@ public:
 			throw new Exception("Value not found: "~sHeader~"."~sName);
 	}
 
+	void Set(T)(string sHeader, string sName, T value){
+		m_Data[sHeader][sName] = to!string(value);
+	}
+
 	/**
 		Prints the configuration entries, useful for debugging purposes
 	*/

@@ -71,6 +71,11 @@ public:
 		return m_inst.m_ini.Get!T(sHeader, sName);
 	}
 
+	static void Set(T)(string sHeader, string sName, T value){
+		if(m_inst is null)m_inst = new Config();
+		m_inst.m_ini.Set!T(sHeader, sName, value);
+	}
+
 
 private:
 	static __gshared Config m_inst;

@@ -1,9 +1,11 @@
 module main;
 
 import std.stdio;
+import std.getopt;
 import hardware.hardware;
 import decisioncenter;
 import saillog;
+import config;
 
 import vibe.vibe;
 import Server;
@@ -25,6 +27,23 @@ int main(string[] args)
 	else{
 		if (!finalizeCommandLineOptions())
 			return 1;
+
+		bool bRestart = false;
+		bool bStartWithoutGPS = false;
+		getopt(
+		    args,
+		    "Restart|r",  &bRestart,
+		    "StartWithoutGPS|g", &bStartWithoutGPS
+		    );
+
+		if(bRestart){
+			string sRoute = Config.Get!string("DecisionCenter", "RestoreRoute");
+			if(std.file.exists(sRoute))
+				std.file.remove(sRoute);
+		}
+		if(bStartWithoutGPS)
+			Config.Set!bool("DecisionCenter", "StartWithoutGPS", true);
+
 		
 		SailLog.Success("Starting program");
 
