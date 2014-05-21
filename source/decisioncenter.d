@@ -148,6 +148,10 @@ private:
 		Hardware.GetClass();
 
 		SailLog.Success(typeof(this).stringof~" instantiated in ",Thread.getThis().name," thread");
+
+		version(unittest){
+			StartWithGPS(GpsCoord(0,0));
+		}
 	}
 	~this(){
 		SailLog.Critical("Destroying ",typeof(this).stringof);

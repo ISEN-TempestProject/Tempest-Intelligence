@@ -33,8 +33,8 @@ private:
 		"Autopilot" : ([
 			"Period":"1000",
 			"Delta":"1.0",
-			"Tolerance":"3.0",
 			"CommandRatio":"0.1",
+			"Tolerance":"3.0",
 			"EdgeLocks":"5"
 		]),
 		"SailHandler" : ([
@@ -43,11 +43,10 @@ private:
 			"Danger":"40.0"
 		]),
 		"Hardware" : ([
-			"Pipe":"/tmp/pipe",
-			"ConstantWindValue":""
+			"Pipe":"/tmp/pipe"
 		]),
 		"Battery" : ([
-			"LowVoltage":"7.4",
+			"LowVoltage":"7.5",
 			"CriticalVoltage":"7.0"
 		]),
 		"WebServer" : ([

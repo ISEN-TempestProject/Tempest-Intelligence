@@ -159,5 +159,7 @@ private:
 		dec.targetheading = 15;
 		ap.AdjustHelm();
 		assert(std.math.abs(helm.value-(helm.init-(ap.m_fDelta+0.2)))<0.01);
+
+		SailLog.Notify("Autopilot unittest done");
 	}
 }
