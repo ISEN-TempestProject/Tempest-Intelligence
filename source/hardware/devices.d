@@ -174,6 +174,9 @@ class Roll : HWSens!float {
 
 		void ExecFilter(){
 			m_lastvalue = Filter.TimedAvgOnDuration!float(m_values, TickDuration.from!"seconds"(7));
+			
+			if(m_lastvalue>180.0)
+				m_lastvalue-=360.0;
 		}
 
 		void CheckIsOutOfService(){
@@ -218,6 +221,9 @@ class WindDir : HWSens!float {
 
 		void ExecFilter(){
 			m_lastvalue = Filter.TimedAvgOnDurationAngle!float(m_values, TickDuration.from!"seconds"(3));
+
+			if(m_lastvalue>180.0)
+				m_lastvalue-=360.0;
 		}
 
 		void CheckIsOutOfService(){
@@ -268,6 +274,9 @@ class Compass : HWSens!float {
 
 		void ExecFilter(){
 			m_lastvalue = Filter.TimedAvgOnDurationAngle!float(m_values, TickDuration.from!"seconds"(3));
+
+			if(m_lastvalue<0.0)
+				m_lastvalue+=360.0;
 		}
 
 		void CheckIsOutOfService(){
