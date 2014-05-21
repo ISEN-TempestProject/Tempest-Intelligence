@@ -25,7 +25,7 @@ int main(string[] args)
 		SailLog.Success("UnitTest finished ! Congratulations !");
 	}
 	else{
-		if (!finalizeCommandLineOptions())
+		if (!finalizeCommandLineOptions(&args))
 			return 1;
 
 		bool bRestart = false;
