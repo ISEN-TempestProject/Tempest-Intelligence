@@ -272,9 +272,10 @@ private:
 		    restoreFile.open(sFile, "w+");
 		    restoreFile.writeln("[");
             for(int i = m_nDestinationIndex ; i < m_route.length-1 ; i++){
-                restoreFile.writeln("{\"unit\":\"DecDeg\", \"value\":\"", m_route[i].To(GpsCoord.Unit.DecDeg) ,"\"},");
+                restoreFile.write("{\"unit\":\"DecDeg\", \"value\":\"", m_route[i].To(GpsCoord.Unit.DecDeg) ,"\"}");
+                if(i < m_route.length-2)restoreFile.writeln(",");
             }
-            restoreFile.writeln("]");
+            restoreFile.writeln("\n]");
             restoreFile.flush();
             restoreFile.close();
 		}
