@@ -22,8 +22,15 @@ crossunittest:
 crossrelease:
 	dub build --compiler=arm-unknown-linux-gnueabi-gdc --build=release
 
+mount:
+	sudo umount /tmp/sshfs
+	rm -rf /tmp/sshfs
+	mkdir /tmp/sshfs
+	sshfs /tmp/sshfs root@192.168.1.11:/root
+	ls /tmp/sshfs
+
 send: cross
-	tar cvfj - projetvoilier res web_root | ssh root@172.18.2.36 'tar xvfj - -C /root/intel'
+	cp -r projetvoilier res/ /tmp/sshfs/intel
 
 #documentation generation
 .PHONY: doc
