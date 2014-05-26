@@ -30,8 +30,8 @@ mount:
 	ls /tmp/sshfs
 
 send: cross
-	cp -r projetvoilier res/ /tmp/sshfs/intel
 
+	tar cvfj - projetvoilier res | ssh root@192.168.1.11 'tar xvfj - -C /root/intel'
 #documentation generation
 .PHONY: doc
 

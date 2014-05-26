@@ -2,6 +2,7 @@ module datalog;
 
 import core.thread;
 import std.stdio;
+import std.string;
 import std.datetime;
 import hardware.hardware;
 import hardware.devices;
@@ -62,10 +63,10 @@ class DataLog {
             auto time = Clock.currTime(); 
             m_logfile.writeln(
                 time.hour," ",time.minute," ",time.second," "
-                ,GpsCoord.toDeg(Hardware.Get!Gps(DeviceID.Gps).value().latitude())," "
-                ,GpsCoord.toDeg(Hardware.Get!Gps(DeviceID.Gps).value().longitude())," "
-                ,GpsCoord.toDeg(DecisionCenter.Get().targetposition().latitude())," "
-                ,GpsCoord.toDeg(DecisionCenter.Get().targetposition().longitude())," "
+                ,format("%.8f",GpsCoord.toDeg(Hardware.Get!Gps(DeviceID.Gps).value.latitude))," "
+                ,format("%.8f",GpsCoord.toDeg(Hardware.Get!Gps(DeviceID.Gps).value.longitude))," "
+                ,format("%.8f",GpsCoord.toDeg(DecisionCenter.Get().targetposition().latitude()))," "
+                ,format("%.8f",GpsCoord.toDeg(DecisionCenter.Get().targetposition().longitude()))," "
                 ,Hardware.Get!Helm(DeviceID.Helm).value()," "
                 ,Hardware.Get!Sail(DeviceID.Sail).value()," " //Grand-voile
                 ,Hardware.Get!Sail(DeviceID.Sail).value()," " //Foc
