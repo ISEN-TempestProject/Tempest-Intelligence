@@ -32,6 +32,9 @@ mount:
 send: cross
 	cp -r projetvoilier res/ /tmp/sshfs/intel
 
+sendconf: 
+	cp -r res/ /tmp/sshfs/intel
+
 #documentation generation
 .PHONY: doc
 
