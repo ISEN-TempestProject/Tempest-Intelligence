@@ -23,9 +23,9 @@ crossrelease:
 	dub build --compiler=arm-unknown-linux-gnueabi-gdc --build=release
 
 mount:
-	sudo umount /tmp/sshfs
-	rm -rf /tmp/sshfs
-	mkdir /tmp/sshfs
+	-sudo umount /tmp/sshfs
+	-rm -rf /tmp/sshfs
+	-mkdir /tmp/sshfs
 	sshfs /tmp/sshfs root@192.168.1.11:/root
 	ls /tmp/sshfs
 
