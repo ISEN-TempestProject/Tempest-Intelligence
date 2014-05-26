@@ -67,15 +67,16 @@ private:
 		auto comp = Hardware.Get!Compass(DeviceID.Compass);
 		auto helm = Hardware.Get!Helm(DeviceID.Helm);
 
-		float fDeltaHead = (DecisionCenter.Get()).targetheading - comp.value;
-		if(fDeltaHead>180.0)
+		float fDeltaHead = ((DecisionCenter.Get()).targetheading - comp.value)%360.0;
+		if(fDeltaHead<-180.0)
+			fDeltaHead+=360.0;
+		else if(fDeltaHead>180.0)
 			fDeltaHead-=360.0;
 		
-		float fDiffRatio = 0;
-		if(std.math.abs(fDeltaHead)>m_fTolerance || std.math.abs(fDeltaHead)<m_fTolerance)
-			fDiffRatio = (std.math.abs(fDeltaHead) - m_fTolerance) * Config.Get!float("Autopilot", "CommandRatio");
-		
-		if(fDeltaHead>m_fTolerance){
+		float fDiffRatio = (std.math.abs(fDeltaHead) - m_fTolerance) * Config.Get!float("Autopilot", "CommandRatio");
+		if(fDeltaHead > m_fTolerance){
+			
+
 			float fNewValue = helm.value + m_fDelta + fDiffRatio;
 
 			if(fNewValue>helm.max){
@@ -93,7 +94,7 @@ private:
 				m_nCounter = 0;
 			}
 		}
-		else if(fDeltaHead<m_fTolerance){
+		else if(fDeltaHead < -m_fTolerance){
 			float fNewValue = helm.value - m_fDelta - fDiffRatio;
 			
 			if(fNewValue<helm.min){
