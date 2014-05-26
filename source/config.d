@@ -76,6 +76,11 @@ public:
 		m_inst.m_ini.Set!T(sHeader, sName, value);
 	}
 
+	static string toString(){
+		if(m_inst is null)m_inst = new Config();
+		return m_inst.m_ini.toString;
+	}
+
 
 private:
 	static __gshared Config m_inst;

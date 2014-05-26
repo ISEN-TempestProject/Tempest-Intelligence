@@ -117,6 +117,9 @@ private:
 			}
 			stdout.writeln(MOTD~execute("date").output);
 			m_logfile.writeln(MOTD~execute("date").output);
+
+			stdout.writeln(config.Config.toString);
+			m_logfile.writeln(config.Config.toString);
 		}
 		writeln(fg.green~var.bold~"Success:  "~var.end,typeof(this).stringof~" instantiated in ",Thread.getThis().name," thread");
 		m_logfile.writeln(fg.green~var.bold~"Success:  "~var.end,typeof(this).stringof~" instantiated in ",Thread.getThis().name," thread");

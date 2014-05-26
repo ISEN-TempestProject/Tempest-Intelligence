@@ -49,17 +49,19 @@ public:
 	/**
 		Prints the configuration entries, useful for debugging purposes
 	*/
-	void Print()
+	string toString()
 	{
+		string sRet;
 		foreach(string section, entries ; m_Data)
 		{
-			writeln("[",section,"]");
+			sRet ~= "["~section~"]\n";
 
 			foreach(string name, string value ; entries)
 			{
-				writeln("\t",name,"=",value);
+				sRet ~= "\t"~name~"="~value~"\n";
 			}
 		}
+		return sRet;
 	}
 
 private:
