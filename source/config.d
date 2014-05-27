@@ -85,15 +85,7 @@ public:
 private:
 	static __gshared Config m_inst;
 
-	this()
-	out{
-		import std.exception;
-		assert(m_ini.Get!float("DecisionCenter", "DistanceToRoute")==50.0);
-		assert(m_ini.Get!string("Global", "LogFile")==CONFIG_DEFAULT["Global"]["LogFile"]);
-		assertThrown(m_ini.Get!string("Global", ""));
-		assertThrown(m_ini.Get!string("", ""));
-	}
-	body{
+	this(){
 		version(unittest){
 			//using default config for unittests
 			m_ini = new INIReader("", CONFIG_DEFAULT);
