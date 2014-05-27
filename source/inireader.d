@@ -49,7 +49,7 @@ public:
 	/**
 		Prints the configuration entries, useful for debugging purposes
 	*/
-	string toString()
+	override string toString()
 	{
 		string sRet;
 		foreach(string section, entries ; m_Data)
