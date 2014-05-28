@@ -27,3 +27,4 @@ doc/*
 #Miscellaneous
 *.log
 tags
+res/restoreRoute.json

@@ -29,7 +29,7 @@ class DataLog {
         File m_logfile;
         
         bool m_stop = false;
-        uint m_nLoopTimeMS = 5000;
+        uint m_nLoopTimeMS = 1000;
         Thread m_thread;
         
         
