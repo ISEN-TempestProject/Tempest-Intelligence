@@ -1,6 +1,6 @@
 [submodule "tools/HWDaemon"]
 	path = tools/HWDaemon
-	url = https://github.com/CromFr/SailHWDaemonExample.git
+	url = https://github.com/CromFr/Tempest-HWDaemon.git
 [submodule "tools/Launcher"]
 	path = tools/Launcher
-	url = https://CromFr@bitbucket.org/CromFr/saillauncher.git
+	url = https://github.com/CromFr/Tempest-Launcher.git

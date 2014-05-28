@@ -1,5 +1,5 @@
 # Autonomous Sailboat Intelligence Program
-![AutoSailBoat](https://bitbucket.org/triskell/voilier-autonome/raw/HEAD/misc/logo.png "AutoSailBoat")
+![AutoSailBoat](https://raw.githubusercontent.com/CromFr/Tempest-Intelligence/master/misc/logo.png "AutoSailBoat")
 ## Informations
 This software has been written by:
 
