@@ -3,7 +3,7 @@
 ## Informations
 This software has been written by:
 
-* Thomas ABOT (Tryskel)
+* Thomas ABOT (Triskell)
 * Thibaut CHARLES (CromFr)
 
 for ISEN Brest, M1 Project
