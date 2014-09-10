@@ -1,6 +1,0 @@
-[submodule "tools/HWDaemon"]
-	path = tools/HWDaemon
-	url = https://github.com/CromFr/Tempest-HWDaemon.git
-[submodule "tools/Launcher"]
-	path = tools/Launcher
-	url = https://github.com/CromFr/Tempest-Launcher.git
