@@ -4,7 +4,7 @@
 logs
 gpslogs
 .dub/
-projetvoilier
+tempestintel
 
 #Web tool related
 web_root/libs/
@@ -28,3 +28,4 @@ doc/*
 *.log
 tags
 res/restoreRoute.json
+hidden/
