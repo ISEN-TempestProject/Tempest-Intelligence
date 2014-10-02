@@ -16,7 +16,7 @@ extern(C) void SigHdl(int sig) nothrow{
 	try getEventDriver.exitEventLoop();
 	catch(Throwable t){}
 }
-bool bQuit = false;
+//bool bQuit = false;
 
 int main(string[] args)
 {
