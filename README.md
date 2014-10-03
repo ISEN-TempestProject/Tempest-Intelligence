@@ -1,5 +1,5 @@
 # Autonomous Sailboat Intelligence
-## Build Status: [![Build Status](https://travis-ci.org/ISEN-TempestProject/Tempest-Intelligence.svg?branch=testtravis)](https://travis-ci.org/ISEN-TempestProject/Tempest-Intelligence)
+## Build Status: [![Master](https://travis-ci.org/ISEN-TempestProject/Tempest-Intelligence.svg?branch=master)](https://travis-ci.org/ISEN-TempestProject/Tempest-Intelligence) (Dev: [![Dev](https://travis-ci.org/ISEN-TempestProject/Tempest-Intelligence.svg?branch=dev)](https://travis-ci.org/ISEN-TempestProject/Tempest-Intelligence))
 ![AutoSailBoat](https://raw.githubusercontent.com/CromFr/Tempest-Intelligence/master/misc/logo.png "AutoSailBoat")
 ## Informations
 This software has been written by:
