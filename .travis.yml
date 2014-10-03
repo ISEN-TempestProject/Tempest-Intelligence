@@ -6,7 +6,7 @@ before_install:
 
 branches:
   only:
-   - testtravis
+   - master
 
 script:
  - dub build --build=unittest
