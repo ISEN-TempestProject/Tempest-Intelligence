@@ -4,11 +4,6 @@ before_install:
  - sudo apt-get update
  - sudo apt-get install dmd-bin gdc dub
 
-branches:
-  only:
-   - master
-
 script:
  - dub build --build=unittest
  - ./tempestintel
-# - ./testsuite.sh
