@@ -186,18 +186,20 @@ private:
 
 	}
 
-
-	unittest {
-		assert(HWEvent.id.sizeof == 1);
-		assert(HWEvent.data.sizeof == 16);
-	}
 	/**
 		Events for socket communication
 	*/
-	struct HWEvent{
+	//align(1) = struct & arguments must be packed
+	align(1) struct HWEvent{
+	align(1):
 		DeviceID id;
 		ulong data[2];
 	}
+	static assert(HWEvent.id.offsetof == 0);
+	static assert(HWEvent.id.sizeof == 1);
+	static assert(HWEvent.data.offsetof == 1);
+	static assert(HWEvent.data.sizeof == 16);
+	static assert(HWEvent.sizeof==17);
 
 
 	UnixAddress m_addr;
