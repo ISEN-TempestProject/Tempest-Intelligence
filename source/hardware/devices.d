@@ -19,7 +19,8 @@ enum DeviceID : ubyte{
 	Roll=4,
 	WindDir=5,
 	Compass=6,
-	Battery=7
+	Battery=7,
+	TurnSpeed=8
 }
 
 /**
@@ -323,6 +324,49 @@ class Battery : HWSens!float {
 			}
 			else if(fBattery <= Config.Get!float("Battery", "LowVoltage")){
 				SailLog.Warning("Battery voltage is low : ",fBattery,"v");
+			}
+		}
+
+		void ExecFilter(){
+			m_lastvalue = Filter.Raw!float(m_values);
+		}
+
+		void CheckIsOutOfService(){
+			//May be wise to check if values are coherent
+		}
+	}
+}
+
+
+
+
+/**
+	Gets the heading
+*/
+class TurnSpeed : HWSens!float {
+	this(){
+		super(1);
+		m_id = DeviceID.TurnSpeed;
+		m_min = -360;
+		m_max = 360;
+		m_init = 0;
+		m_lastvalue=m_init;
+	}
+
+	invariant(){
+		assert(m_min<=m_lastvalue && m_lastvalue<=m_max, "Value is out of bound");
+	}
+
+	override{
+		void ParseValue(ulong[2] data)
+		out{
+			assert(m_min<=m_values.front.value && m_values.front.value<=m_max, "Value is out of bound");
+		}body{
+			synchronized(this.classinfo){
+				m_values.Append(TimestampedValue!float(
+					Clock.currAppTick(),
+					to!float((m_max-m_min)*data[0]/ulong.max)+m_min
+				));
 			}
 		}
 

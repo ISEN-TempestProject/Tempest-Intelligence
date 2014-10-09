@@ -160,6 +160,11 @@ private:
 								if(!dev.isemulated)
 									dev.ParseValue(buffer[0].data);
 								break;
+							case DeviceID.TurnSpeed:
+								auto dev = (cast(TurnSpeed)(m_hwlist[buffer[0].id]));
+								if(!dev.isemulated)
+									dev.ParseValue(buffer[0].data);
+								break;
 
 							default:
 								SailLog.Critical("NetworkThread: ",buffer[0].id," is not a handled HWSensor");
