@@ -109,6 +109,7 @@ private:
 		m_hwlist[DeviceID.WindDir] = new WindDir();
 		m_hwlist[DeviceID.Compass] = new Compass();
 		m_hwlist[DeviceID.Battery] = new Battery();
+		m_hwlist[DeviceID.TurnSpeed] = new TurnSpeed();
 	}
 
 

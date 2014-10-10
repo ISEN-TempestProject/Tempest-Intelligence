@@ -143,6 +143,13 @@ class API : ISailAPI
                 device.emulated = battery.isemulated();
                 device.value = battery.value();
                 break;
+			case DeviceID.TurnSpeed:
+                TurnSpeed turnspeed = Hardware.Get!TurnSpeed(id);
+                device.id = turnspeed.id();
+                device.name = "TurnSpeed";
+                device.emulated = turnspeed.isemulated();
+                device.value = turnspeed.value();
+                break;
 			default:
 				SailLog.Warning("Called unknown Device ID. Sending empty object.");
 				return parseJsonString("{}");
@@ -196,6 +203,10 @@ class API : ISailAPI
                 Battery battery = Hardware.Get!Battery(cast(DeviceID) to!ubyte(device.id));
                 battery.isemulated(to!bool(device.emulated));
                 break;
+			case DeviceID.TurnSpeed:
+                TurnSpeed turnspeed = Hardware.Get!TurnSpeed(cast(DeviceID) to!ubyte(device.id));
+                turnspeed.isemulated(to!bool(device.emulated));
+                break;
 			default:
 				SailLog.Warning("Called unknown Device ID. No device set.");
 		}
@@ -233,6 +244,10 @@ class API : ISailAPI
 			case DeviceID.Battery:
                 Battery battery = Hardware.Get!Battery(cast(DeviceID) to!ubyte(device.id));
                 battery.value(device.value.to!float);
+                break;
+			case DeviceID.TurnSpeed:
+                TurnSpeed turnspeed = Hardware.Get!TurnSpeed(cast(DeviceID) to!ubyte(device.id));
+                turnspeed.value(device.value.to!float);
                 break;
 			default:
 				SailLog.Warning("Called unknown Device ID. No device set.");
