@@ -48,7 +48,7 @@ struct Polar {
             }
         }
         catch(Exception e){
-            SailLog.Warning("Error while parsing polar curve file : " , e);
+            SailLog.Warning("Error while parsing polar curve file "~filename~" : " , e);
         }
         
         return curve;

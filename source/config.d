@@ -35,7 +35,7 @@ private:
 		"Autopilot" : ([
 			"Period":"1000",
 			"Delta":"1.0",
-			"CommandRatio":"0.1",
+			"CommandRatio":"1.0",
 			"Tolerance":"3.0",
 			"EdgeLocks":"5"
 		]),
@@ -57,7 +57,8 @@ private:
 		"Polars": ([
 			"Wind":"res/polar_wind_basic.json",
 			"Heading":"res/polar_heading_basic.json",
-			"Sail":"res/polar_sail_basic.json"
+			"Sail":"res/polar_sail_basic.json",
+			"HelmSpeed":"res/polar_helmspeed_basic.json"
 		])
 	];
 

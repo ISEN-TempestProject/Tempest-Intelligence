@@ -3,6 +3,7 @@ module autopilot;
 import core.thread;
 import saillog, config, decisioncenter;
 import hardware.hardware;
+import polar;
 
 /**
 	Handles the helm in order to follow a heading
@@ -16,6 +17,7 @@ class Autopilot{
 		m_nLoopTimeMS = Config.Get!uint("Autopilot", "Period");
 		m_fDelta = Config.Get!float("Autopilot", "Delta");
 		m_fTolerance = Config.Get!float("Autopilot", "Tolerance");
+		m_polSpeed = Polar(Config.Get!string("Polars", "HelmSpeed"));
 
 		m_bEnabled = true;
 
@@ -66,18 +68,25 @@ private:
 	void AdjustHelm(){
 		auto comp = Hardware.Get!Compass(DeviceID.Compass);
 		auto helm = Hardware.Get!Helm(DeviceID.Helm);
+		auto turns = Hardware.Get!TurnSpeed(DeviceID.TurnSpeed);
 
 		float fDeltaHead = ((DecisionCenter.Get()).targetheading - comp.value)%360.0;
-		if(fDeltaHead<-180.0)
-			fDeltaHead+=360.0;
-		else if(fDeltaHead>180.0)
-			fDeltaHead-=360.0;
-		
-		float fDiffRatio = (std.math.abs(fDeltaHead) - m_fTolerance) * Config.Get!float("Autopilot", "CommandRatio");
-		if(fDeltaHead > m_fTolerance){
-			
+		//if(fDeltaHead<-180.0)
+		//	fDeltaHead+=360.0;
+		//else if(fDeltaHead>180.0)
+		//	fDeltaHead-=360.0;
 
-			float fNewValue = helm.value + m_fDelta + fDiffRatio;
+		//TurnSpeed the boat should have
+		float fTrgSpeed = m_polSpeed.getValue(fDeltaHead);
+
+		//TurnSpeed the boat have
+		float fSpeed = turns.value;
+
+
+		float fDeltaSpeed = fTrgSpeed - fSpeed;
+		if(fDeltaSpeed<0.0){
+			//The boat should turn faster to the right
+			float fNewValue = helm.value + std.math.abs(fDeltaSpeed) * Config.Get!float("Autopilot", "CommandRatio");
 
 			if(fNewValue>helm.max){
 				m_nCounter++;
@@ -94,10 +103,11 @@ private:
 				m_nCounter = 0;
 			}
 		}
-		else if(fDeltaHead < -m_fTolerance){
-			float fNewValue = helm.value - m_fDelta - fDiffRatio;
-			
-			if(fNewValue<helm.min){
+		else if(fDeltaSpeed>0.0){
+			//The boat should turn faster to the left
+			float fNewValue = helm.value - std.math.abs(fDeltaSpeed) * Config.Get!float("Autopilot", "CommandRatio");
+
+			if(fNewValue>helm.min){
 				m_nCounter++;
 				if(m_nCounter>=Config.Get!int("Autopilot", "EdgeLocks")){
 					helm.value = helm.init;
@@ -108,8 +118,8 @@ private:
 			}
 			else
 			{
-				m_nCounter = 0;
 				helm.value = fNewValue;
+				m_nCounter = 0;
 			}
 		}
 	}
@@ -117,6 +127,7 @@ private:
 	uint m_nLoopTimeMS;
 	float m_fDelta;
 	float m_fTolerance;
+	Polar m_polSpeed;
 
 	int m_nCounter = 0;
 
@@ -125,41 +136,58 @@ private:
 		auto ap = dec.autopilot;
 		auto comp = Hardware.Get!Compass(DeviceID.Compass);
 		auto helm = Hardware.Get!Helm(DeviceID.Helm);
+		auto turns = Hardware.Get!TurnSpeed(DeviceID.TurnSpeed);
 
 		dec.enabled = false;
 		ap.enabled = false;
 		Thread.sleep(dur!("msecs")(100));
 
 		comp.isemulated = true;
-		comp.value = 20;
-		dec.targetheading = 25;
-
-		//Delta compensation
+		turns.isemulated = true;
+		dec.targetheading = 90;
+		
+		//Dont move helm when speed is good
+		comp.value = 90;
+		turns.value = 0;
 		helm.value = helm.init;
 		ap.AdjustHelm();
-		assert(std.math.abs(helm.value-(helm.init+ap.m_fDelta+0.2))<0.01);
-		ap.AdjustHelm();
-		ap.AdjustHelm();
-		assert(std.math.abs(helm.value-(helm.init+3*(ap.m_fDelta+0.2)))<0.01);
+		assert(helm.value==helm.init);
 
-		//return to init position
-		helm.value = helm.max - ap.m_fDelta/2;
-		ap.AdjustHelm();
-		assert(helm.value == helm.max);
-		ap.AdjustHelm();
-		assert(helm.value == helm.max);
-		ap.AdjustHelm();
-		assert(helm.value == helm.max);
-		ap.AdjustHelm();
-		assert(helm.value == helm.max);
-		ap.AdjustHelm();
-		assert(helm.value == helm.init);
-
-		//-delta compensation
+		//Move by delta if speed is incorrect
+		comp.value = 90;
+		turns.value = 10;
 		helm.value = helm.init;
-		dec.targetheading = 15;
 		ap.AdjustHelm();
-		assert(std.math.abs(helm.value-(helm.init-(ap.m_fDelta+0.2)))<0.01);
+		assert(helm.value==10.0);
+		ap.AdjustHelm();
+		assert(helm.value==20.0);
+
+		
+
+
+		//assert(std.math.abs(helm.value-(helm.init+ap.m_fDelta+0.2))<0.01);
+		//ap.AdjustHelm();
+		//ap.AdjustHelm();
+		//assert(std.math.abs(helm.value-(helm.init+3*(ap.m_fDelta+0.2)))<0.01);
+
+		////return to init position
+		//helm.value = helm.max - ap.m_fDelta/2;
+		//ap.AdjustHelm();
+		//assert(helm.value == helm.max);
+		//ap.AdjustHelm();
+		//assert(helm.value == helm.max);
+		//ap.AdjustHelm();
+		//assert(helm.value == helm.max);
+		//ap.AdjustHelm();
+		//assert(helm.value == helm.max);
+		//ap.AdjustHelm();
+		//assert(helm.value == helm.init);
+
+		////-delta compensation
+		//helm.value = helm.init;
+		//dec.targetheading = 15;
+		//ap.AdjustHelm();
+		//assert(std.math.abs(helm.value-(helm.init-(ap.m_fDelta+0.2)))<0.01);
 
 		SailLog.Notify("Autopilot unittest done");
 	}
