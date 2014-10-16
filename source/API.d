@@ -92,64 +92,30 @@ class API : ISailAPI
 		DeviceID id = cast(DeviceID) id_ ;
 		Json device = Json.emptyObject;
 		switch(id){
-			case DeviceID.Roll: 
-				Roll roll = Hardware.Get!Roll(id);
-				device.id = roll.id();
-				device.name = "Roll";
-				device.emulated = roll.isemulated();
-				device.value = roll.value();
-				break;
-			case DeviceID.WindDir: 
-				WindDir wd = Hardware.Get!WindDir(id);
-				device.id = wd.id();
-				device.name = "Wind direction";
-				device.emulated = wd.isemulated();
-				device.value = wd.value();
-				break;
-			case DeviceID.Compass: 
-				Compass compass = Hardware.Get!Compass(id);
-				device.id = compass.id();
-				device.name = "Compass";
-				device.emulated = compass.isemulated();
-				device.value = compass.value();
-				break;
-			case DeviceID.Sail:
-				Sail sail = Hardware.Get!Sail(id);
-				device.id = sail.id();
-				device.name = "Sail";
-				device.emulated = sail.isemulated();
-				device.value = to!int(sail.value());
-				break;	
-			case DeviceID.Helm:
-				Helm helm = Hardware.Get!Helm(id);
-				device.id = helm.id();
-				device.name = "Helm";
-				device.emulated = helm.isemulated();
-				device.value = helm.value();
-				break;
-			case DeviceID.Gps:
-				Gps gps = Hardware.Get!Gps(id);
-				device.id = gps.id();
-				device.name = "GPS";
-				device.emulated = gps.isemulated();
-				device.value = Json.emptyObject;
-				device.value.longitude = GpsCoord.toDeg(gps.value().longitude());
-				device.value.latitude = GpsCoord.toDeg(gps.value().latitude());
-				break;
-			case DeviceID.Battery:
-                Battery battery = Hardware.Get!Battery(id);
-                device.id = battery.id();
-                device.name = "Battery";
-                device.emulated = battery.isemulated();
-                device.value = battery.value();
-                break;
-			case DeviceID.TurnSpeed:
-                TurnSpeed turnspeed = Hardware.Get!TurnSpeed(id);
-                device.id = turnspeed.id();
-                device.name = "TurnSpeed";
-                device.emulated = turnspeed.isemulated();
-                device.value = turnspeed.value();
-                break;
+
+			foreach(sens ; __traits(allMembers, DeviceID)){
+				static if(mixin("DeviceID."~sens)!=DeviceID.Invalid){
+					case (mixin("DeviceID."~sens)):
+						auto d = Hardware.Get!(mixin(sens))(id);
+						device.id = d.id();
+						device.name = sens;
+						device.emulated = d.isemulated();
+
+						static if(mixin("DeviceID."~sens)==DeviceID.Gps){
+							device.value = Json.emptyObject;
+							device.value.longitude = GpsCoord.toDeg(d.value().longitude());
+							device.value.latitude = GpsCoord.toDeg(d.value().latitude());
+						}
+						else static if(mixin("DeviceID."~sens)==DeviceID.Sail){
+							device.value = to!int(d.value());
+						}
+						else{
+							device.value = d.value();
+						}
+						break;
+				}
+			}
+			break;
 			default:
 				SailLog.Warning("Called unknown Device ID. Sending empty object.");
 				return parseJsonString("{}");
@@ -175,38 +141,17 @@ class API : ISailAPI
 	void postEmulation(string data){
 		Json device = parseJsonString(data);
 		switch(to!ubyte(device.id)){
-			case DeviceID.Roll: 
-				Roll roll = Hardware.Get!Roll(cast(DeviceID) to!ubyte(device.id));
-				roll.isemulated(to!bool(device.emulated));
-				break;
-			case DeviceID.WindDir: 
-				WindDir wd = Hardware.Get!WindDir(cast(DeviceID) to!ubyte(device.id));
-				wd.isemulated(to!bool(device.emulated));
-				break;
-			case DeviceID.Compass: 
-				Compass compass = Hardware.Get!Compass(cast(DeviceID) to!ubyte(device.id));
-				compass.isemulated(to!bool(device.emulated));
-				break;
-			case DeviceID.Sail:
-				Sail sail = Hardware.Get!Sail(cast(DeviceID) to!ubyte(device.id));
-				sail.isemulated(to!bool(device.emulated));
-				break;	
-			case DeviceID.Helm:
-				Helm helm = Hardware.Get!Helm(cast(DeviceID) to!ubyte(device.id));
-				helm.isemulated(to!bool(device.emulated));
-				break;
-			case DeviceID.Gps:
-				Gps gps = Hardware.Get!Gps(cast(DeviceID) to!ubyte(device.id));
-				gps.isemulated(to!bool(device.emulated));
-				break;
-			case DeviceID.Battery:
-                Battery battery = Hardware.Get!Battery(cast(DeviceID) to!ubyte(device.id));
-                battery.isemulated(to!bool(device.emulated));
-                break;
-			case DeviceID.TurnSpeed:
-                TurnSpeed turnspeed = Hardware.Get!TurnSpeed(cast(DeviceID) to!ubyte(device.id));
-                turnspeed.isemulated(to!bool(device.emulated));
-                break;
+
+			foreach(sens ; __traits(allMembers, DeviceID)){
+				static if(mixin("DeviceID."~sens)!=DeviceID.Invalid){
+					case (mixin("DeviceID."~sens)):
+
+		                auto d = Hardware.Get!(mixin(sens))(cast(DeviceID)(to!ubyte(device.id)));
+		                d.isemulated(to!bool(device.emulated));
+						break;
+				}
+			}
+			break;
 			default:
 				SailLog.Warning("Called unknown Device ID. No device set.");
 		}
@@ -217,38 +162,21 @@ class API : ISailAPI
 		SailLog.Post("Device set : " ~ data);
 		Json device = parseJsonString(data);
 		switch(to!ubyte(device.id)){
-			case DeviceID.Roll: 
-				Roll roll = Hardware.Get!Roll(cast(DeviceID) to!ubyte(device.id));
-				roll.value(device.value.to!float);
-				break;
-			case DeviceID.WindDir: 
-				WindDir wd = Hardware.Get!WindDir(cast(DeviceID) to!ubyte(device.id));
-				wd.value(device.value.to!float);
-				break;
-			case DeviceID.Compass: 
-				Compass compass = Hardware.Get!Compass(cast(DeviceID) to!ubyte(device.id));
-				compass.value(device.value.to!float);
-				break;
-			case DeviceID.Sail:
-				Sail sail = Hardware.Get!Sail(cast(DeviceID) to!ubyte(device.id));
-				sail.value(device.value.to!ubyte);
-				break;	
-			case DeviceID.Helm:
-				Helm helm = Hardware.Get!Helm(cast(DeviceID) to!ubyte(device.id));
-				helm.value(device.value.to!float);
-				break;
-			case DeviceID.Gps:
-				Gps gps = Hardware.Get!Gps(cast(DeviceID) to!ubyte(device.id));
-				gps.value(GpsCoord(GpsCoord.toRad(device.value.latitude.to!double), GpsCoord.toRad(device.value.longitude.to!double)));
-				break;
-			case DeviceID.Battery:
-                Battery battery = Hardware.Get!Battery(cast(DeviceID) to!ubyte(device.id));
-                battery.value(device.value.to!float);
-                break;
-			case DeviceID.TurnSpeed:
-                TurnSpeed turnspeed = Hardware.Get!TurnSpeed(cast(DeviceID) to!ubyte(device.id));
-                turnspeed.value(device.value.to!float);
-                break;
+			foreach(sens ; __traits(allMembers, DeviceID)){
+				static if(mixin("DeviceID."~sens)!=DeviceID.Invalid){
+					case (mixin("DeviceID."~sens)):
+
+						auto d = Hardware.Get!(mixin(sens))(cast(DeviceID) to!ubyte(device.id));
+						static if(mixin("DeviceID."~sens)==DeviceID.Gps){
+							d.value(GpsCoord(GpsCoord.toRad(device.value.latitude.to!double), GpsCoord.toRad(device.value.longitude.to!double)));
+						}
+						else{
+							d.value(device.value.to!(typeof(d.value)));
+						}
+						break;
+				}
+			}
+			break;
 			default:
 				SailLog.Warning("Called unknown Device ID. No device set.");
 		}
