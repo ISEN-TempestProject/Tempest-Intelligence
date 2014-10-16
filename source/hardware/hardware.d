@@ -135,40 +135,42 @@ private:
 					if(nReceived>0){
 						//SailLog.Post("Received: [",buffer[0].id,"|",buffer[0].data,"]");
 
-						switch(buffer[0].id){
-							case DeviceID.Gps:
-								auto dev = (cast(Gps)(m_hwlist[buffer[0].id]));
-								if(!dev.isemulated)
-									dev.ParseValue(buffer[0].data);
-								break;
-							case DeviceID.Roll:
-								auto dev = (cast(Roll)(m_hwlist[buffer[0].id]));
-								if(!dev.isemulated)
-									dev.ParseValue(buffer[0].data);
-								break;
-							case DeviceID.WindDir:
-								auto dev = (cast(WindDir)(m_hwlist[buffer[0].id]));
-								if(!dev.isemulated)
-									dev.ParseValue(buffer[0].data);
-								break;
-							case DeviceID.Compass:
-								auto dev = (cast(Compass)(m_hwlist[buffer[0].id]));
-								if(!dev.isemulated)
-									dev.ParseValue(buffer[0].data);
-								break;
-							case DeviceID.Battery:
-								auto dev = (cast(Battery)(m_hwlist[buffer[0].id]));
-								if(!dev.isemulated)
-									dev.ParseValue(buffer[0].data);
-								break;
-							case DeviceID.TurnSpeed:
-								auto dev = (cast(TurnSpeed)(m_hwlist[buffer[0].id]));
-								if(!dev.isemulated)
-									dev.ParseValue(buffer[0].data);
-								break;
+						//import std.traits;
+						//foreach(sens ; __traits(allMembers, DeviceID)){
+						//	if( buffer[0].id == mixin(sens) ){
 
-							default:
-								SailLog.Critical("NetworkThread: ",buffer[0].id," is not a handled HWSensor");
+						//		auto dev = (cast(mixin(sens))(m_hwlist[buffer[0].id]));
+						//		if(!dev.isemulated)
+						//			dev.ParseValue(buffer[0].data);
+
+						//	}
+						//}
+
+						switch(buffer[0].id){
+
+							//Compile-time cast to associated class using received ID to parse value
+							foreach(sens ; __traits(allMembers, DeviceID)){
+								static if(mixin("DeviceID."~sens)!=DeviceID.Invalid){
+
+									//Do not handle actuators
+									static if( mixin("DeviceID."~sens)!=DeviceID.Helm
+											&& mixin("DeviceID."~sens)!=DeviceID.Sail){
+
+										pragma(msg, "  Note: Registered "~sens~" as a sensor");
+
+										case (mixin("DeviceID."~sens)):
+											auto dev = mixin("cast("~sens~")(m_hwlist[buffer[0].id])");
+
+											if(!dev.isemulated)
+												dev.ParseValue(buffer[0].data);
+											break;
+									}
+								}
+							}
+
+
+						default:
+							SailLog.Critical("NetworkThread: ",buffer[0].id," is not a handled HWSensor");
 						}
 					}
 					else
