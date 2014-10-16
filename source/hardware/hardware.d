@@ -135,17 +135,6 @@ private:
 					if(nReceived>0){
 						//SailLog.Post("Received: [",buffer[0].id,"|",buffer[0].data,"]");
 
-						//import std.traits;
-						//foreach(sens ; __traits(allMembers, DeviceID)){
-						//	if( buffer[0].id == mixin(sens) ){
-
-						//		auto dev = (cast(mixin(sens))(m_hwlist[buffer[0].id]));
-						//		if(!dev.isemulated)
-						//			dev.ParseValue(buffer[0].data);
-
-						//	}
-						//}
-
 						switch(buffer[0].id){
 
 							//Compile-time cast to associated class using received ID to parse value
