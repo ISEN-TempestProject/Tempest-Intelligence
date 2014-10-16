@@ -15,8 +15,8 @@ class Autopilot{
 
 		//Get configuration
 		m_nLoopTimeMS = Config.Get!uint("Autopilot", "Period");
-		m_fDelta = Config.Get!float("Autopilot", "Delta");
-		m_fTolerance = Config.Get!float("Autopilot", "Tolerance");
+		m_nEdgeLocks = Config.Get!uint("Autopilot", "EdgeLocks");
+		m_fCommandRatio = Config.Get!float("Autopilot", "CommandRatio");
 		m_polSpeed = Polar(Config.Get!string("Polars", "HelmSpeed"));
 
 		m_bEnabled = true;
@@ -86,11 +86,11 @@ private:
 		float fDeltaSpeed = fTrgSpeed - fSpeed;
 		if(fDeltaSpeed<0.0){
 			//The boat should turn faster to the right
-			float fNewValue = helm.value + std.math.abs(fDeltaSpeed) * Config.Get!float("Autopilot", "CommandRatio");
+			float fNewValue = helm.value + std.math.abs(fDeltaSpeed) * m_fCommandRatio;
 
 			if(fNewValue>helm.max){
 				m_nCounter++;
-				if(m_nCounter>=Config.Get!int("Autopilot", "EdgeLocks")){
+				if(m_nCounter>=m_nEdgeLocks){
 					helm.value = helm.init;
 					m_nCounter = 0;
 				}
@@ -105,11 +105,11 @@ private:
 		}
 		else if(fDeltaSpeed>0.0){
 			//The boat should turn faster to the left
-			float fNewValue = helm.value - std.math.abs(fDeltaSpeed) * Config.Get!float("Autopilot", "CommandRatio");
+			float fNewValue = helm.value - std.math.abs(fDeltaSpeed) * m_fCommandRatio;
 
 			if(fNewValue<helm.min){
 				m_nCounter++;
-				if(m_nCounter>=Config.Get!int("Autopilot", "EdgeLocks")){
+				if(m_nCounter>=m_nEdgeLocks){
 					helm.value = helm.init;
 					m_nCounter = 0;
 				}
@@ -125,9 +125,9 @@ private:
 	}
   
 	uint m_nLoopTimeMS;
-	float m_fDelta;
-	float m_fTolerance;
 	Polar m_polSpeed;
+	uint m_nEdgeLocks;
+	float m_fCommandRatio;
 
 	int m_nCounter = 0;
 
