@@ -156,10 +156,9 @@ private:
 									}
 								}
 							}
-
-
-						default:
-							SailLog.Critical("NetworkThread: ",buffer[0].id," is not a handled HWSensor");
+							break;
+							default:
+								SailLog.Critical("NetworkThread: ",buffer[0].id," is not a handled HWSensor");
 						}
 					}
 					else
