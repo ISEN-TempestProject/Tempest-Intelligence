@@ -138,23 +138,14 @@ private:
 						switch(buffer[0].id){
 
 							//Compile-time cast to associated class using received ID to parse value
-							foreach(sens ; __traits(allMembers, DeviceID)){
-								static if(mixin("DeviceID."~sens)!=DeviceID.Invalid){
+							foreach(sens ; __traits(allMembers, DeviceSens)){
 
-									//Do not handle actuators
-									static if( mixin("DeviceID."~sens)!=DeviceID.Helm
-											&& mixin("DeviceID."~sens)!=DeviceID.Sail){
+								case (mixin("DeviceID."~sens)):
+									auto dev = mixin("cast("~sens~")(m_hwlist[buffer[0].id])");
 
-										pragma(msg, "  Note: Registered "~sens~" as a sensor");
-
-										case (mixin("DeviceID."~sens)):
-											auto dev = mixin("cast("~sens~")(m_hwlist[buffer[0].id])");
-
-											if(!dev.isemulated)
-												dev.ParseValue(buffer[0].data);
-											break;
-									}
-								}
+									if(!dev.isemulated)
+										dev.ParseValue(buffer[0].data);
+									break;
 							}
 							break;
 							default:
