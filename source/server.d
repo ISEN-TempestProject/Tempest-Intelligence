@@ -1,3 +1,5 @@
+module server;
+
 import vibe.d;
 import std.conv;
 import std.process;

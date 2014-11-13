@@ -8,7 +8,7 @@ import saillog;
 import config;
 
 import vibe.vibe;
-import Server;
+import server;
 
 import core.sys.posix.signal;
 extern(C) void SigHdl(int sig) nothrow{
