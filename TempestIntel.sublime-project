@@ -1,0 +1,14 @@
+{
+	"folders":
+	[
+		{
+			"follow_symlinks": true,
+			"path": "."
+		}
+	],
+	"settings":
+	{
+		"sublimegdb_workingdir": "${folder:${project_path:.}}",
+		"sublimegdb_commandline": "gdb -nx -readnow -fullname --interpreter=mi -ex \"n\" -ex \"b _d_assert\" -ex \"b _d_assert_msg\" -ex \"set language d\" -args ./tempestintel"
+	}
+}
