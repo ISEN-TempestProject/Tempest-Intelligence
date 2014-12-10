@@ -41,3 +41,7 @@ sendconf:
 doc:
 	dmd -D -X -Xfdocs.json `find source -name "*.d"` -Dddoc -c -o-
 	ddox generate-html docs.json doc
+
+clean:
+	rm -rf .dub/
+	rm tempestintel
