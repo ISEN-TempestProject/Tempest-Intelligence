@@ -16,48 +16,17 @@ struct Polar {
         m_curve = curve;
         m_left = true;
         m_right = true;
-        SailLog.Post("New polar : ", m_curve);
     }
     
-    this(string filename){
+    this(in string filename){
         this(getDataFromFile(filename));
     }
     
-    /**
-        Get points of the curve from Json file.
-        Format : 
-            [
-                {
-                    "key": float_key_1,
-                    "value" : float_value_2
-                },
-                ...
-                {
-                    "key" : float_key_N,
-                    "value" : float_value_N
-                }
-            ]
-    */
-    float[float] getDataFromFile(string filename){
-        float curve[float];
-        try{
-            string jsonText = readText(filename);
-            Json json = parseJsonString(jsonText);
-            foreach(Json el ; json){
-                curve[to!float(el.key)] = to!float(el.value);
-            }
-        }
-        catch(Exception e){
-            SailLog.Warning("Error while parsing polar curve file "~filename~" : " , e);
-        }
-        
-        return curve;
-    }
     
     /**
         Get value asssociated to a key. If value doesn't exist, extrapolate the value.
     */
-    float getValue(float key){
+    float getValue(float key) const{
         float _key = (key + 360.0) % 360.0;
         
         //Return value only if this side is allowed
@@ -76,7 +45,7 @@ struct Polar {
     /**
         Extrapolate a value associatied to the given key
     */
-    float extrapolate(float key){
+    float extrapolate(float key) const{
 
         float key_prev = minPos(m_curve.keys)[0]; //TODO : buggy line. curve is []
         float val_prev = m_curve[key_prev];
@@ -134,6 +103,37 @@ private :
     
     bool m_left;
     bool m_right;
+
+    /**
+        Get points of the curve from Json file.
+        Format : 
+            [
+                {
+                    "key": float_key_1,
+                    "value" : float_value_2
+                },
+                ...
+                {
+                    "key" : float_key_N,
+                    "value" : float_value_N
+                }
+            ]
+    */
+    float[float] getDataFromFile(in string filename){
+        float curve[float];
+        try{
+            string jsonText = readText(filename);
+            Json json = parseJsonString(jsonText);
+            foreach(Json el ; json){
+                curve[to!float(el.key)] = to!float(el.value);
+            }
+        }
+        catch(Exception e){
+            SailLog.Warning("Error while parsing polar curve file "~filename~" : " , e);
+        }
+        
+        return curve;
+    }
     
     
     unittest {
