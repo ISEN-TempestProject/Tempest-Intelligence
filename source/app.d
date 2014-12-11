@@ -11,7 +11,8 @@ import vibe.vibe;
 import server;
 
 import core.sys.posix.signal;
-extern(C) void SigHdl(int sig) nothrow{
+extern(C) @system
+void SigHdl(int sig) nothrow{
 	bQuit = true;
 	try getEventDriver.exitEventLoop();
 	catch(Throwable t){}
