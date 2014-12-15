@@ -31,10 +31,12 @@ int main(string[] args)
 
 		bool bRestart = false;
 		bool bStartWithoutGPS = false;
+		bool bNoSocket = false;
 		getopt(
 		    args,
 		    "Restart|r",  &bRestart,
-		    "StartWithoutGPS|g", &bStartWithoutGPS
+		    "StartWithoutGPS|g", &bStartWithoutGPS,
+		    "NoSocket|s", &bNoSocket
 		    );
 
 		if(bRestart){
@@ -44,6 +46,8 @@ int main(string[] args)
 		}
 		if(bStartWithoutGPS)
 			Config.Set!bool("DecisionCenter", "StartWithoutGPS", true);
+		if(bNoSocket)
+			Config.Set!bool("Global", "ConnectSockets", false);
 
 		
 		SailLog.Success("Starting program");

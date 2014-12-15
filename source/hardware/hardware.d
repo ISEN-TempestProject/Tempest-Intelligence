@@ -5,6 +5,7 @@ import std.socket;
 import core.thread;
 import saillog;
 import datalog;
+import config;
 
 public import hardware.devices;
 
@@ -70,19 +71,21 @@ private:
 		//Init devices
 		InitDevices();
 
-		version(unittest){}else{
-			//Open Socket
-			m_addr = new UnixAddress("/tmp/hwsocket");
-			
-			//Start network thread
-			m_thread = new Thread(&NetworkThread);
-			m_thread.name(typeof(this).stringof~"-Network");
-			m_thread.isDaemon(true);
-			m_thread.start();
+		if(config.Config.Get!bool("Global", "ConnectSockets")){
+			version(unittest){}else{
+				//Open Socket
+				m_addr = new UnixAddress("/tmp/hwsocket");
+				
+				//Start network thread
+				m_thread = new Thread(&NetworkThread);
+				m_thread.name(typeof(this).stringof~"-Network");
+				m_thread.isDaemon(true);
+				m_thread.start();
+			}
 		}
+		//m_datalog = new DataLog();
+		
 		SailLog.Success(typeof(this).stringof~" instantiated in ",Thread.getThis().name," thread");
-	
-	    //m_datalog = new DataLog();
 	}
 	~this(){
 	    //delete m_datalog;

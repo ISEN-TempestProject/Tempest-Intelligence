@@ -21,7 +21,8 @@ private:
 	enum string[string][string] CONFIG_DEFAULT = [
 		"Global" : ([
 			"LogFile":"logs",
-			"GPSLogFile":"gpslogs"
+			"GPSLogFile":"gpslogs",
+			"ConnectSockets":"true"
 		]),
 		"DecisionCenter" : ([
 			"Route":"res/route.json",
