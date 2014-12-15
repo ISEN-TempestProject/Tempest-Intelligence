@@ -147,6 +147,13 @@ class Gps : HWSens!GpsCoord {
 		void CheckIsOutOfService(){
 			//May be wise to check if values are coherent
 		}
+
+		bool isValueInBounds(GpsCoord value) const{
+			if(		m_min.latitude<=value.latitude && value.latitude<=m_max.latitude
+				&&	m_min.longitude<=value.longitude && value.longitude<=m_max.longitude)
+				return true;
+			return false;
+		}
 	}
 
 private:

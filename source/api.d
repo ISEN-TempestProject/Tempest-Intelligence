@@ -166,13 +166,19 @@ class API : ISailAPI
 				static if(mixin("DeviceID."~sens)!=DeviceID.Invalid){
 					case (mixin("DeviceID."~sens)):
 
-						auto d = Hardware.Get!(mixin(sens))(cast(DeviceID) to!ubyte(device.id));
+						auto did = cast(DeviceID) to!ubyte(device.id);
+						auto d = Hardware.Get!(mixin(sens))(did);
 						static if(mixin("DeviceID."~sens)==DeviceID.Gps){
-							d.value(GpsCoord(GpsCoord.toRad(device.value.latitude.to!double), GpsCoord.toRad(device.value.longitude.to!double)));
+							auto val = GpsCoord(GpsCoord.toRad(device.value.latitude.to!double), GpsCoord.toRad(device.value.longitude.to!double));
 						}
 						else{
-							d.value(device.value.to!(typeof(d.value)));
+							auto val = device.value.to!(typeof(d.value));
 						}
+
+						if(d.isValueInBounds(val))
+							d.value = val;
+						else
+							SailLog.Warning("Refused value '",val,"' for ",did," because it was out of bounds");
 						break;
 				}
 			}

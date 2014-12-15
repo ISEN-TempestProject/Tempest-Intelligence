@@ -61,6 +61,15 @@ abstract class HWElement(T) {
 		T init() {return m_init;}
 	}
 
+	bool isValueInBounds(T value) const{
+		import gpscoord;
+		static if(!is(T: GpsCoord)){
+			if(m_min<=value && value<=m_max)
+				return true;
+		}
+		return false;
+	}
+
 protected:
 	DeviceID m_id;
 	bool m_isemulated = false;
