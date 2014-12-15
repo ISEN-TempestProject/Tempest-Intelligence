@@ -76,6 +76,23 @@ sailControllers.controller('deviceCtrl', ['$scope', '$rootScope', '$http', '$log
 			        $log.error('Can\'t reach device with id ' + id);
 			    });
 		}
+
+		$scope.setDevice = function(id, newval) {
+			$http.get('/api/' + id + '/devices')
+			    .success(function(data, status, headers, config) {
+			    	data.value = newval;
+			    	$http.post('/api/value', {"data" : JSON.stringify(data)})
+			    		.success(function(data, status, headers, config) {
+					        $scope.getDevices();
+					    })
+					    .error(function(data, status, headers, config) {
+					        $log.error('Can\'t post devices.');
+					    });       
+			    })
+			    .error(function(data, status, headers, config) {
+			        $log.error('Can\'t reach device with id ' + id);
+			    });
+		}
 		
 		$scope.setGPS = function(latitude, longitude){
             var data = '{"latitude" : '+latitude+', "longitude" : '+longitude+'}';

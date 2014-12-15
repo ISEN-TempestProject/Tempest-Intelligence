@@ -14,11 +14,12 @@
 			
 			<div class="col-sm-3">{{device.name}}</div>
 			<div class="col-sm-6 row">
-				<button class="col-xs-3" type="button" ng-click="deltaDevice(device.id, -device.delta)" ng-disabled="!device.emulated">{{device.lowCaption}}</button>
-
-				<input type="text" class="col-xs-6" name="value" value="{{device.value}}" ng-disabled="!device.emulated">
-
-				<button class="col-xs-3" type="button" ng-click="deltaDevice(device.id, device.delta)" ng-disabled="!device.emulated">{{device.highCaption}}</button>
+				<div class="input-group">
+					<input type="text" class="form-control" value="{{device.value}}" ng-disabled="!device.emulated" ng-model="device.value" />
+					<span class="input-group-btn">
+						<button class="btn btn-primary" type="button" ng-click="setDevice(device.id, device.value)" ng-disabled="!device.emulated"><div class="glyphicon glyphicon-ok"></div></button>
+					</span>
+				</div>
 			</div>
 		</li>
 		<li class="row">
@@ -31,25 +32,15 @@
 				    </label>
 				</div>
 			</div>
+
 			<div class="col-sm-3">GPS</div>
+			<div class="input-group col-sm-6">
+			 	<input type="text" class="form-control" style="width: 50%" name="value" value="{{devices[2].value.latitude}}" ng-model="gps.latitude" ng-disabled="!devices[2].emulated"/>
+			 	<input type="text" class="form-control" style="width: 50%" name="value" value="{{devices[2].value.longitude}}"ng-model="gps.longitude"  ng-disabled="!devices[2].emulated"/>
+				<span class="input-group-btn">
+					<button class="btn btn-primary" type="button" ng-click="setGPS(gps.latitude, gps.longitude)" ng-disabled="!devices[2].emulated"><div class="glyphicon glyphicon-ok"></div></button>
+				</span>
+			</div>
 		</li>
-		<li class="row">
-            <div class="col-md-offset-3 col-sm-3">Latitude</div>
-            <div class="col-sm-6">
-                <input type="text" name="value" value="{{devices[2].value.latitude}}" ng-model="gps.latitude" ng-disabled="!devices[2].emulated">
-            </div>
-        </li>
-		<li class="row">
-			<div class="col-md-offset-3 col-sm-3">Longitude</div>
-			<div class="col-sm-6">
-				<input type="text" name="value" value="{{devices[2].value.longitude}}"ng-model="gps.longitude"  ng-disabled="!devices[2].emulated">
-        	</div>
-		</li>
-		<li class="row">
-            <div class="col-md-offset-3 col-sm-6">
-                <button class="col-xs-3" type="button" ng-click="setGPS(gps.latitude, gps.longitude)" ng-hide="!devices[2].emulated">Set</button>
-        
-            </div>
-        </li>
 	</ul>
 </div>
