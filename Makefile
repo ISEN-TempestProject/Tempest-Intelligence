@@ -8,7 +8,7 @@ deps:
 	dub build --compiler=gdc
 
 unittest:
-	dub build --compiler=gdc --build=unittest
+	dub test # --compiler=gdc
 
 cov:
 	dub build --compiler=gdc --build=unittest-cov
