@@ -30,3 +30,4 @@ tags
 res/restoreRoute.json
 hidden/
 dub.selections.json
+*.sublime-workspace
