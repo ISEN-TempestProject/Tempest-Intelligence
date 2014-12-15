@@ -18,6 +18,9 @@ doc/*
 !doc/scripts/
 !doc/styles/
 
+# Dub related
+dub.selections.json
+
 #Notes
 *.notes
 
