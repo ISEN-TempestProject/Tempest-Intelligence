@@ -221,7 +221,7 @@ private:
                 //get wind vector (position fixed)
             w_vect = m_polarWind.getValue(wind_angle - i);
                 //apply coefs on those 2 vectors and sum them
-            s_vector  = h_vect * PolarFactor.Heading + w_vect * PolarFactor.Wind;
+            s_vector  = ( h_vect * PolarFactor.Heading ) * ( w_vect * PolarFactor.Wind );
             //DBG : SailLog.Post("s_vector (",i,") : ", s_vector , "[w", w_vect, ";h", h_vect,"]");
                 //is the vector greater than result vector ?
             if(s_vector > res_sum){

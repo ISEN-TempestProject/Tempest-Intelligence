@@ -55,7 +55,7 @@ struct Polar {
     }
     
     /**
-        Get value asssociated to a key. If value doesn't exist, extrapolate the value.
+        Get value asssociated to a key. If value doesn't exist, interpolate the value.
     */
     float getValue(float key){
         float _key = (key + 360.0) % 360.0;
@@ -63,9 +63,9 @@ struct Polar {
         //Return value only if this side is allowed
         if( (_key<180.0 && m_right) || (_key>=180 && m_left) ){
             float value = m_curve.get(_key, -1.0);
-            //If value isn't in the table, we extrapolate it
+            //If value isn't in the table, we interpolate it
             if(value == -1.0){
-                value = extrapolate(_key);
+                value = interpolate(_key);
             }
             return value;
         }
@@ -76,7 +76,7 @@ struct Polar {
     /**
         Extrapolate a value associatied to the given key
     */
-    float extrapolate(float key){
+    float interpolate(float key){
 
         float key_prev = minPos(m_curve.keys)[0]; //TODO : buggy line. curve is []
         float val_prev = m_curve[key_prev];
@@ -98,15 +98,8 @@ struct Polar {
             }
         }
         
-        //extrapolate value
-        float value, coef_val, coef_key;
-        
-        coef_val = val_next - val_prev;
-        coef_key = key_next - key_prev;
-        
-        float scale = (key - key_prev) / coef_key;
-        
-        value =  (coef_val * scale) + val_prev;
+        //interpolate value
+        float value = val_prev + (key - key_prev) * (val_next - val_prev) / (key_next - key_prev);
         
         //return value
         return value;
