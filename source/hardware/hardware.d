@@ -63,7 +63,7 @@ package:
 
 private:
 	static __gshared Hardware m_inst;
-	DataLog m_datalog;
+	//DataLog m_datalog;
 	this() {
 		SailLog.Notify("Starting ",typeof(this).stringof," instantiation in ",Thread.getThis().name," thread...");
 
@@ -82,10 +82,10 @@ private:
 		}
 		SailLog.Success(typeof(this).stringof~" instantiated in ",Thread.getThis().name," thread");
 	
-	    m_datalog = new DataLog();
+	    //m_datalog = new DataLog();
 	}
 	~this(){
-	    delete m_datalog;
+	    //delete m_datalog;
 	
 		SailLog.Critical("Destroying ",typeof(this).stringof);
 		if(m_thread !is null){
@@ -138,23 +138,14 @@ private:
 						switch(buffer[0].id){
 
 							//Compile-time cast to associated class using received ID to parse value
-							foreach(sens ; __traits(allMembers, DeviceID)){
-								static if(mixin("DeviceID."~sens)!=DeviceID.Invalid){
+							foreach(sens ; __traits(allMembers, DeviceSens)){
 
-									//Do not handle actuators
-									static if( mixin("DeviceID."~sens)!=DeviceID.Helm
-											&& mixin("DeviceID."~sens)!=DeviceID.Sail){
+								case (mixin("DeviceID."~sens)):
+									auto dev = mixin("cast("~sens~")(m_hwlist[buffer[0].id])");
 
-										pragma(msg, "  Note: Registered "~sens~" as a sensor");
-
-										case (mixin("DeviceID."~sens)):
-											auto dev = mixin("cast("~sens~")(m_hwlist[buffer[0].id])");
-
-											if(!dev.isemulated)
-												dev.ParseValue(buffer[0].data);
-											break;
-									}
-								}
+									if(!dev.isemulated)
+										dev.ParseValue(buffer[0].data);
+									break;
 							}
 							break;
 							default:

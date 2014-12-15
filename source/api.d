@@ -81,7 +81,7 @@ class API : ISailAPI
 		Json devices = Json.emptyArray;
 		foreach(device; DeviceID.min+1 .. DeviceID.max+1)
 		{
-				devices ~= getDevices(device);
+			devices ~= getDevices(device);
 		}
 		return devices;
 	}	
@@ -132,10 +132,10 @@ class API : ISailAPI
 	}
 	
 	void postGps(float latitude, float longitude){
-	    Gps gps = Hardware.Get!Gps(DeviceID.Gps);
-	    
-	    gps.value(GpsCoord(GpsCoord.toRad(latitude), GpsCoord.toRad(longitude)));
-        SailLog.Notify("GPS set to [",gps.value().latitude(),";",gps.value().longitude(),"]");
+		Gps gps = Hardware.Get!Gps(DeviceID.Gps);
+		
+		gps.value(GpsCoord(GpsCoord.toRad(latitude), GpsCoord.toRad(longitude)));
+		SailLog.Notify("GPS set to [",gps.value().latitude(),";",gps.value().longitude(),"]");
 	}
 
 	void postEmulation(string data){
@@ -146,8 +146,8 @@ class API : ISailAPI
 				static if(mixin("DeviceID."~sens)!=DeviceID.Invalid){
 					case (mixin("DeviceID."~sens)):
 
-		                auto d = Hardware.Get!(mixin(sens))(cast(DeviceID)(to!ubyte(device.id)));
-		                d.isemulated(to!bool(device.emulated));
+						auto d = Hardware.Get!(mixin(sens))(cast(DeviceID)(to!ubyte(device.id)));
+						d.isemulated(to!bool(device.emulated));
 						break;
 				}
 			}
@@ -211,24 +211,26 @@ class API : ISailAPI
 
 	Json getDc(){
 		Json dc = Json.emptyObject;
-		dc.enabled = DecisionCenter.Get().enabled();
+		auto dcobj = DecisionCenter.Get();
+
+		dc.enabled = dcobj.enabled;
 
 		dc.targetPosition = Json.emptyObject;
-		dc.targetPosition.longitude = GpsCoord.toDeg(DecisionCenter.Get().targetposition().longitude());
-		dc.targetPosition.latitude = GpsCoord.toDeg(DecisionCenter.Get().targetposition().latitude());
+		dc.targetPosition.longitude = GpsCoord.toDeg(dcobj.targetposition().longitude());
+		dc.targetPosition.latitude = GpsCoord.toDeg(dcobj.targetposition().latitude());
 
-		dc.targetHeading = DecisionCenter.Get().targetheading();
+		dc.targetHeading = dcobj.targetheading();
 
 		return dc;
 	}
 
 	void postDc(bool status){
-		DecisionCenter.Get().enabled(status);
-		SailLog.Notify("Decision center is now ", DecisionCenter.Get().enabled() ? "Enabled" : "Disbaled");
+		DecisionCenter.Get().enabled = status;
+		SailLog.Notify("Decision center is now ", DecisionCenter.Get().enabled ? "Enabled" : "Disabled");
 	}
 
 	void postTargetposition(float latitude, float longitude){
-	    SailLog.Notify("[DBG] ", latitude,";" , longitude);
+		SailLog.Notify("[DBG] ", latitude,";" , longitude);
 		DecisionCenter.Get().targetposition(GpsCoord(GpsCoord.toRad(to!double(latitude)), GpsCoord.toRad(to!double(longitude))));
 	}
 
@@ -239,28 +241,38 @@ class API : ISailAPI
 
 	Json getAutopilot(){
 		Json ap = Json.emptyObject;
-		if(DecisionCenter.Get().autopilot() !is null) ap.enabled = DecisionCenter.Get().autopilot().enabled();
-        else ap.enabled = false;
+		if(DecisionCenter.Get().autopilot !is null)
+			ap.enabled = DecisionCenter.Get().autopilot.enabled;
+		else 
+			ap.enabled = false;
 
 		return ap;
 	}
 
 	void postAutopilot(bool status){
-		DecisionCenter.Get().autopilot().enabled(status);
-		SailLog.Notify("Autopilot is now ", DecisionCenter.Get().autopilot().enabled() ? "Enabled" : "Disbaled");
+		auto ap = DecisionCenter.Get().autopilot;
+		if(ap !is null){
+			ap.enabled = status;
+			SailLog.Notify("Autopilot is now ", DecisionCenter.Get().autopilot.enabled ? "Enabled" : "Disabled");
+		}
 	}
 
 	Json getSh(){
 		Json sh = Json.emptyObject;
-		if(DecisionCenter.Get().sailhandler() !is null) sh.enabled = DecisionCenter.Get().sailhandler().enabled();
-		else sh.enabled = false;
+		if(DecisionCenter.Get().sailhandler !is null) 
+			sh.enabled = DecisionCenter.Get().sailhandler.enabled;
+		else
+			sh.enabled = false;
 
 		return sh;
 	}
 
 	void postSh(bool status){
-		DecisionCenter.Get().sailhandler().enabled(status);
-		SailLog.Notify("Sail Handler is now ", DecisionCenter.Get().sailhandler().enabled() ? "Enabled" : "Disbaled");
+		auto sh = DecisionCenter.Get().sailhandler;
+		if(sh !is null){
+			sh.enabled = status;
+			SailLog.Notify("Sail Handler is now ", DecisionCenter.Get().sailhandler.enabled ? "Enabled" : "Disabled");
+		}
 	}
 
 	void postEmergency(){
@@ -272,7 +284,6 @@ class API : ISailAPI
 		//Emulate sensors and actuators
 		for(int i = 1 ; i<=DeviceID.max ; i++){
 			postEmulation("{\"id\":"~to!string(i)~",\"emulated\":true}");
-
 		}
 	}
 

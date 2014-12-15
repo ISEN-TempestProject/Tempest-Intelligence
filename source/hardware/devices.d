@@ -10,7 +10,7 @@ import config;
 
 public import hardware.hwelement;
 
-enum DeviceID : ubyte{
+enum DeviceID : ubyte{//List all devices
 	Invalid=0,
 	Sail=1,
 	Helm=2,
@@ -21,6 +21,18 @@ enum DeviceID : ubyte{
 	Compass=6,
 	Battery=7,
 	TurnSpeed=8
+}
+enum DeviceSens : DeviceID{//List all sensors
+	Gps=DeviceID.Gps,
+	Roll=DeviceID.Roll,
+	WindDir=DeviceID.WindDir,
+	Compass=DeviceID.Compass,
+	Battery=DeviceID.Battery,
+	TurnSpeed=DeviceID.TurnSpeed
+}
+enum DeviceAct : DeviceID{//List all actuators
+	Sail=DeviceID.Sail,
+	Helm=DeviceID.Helm
 }
 
 /**

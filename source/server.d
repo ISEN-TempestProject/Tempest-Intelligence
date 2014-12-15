@@ -1,3 +1,5 @@
+module server;
+
 import vibe.d;
 import std.conv;
 import std.process;
@@ -24,7 +26,7 @@ class Server
 		*		ROUTERS
 		*************************/
 		m_Router = new URLRouter;
-		registerRestInterface!ISailAPI(m_Router, API.Get(), "/api/");
+		registerRestInterface(m_Router, API.Get(), "/api/");
 		m_Router
 			.get("/", serveStaticFile("web_root/index.html"))
 			.get("*", serveStaticFiles("web_root/"));
