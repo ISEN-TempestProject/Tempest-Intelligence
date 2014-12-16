@@ -21,9 +21,10 @@ public:
 	static void Warning(T...)(T args){//Variadic function with undefined number of parameters
 		CheckInstance();
 		synchronized(m_inst.m_mtx){
-			API.log("Warning", args);
-			stderr.writeln(bg.lightyellow~fg.red~var.bold~"Warning:  "~var.end,args);
-			m_inst.m_logfile.writeln(bg.lightyellow~fg.red~var.bold~"Warning:  "~var.end,args);
+			auto uptime = GetUptime();
+			API.log("Warning", uptime, args);
+			stderr.writeln(var.faded~uptime~"|"~var.end~bg.lightyellow~fg.red~var.bold~"Warning:  "~var.end,args);
+			m_inst.m_logfile.writeln(var.faded~uptime~"|"~var.end~bg.lightyellow~fg.red~var.bold~"Warning:  "~var.end,args);
 			m_inst.m_logfile.flush();//It is is important to save this
 		}
 	}
@@ -34,9 +35,10 @@ public:
 	static void Critical(T...)(T args){
 		CheckInstance();
 		synchronized(m_inst.m_mtx){
-			API.log("Critical", args);
-			stderr.writeln(bg.red~fg.white~var.bold~"CRIT ERR: "~var.end,args);
-			m_inst.m_logfile.writeln(bg.red~fg.white~var.bold~"CRIT ERR: "~var.end,args);
+			auto uptime = GetUptime();
+			API.log("Critical", uptime, args);
+			stderr.writeln(var.faded~uptime~"|"~var.end~bg.red~fg.white~var.bold~"CRIT ERR: "~var.end,args);
+			m_inst.m_logfile.writeln(var.faded~uptime~"|"~var.end~bg.red~fg.white~var.bold~"CRIT ERR: "~var.end,args);
 			m_inst.m_logfile.flush();
 		}
 	}
@@ -47,9 +49,10 @@ public:
 	static void Success(T...)(T args){
 		CheckInstance();
 		synchronized(m_inst.m_mtx){
-			API.log("Success", args);
-			writeln(fg.green~var.bold~"Success:  "~var.end,args);
-			m_inst.m_logfile.writeln(fg.green~var.bold~"Success:  "~var.end,args);
+			auto uptime = GetUptime();
+			API.log("Success", uptime, args);
+			writeln(var.faded~uptime~"|"~var.end~fg.green~var.bold~"Success:  "~var.end,args);
+			m_inst.m_logfile.writeln(var.faded~uptime~"|"~var.end~fg.green~var.bold~"Success:  "~var.end,args);
 			debug {
 				m_inst.m_logfile.flush();
 			}
@@ -63,9 +66,10 @@ public:
 	static void Notify(T...)(T args){
 		CheckInstance();
 		synchronized(m_inst.m_mtx){
-			API.log("Notify", args);
-			writeln(fg.lightblack~var.bold~"Notify:   "~var.end,args);
-			m_inst.m_logfile.writeln(fg.lightblack~var.bold~"Notify:   "~var.end,args);
+			auto uptime = GetUptime();
+			API.log("Notify", uptime, args);
+			writeln(var.faded~uptime~"|"~var.end~fg.lightblack~var.bold~"Notify:   "~var.end,args);
+			m_inst.m_logfile.writeln(var.faded~uptime~"|"~var.end~fg.lightblack~var.bold~"Notify:   "~var.end,args);
 			debug {
 				m_inst.m_logfile.flush();
 			}
@@ -79,8 +83,9 @@ public:
 	static void Post(T...)(T args){
 		CheckInstance();
 		synchronized(m_inst.m_mtx){
-			API.log("Post", args);
-			stdout.writeln(var.faded~"Post:     "~var.end,args);
+			auto uptime = GetUptime();
+			API.log("Post", uptime, args);
+			stdout.writeln(var.faded~uptime~"|"~var.end~var.faded~"Post:     "~var.end,args);
 		}
 	}
 
@@ -94,6 +99,12 @@ private:
 		if(!m_inst){
 			m_inst = new SailLog();
 		}
+	}
+
+	static string GetUptime(){
+		import std.string;
+		import std.datetime;
+		return format("%.1f", Clock.currAppTick().to!("seconds", float)).rightJustify(7);
 	}
 
 	static enum string MOTD = 
@@ -110,10 +121,11 @@ private:
 			try{
 				m_logfile.open(config.Config.Get!string("Global", "LogFile"), "a");
 			}catch(Exception e){
-				stderr.writeln(bg.red~fg.white~var.bold~"CRIT ERR: "~var.end,e, "\nNow logging to /tmp/logs");
+				auto uptime = GetUptime();
+				stderr.writeln(var.faded~uptime~"|"~var.end~bg.red~fg.white~var.bold~"CRIT ERR: "~var.end,e, "\nNow logging to /tmp/logs");
 
 				m_logfile.open("/tmp/logs", "a");
-				m_logfile.writeln(bg.red~fg.white~var.bold~"CRIT ERR: "~var.end,e, "\nNow logging to /tmp/logs");
+				m_logfile.writeln(var.faded~uptime~"|"~var.end~bg.red~fg.white~var.bold~"CRIT ERR: "~var.end,e, "\nNow logging to /tmp/logs");
 			}
 			stdout.writeln(MOTD~execute("date").output);
 			m_logfile.writeln(MOTD~execute("date").output);
@@ -121,8 +133,9 @@ private:
 			stdout.writeln(config.Config.toString);
 			m_logfile.writeln(config.Config.toString);
 		}
-		writeln(fg.green~var.bold~"Success:  "~var.end,typeof(this).stringof~" instantiated in ",Thread.getThis().name," thread");
-		m_logfile.writeln(fg.green~var.bold~"Success:  "~var.end,typeof(this).stringof~" instantiated in ",Thread.getThis().name," thread");
+		auto uptime = GetUptime();
+		writeln(var.faded~uptime~"|"~var.end~fg.green~var.bold~"Success:  "~var.end,typeof(this).stringof~" instantiated in ",Thread.getThis().name," thread");
+		m_logfile.writeln(var.faded~uptime~"|"~var.end~fg.green~var.bold~"Success:  "~var.end,typeof(this).stringof~" instantiated in ",Thread.getThis().name," thread");
 
 		m_logfile.flush();
 	}

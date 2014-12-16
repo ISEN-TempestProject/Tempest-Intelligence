@@ -195,11 +195,11 @@ class API : ISailAPI
 	/**
 		Add a new log line into cache
 	*/
-	static void log(T...)(string level, T args){
+	static void log(T...)(string level, in string date, T args){
 		CheckInstance();
 		Json log = Json.emptyObject;
 		log.level = level;
-		log.date = Clock.currTime().toSimpleString();
+		log.date = date;
 
 		//Format content in a single string
 		string content = "";
