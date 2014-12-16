@@ -243,6 +243,7 @@ private:
 	*/
 	void checkDistanceToRoute(){
 	    float distanceToRoute = to!float(Hardware.Get!Gps(DeviceID.Gps).value.GetDistanceToRoute(m_route[m_nDestinationIndex - 1], m_route[m_nDestinationIndex] ));
+		SailLog.Post("Distance to route: ", distanceToRoute, "m");
 	    
 	    if(distanceToRoute > m_fDistanceToRoute){
 	        //Right : disable right side
@@ -261,7 +262,7 @@ private:
 	void CheckIsDestinationReached(){
 		GpsCoord currPos = Hardware.Get!Gps(DeviceID.Gps).value;
 		float fDistance = currPos.GetDistanceTo(m_route[m_nDestinationIndex]);
-		SailLog.Warning("Distance : ", fDistance);
+		SailLog.Post("Distance to target: ", fDistance, "m");
 		if(fDistance<=m_fDistanceToTarget){
 			m_nDestinationIndex++;
 			SailLog.Notify("Set new target to ",m_route[m_nDestinationIndex].To(GpsCoord.Unit.DecDeg)," (index=",m_nDestinationIndex,")");
