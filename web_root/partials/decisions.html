@@ -41,40 +41,27 @@
 			
 			<div class="col-sm-3">Decision center</div>
 		</li>
-		<li class="panel panel-default" ng-controller="dcModulesCtrl">
+		<li ng-controller="dcModulesCtrl">
 			<ul class="panel-body list-unstyled">
-				
 				<li class="row">
-					<div class="panel panel-default">
-						<div class="panel-heading">Target position</div>
-						<ul class="panel-body list-unstyled">
-							<li class="row">
-                                <div class="col-sm-3">Latitude</div>
-                                <input  class="col-sm-9 row"type="text" class="col-xs-6" name="latitude" ng-model="dc.targetPosition.latitude" ng-disabled="dc.enabled">
-                            </li>
-							<li class="row">
-								<div class="col-sm-3">Longitude</div>
-								<input  class="col-sm-9 row"type="text" class="col-xs-6" name="longitude" ng-model="dc.targetPosition.longitude" ng-disabled="dc.enabled">
-							</li>
-							<li class="row">
-								<button type="button" ng-click="setTargetPosition();" ng-hide="dc.enabled" ng-disabled="dc.enabled">Set</button>
-							</li>
-						</ul>
+					<label>Target position (Latitude / Longitude)</label>
+					<div class="input-group">
+					 	<input type="text" class="form-control" style="width: 50%" name="latitude" ng-model="dc.targetPosition.latitude" ng-disabled="dc.enabled"/>
+					 	<input type="text" class="form-control" style="width: 50%" name="longitude" ng-model="dc.targetPosition.longitude"  ng-disabled="dc.enabled"/>
+						<span class="input-group-btn">
+							<button class="btn btn-primary" type="button" ng-click="setTargetPosition();" ng-disabled="dc.enabled"><div class="glyphicon glyphicon-ok"></div></button>
+						</span>
 					</div>
 
 				</li>
+				<li><br/></li>
 				<li class="row">
-					<div class="panel panel-default">
-						<div class="panel-heading">Target Heading</div>
-						<ul class="panel-body list-unstyled">
-							<li class="row">
-								<div class="col-sm-3">Angle</div>
-								<input  class="col-sm-9 row"type="text" class="col-xs-6" name="angle" ng-model="dc.targetHeading" ng-disabled="dc.enabled">
-							</li>
-							<li class="row">
-								<button type="button" ng-click="setTargetHeading();" ng-hide="dc.enabled" ng-disabled="dc.enabled">Set</button>
-							</li>
-						</ul>
+					<label>Target Heading (degrees)</label>
+					<div class="input-group">
+						<input type="text" class="form-control" name="angle" ng-model="dc.targetHeading" ng-disabled="dc.enabled"/>
+						<span class="input-group-btn">
+							<button class="btn btn-primary" type="button" ng-click="setTargetHeading();" ng-disabled="dc.enabled"><div class="glyphicon glyphicon-ok"></div></button>
+						</span>
 					</div>
 				</li>
 			</ul>
