@@ -46,7 +46,7 @@ private:
 	void ThreadFunction(){
 		while(!m_stop){
 			try{
-				debug{
+				debug(thread){
 					SailLog.Post("Running "~typeof(this).stringof~" thread");
 				}
 				if(m_bEnabled)
