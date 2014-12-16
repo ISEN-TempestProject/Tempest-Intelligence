@@ -12,7 +12,7 @@
 		</select>
 
 		<ul class="list-group scroll-log">
-		  <li class="list-group-item  {{log.level | logLevelCSS}}" ng-repeat="log in logs | filter:level | filter:query"><span class="badge">{{log.date}}</span>{{log.content}}</li>
+		  <li class="list-group-item  {{log.level | logLevelCSS}}" ng-repeat="log in logs | orderBy:'date':true | filter:level | filter:query"><span class="badge">{{log.date}}</span>{{log.content}}</li>
 		</ul>
 	</div>
 </div>
