@@ -18,6 +18,11 @@ doc/*
 !doc/scripts/
 !doc/styles/
 
+# Coverage analysis
+*.gcno
+*.gcda
+cov/
+
 # Dub related
 dub.selections.json
 
