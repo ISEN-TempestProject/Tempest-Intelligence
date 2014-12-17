@@ -34,11 +34,11 @@ struct Fifo(T) {
 	*/
 	void Append(T val){
 		if(m_nSize>=m_nMaxSize){
-			m_list.removeFront();
-			m_list.insertBack(val);
+			m_list.removeBack();
+			m_list.insertFront(val);
 		}
 		else{
-			m_list.insertBack(val);
+			m_list.insertFront(val);
 			m_nSize++;
 		}
 	}
@@ -71,28 +71,15 @@ private:
 
 unittest {
 	import saillog;
-	import std.algorithm;
-
+	int GetSize(T)(ref DList!T list){
+		int i=0;
+		foreach(ref cell ; list) i++;
+		return i;
+	}
 	auto array = [0, 1, 2, 3, 4, 5, 6, 7];
 	auto complete = DList!int(array);
 	auto fifo = Fifo!int(5, complete);
-	assert(fifo.length==5 && fifo.elements[].equal([0,1,2,3,4]));
-
-	fifo.Append(42);
-	import std.stdio; writeln(fifo.elements[]);
-	assert(fifo.length==5 && fifo.elements[].equal([1,2,3,4,42]));
-
-	fifo = Fifo!int(3);
-	assert(fifo.empty);
-	fifo.Append(1);
-	assert(fifo.length==1 && fifo.elements[].equal([1]));
-	assert(fifo.front == 1);
-	fifo.Append(2);
-	fifo.front = 42;
-	fifo.Append(3);
-	assert(fifo.length==3 && fifo.elements[].equal([42,2,3]));
-	assert(fifo.front == 42);
-
+	assert(fifo.length==5 && GetSize!int(fifo.elements)==5);
 
 	SailLog.Notify("Fifo unittest done");
 }
