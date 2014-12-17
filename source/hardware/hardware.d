@@ -53,9 +53,10 @@ package:
 		Sends and event into the socket
 	*/
 	void SendEvent(DeviceID id, ulong[2] data){
+		import std.bitmanip;
 		if(m_connected){
 			synchronized(this.classinfo){
-				m_socket.send([id, data[0], data[1]]);
+				m_socket.send(nativeToBigEndian(id)~nativeToBigEndian(data[0])~nativeToBigEndian(data[1]));
 			}
 		}
 	}
@@ -133,26 +134,41 @@ private:
 
 				//Handle communications
 				while(!m_stopthread && m_socket.isAlive){
-					HWEvent buffer[1];
+					ubyte buffer[17];
 					long nReceived = m_socket.receive(buffer);
 					if(nReceived>0){
 						//SailLog.Post("Received: [",buffer[0].id,"|",buffer[0].data,"]");
+						import std.bitmanip;
+						//auto e = HWEvent(
+						//	cast(DeviceID)bigEndianToNative!ubyte(buffer[0..1]),
+						//	[
+						//		bigEndianToNative!ulong(buffer[1..9]),
+						//		bigEndianToNative!ulong(buffer[9..17])
+						//	]
+						//);
+						auto e = HWEvent(
+							cast(DeviceID)littleEndianToNative!ubyte(buffer[0..1]),
+							[
+								littleEndianToNative!ulong(buffer[1..9]),
+								littleEndianToNative!ulong(buffer[9..17])
+							]
+						);
 
-						switch(buffer[0].id){
+						switch(e.id){
 
 							//Compile-time cast to associated class using received ID to parse value
 							foreach(sens ; __traits(allMembers, DeviceSens)){
 
 								case (mixin("DeviceID."~sens)):
-									auto dev = mixin("cast("~sens~")(m_hwlist[buffer[0].id])");
+									auto dev = mixin("cast("~sens~")(m_hwlist[e.id])");
 
 									if(!dev.isemulated)
-										dev.ParseValue(buffer[0].data);
+										dev.ParseValue(e.data);
 									break;
 							}
 							break;
 							default:
-								SailLog.Critical("NetworkThread: ",buffer[0].id," is not a handled HWSensor");
+								SailLog.Critical("NetworkThread: ",e.id," is not a handled HWSensor");
 						}
 					}
 					else

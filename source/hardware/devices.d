@@ -122,6 +122,7 @@ class Gps : HWSens!GpsCoord {
 				GpsCoord.toRad(((m_max.latitude-m_min.latitude)*data[0]/ulong.max)+m_min.latitude),
 				GpsCoord.toRad(((m_max.longitude-m_min.longitude)*data[1]/ulong.max)+m_min.longitude)
 				);
+			SailLog.Warning("Received ",typeof(this).stringof,"=", coord);
 			synchronized(this.classinfo){
 				m_values.Append(TimestampedValue!GpsCoord(
 					Clock.currAppTick(),
@@ -184,12 +185,14 @@ class Roll : HWSens!float {
 		out{
 			assert(m_min<=m_values.front.value && m_values.front.value<=m_max, "Value is out of bound");
 		}body{
+			auto value = to!float((m_max-m_min)*data[0]/ulong.max)+m_min;
 			synchronized(this.classinfo){
 				m_values.Append(TimestampedValue!float(
 					Clock.currAppTick(),
-					to!float((m_max-m_min)*data[0]/ulong.max)+m_min
+					value
 				));
 			}
+			SailLog.Warning("Received ",typeof(this).stringof,"=", value);
 		}
 
 		void ExecFilter(){
@@ -227,14 +230,15 @@ class WindDir : HWSens!float {
 		out{
 			assert(m_min<=m_values.front.value && m_values.front.value<=m_max, "Value is out of bound");
 		}body{
-			float fValue = to!float((m_max-m_min)*data[0]/ulong.max)+m_min;
-			if(fValue>180)
-				fValue = 360.0-fValue;
+			float value = to!float((m_max-m_min)*data[0]/ulong.max)+m_min;
+			if(value>180)
+				value = 360.0-value;
+			SailLog.Warning("Received ",typeof(this).stringof,"=", value);
 
 			synchronized(this.classinfo){
 				m_values.Append(TimestampedValue!float(
 					Clock.currAppTick(),
-					fValue
+					value
 				));
 			}
 		}
@@ -284,12 +288,14 @@ class Compass : HWSens!float {
 		out{
 			assert(m_min<=m_values.front.value && m_values.front.value<=m_max, "Value is out of bound");
 		}body{
+			auto value = to!float((m_max-m_min)*data[0]/ulong.max)+m_min;
 			synchronized(this.classinfo){
 				m_values.Append(TimestampedValue!float(
 					Clock.currAppTick(),
-					to!float((m_max-m_min)*data[0]/ulong.max)+m_min
+					value
 				));
 			}
+			SailLog.Warning("Received ",typeof(this).stringof,"=", value);
 		}
 
 		void ExecFilter(){
@@ -328,21 +334,22 @@ class Battery : HWSens!float {
 		out{
 			assert(m_min<=m_values.front.value && m_values.front.value<=m_max, "Value is out of bound");
 		}body{
-			float fBattery = to!float((m_max-m_min)*data[0]/ulong.max)+m_min;
+			float value = to!float((m_max-m_min)*data[0]/ulong.max)+m_min;
 			
 			synchronized(this.classinfo){
 				m_values.Append(TimestampedValue!float(
 					Clock.currAppTick(),
-					fBattery
+					value
 				));
 			}
+			SailLog.Warning("Received ",typeof(this).stringof,"=", value);
 
 			//Battery voltage check
-			if(fBattery <= Config.Get!float("Battery", "CriticalVoltage")){
-				SailLog.Critical("Battery voltage is FAR TOO LOW, you should rest : ",fBattery,"v");
+			if(value <= Config.Get!float("Battery", "CriticalVoltage")){
+				SailLog.Critical("Battery voltage is FAR TOO LOW, you should rest : ",value,"v");
 			}
-			else if(fBattery <= Config.Get!float("Battery", "LowVoltage")){
-				SailLog.Warning("Battery voltage is low : ",fBattery,"v");
+			else if(value <= Config.Get!float("Battery", "LowVoltage")){
+				SailLog.Warning("Battery voltage is low : ",value,"v");
 			}
 		}
 
@@ -381,12 +388,14 @@ class TurnSpeed : HWSens!float {
 		out{
 			assert(m_min<=m_values.front.value && m_values.front.value<=m_max, "Value is out of bound");
 		}body{
+			auto value = to!float((m_max-m_min)*data[0]/ulong.max)+m_min;
 			synchronized(this.classinfo){
 				m_values.Append(TimestampedValue!float(
 					Clock.currAppTick(),
-					to!float((m_max-m_min)*data[0]/ulong.max)+m_min
+					value
 				));
 			}
+			SailLog.Warning("Received ",typeof(this).stringof,"=", value);
 		}
 
 		void ExecFilter(){
