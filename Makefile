@@ -8,10 +8,15 @@ deps:
 	dub build --compiler=gdc
 
 unittest:
-	dub test # --compiler=gdc
+	dub build --compiler=gdc --build=unittest
 
 cov:
 	dub build --compiler=gdc --build=unittest-cov
+	./tempestintel
+	gcov -p api
+	-mkdir cov > /dev/null
+	mv source\#* cov/
+	rm *.gcov
 
 cross:
 	dub build --compiler=arm-unknown-linux-gnueabi-gdc
@@ -36,7 +41,7 @@ sendconf:
 	cp -r res/ /tmp/sshfs/intel
 
 #documentation generation
-.PHONY: doc
+.PHONY: doc cov
 
 doc:
 	dmd -D -X -Xfdocs.json `find source -name "*.d"` -Dddoc -c -o-

@@ -64,7 +64,7 @@ class DecisionCenter {
 		m_route = [now, start];
 
 		//next destination is the starting one
-		m_nDestinationIndex = 0;
+		m_nDestinationIndex = 1;
 	}
 
 	void StartWithGPS(in GpsCoord startpoint){
@@ -158,7 +158,7 @@ private:
 	void DecisionThread(){
 		while(!m_stop){
 			try{
-				debug{
+				debug(thread){
 					SailLog.Post("Running "~typeof(this).stringof~" thread");
 				}
 				if(m_bEnabled)
@@ -243,6 +243,7 @@ private:
 	*/
 	void checkDistanceToRoute(){
 	    float distanceToRoute = to!float(Hardware.Get!Gps(DeviceID.Gps).value.GetDistanceToRoute(m_route[m_nDestinationIndex - 1], m_route[m_nDestinationIndex] ));
+		SailLog.Post("Distance to route: ", distanceToRoute, "m");
 	    
 	    if(distanceToRoute > m_fDistanceToRoute){
 	        //Right : disable right side
@@ -261,7 +262,7 @@ private:
 	void CheckIsDestinationReached(){
 		GpsCoord currPos = Hardware.Get!Gps(DeviceID.Gps).value;
 		float fDistance = currPos.GetDistanceTo(m_route[m_nDestinationIndex]);
-		SailLog.Warning("Distance : ", fDistance);
+		SailLog.Post("Distance to target: ", fDistance, "m");
 		if(fDistance<=m_fDistanceToTarget){
 			m_nDestinationIndex++;
 			SailLog.Notify("Set new target to ",m_route[m_nDestinationIndex].To(GpsCoord.Unit.DecDeg)," (index=",m_nDestinationIndex,")");
@@ -319,5 +320,33 @@ private:
 	GpsCoord[] m_route;
 	
 	Polar m_polarWind, m_polarHeading;
+
+}
+
+
+unittest{
+	auto dc = DecisionCenter.Get;
+	dc.enabled = false;
+	assert(dc.enabled == false);
+
+	dc.m_route = [GpsCoord(1, 1), GpsCoord(2,2)];
+	dc.backToStartPosition();
+	assert(dc.targetposition == GpsCoord(1,1));
+	dc.MakeDecision();
+	assert(dc.targetposition == GpsCoord(1,1));
+
+
+	auto gps = Hardware.Get!Gps(DeviceID.Gps);
+	gps.isemulated = true;
+	dc.m_route = [GpsCoord(1, 1), GpsCoord(2,1), GpsCoord(3,1)];
+	dc.m_nDestinationIndex = 0;
+
+	gps.value = GpsCoord(1,1);
+	dc.MakeDecision();
+	assert(dc.targetposition == GpsCoord(2,1));
+
+
+	//TODO: check polar decisions
+
 
 }

@@ -46,7 +46,7 @@ private:
 	void ThreadFunction(){
 		while(!m_stop){
 			try{
-				debug{
+				debug(thread){
 					SailLog.Post("Running "~typeof(this).stringof~" thread");
 				}
 				if(m_bEnabled)
@@ -122,6 +122,9 @@ unittest {
 	auto sh = dec.sailhandler;
 	auto wind = Hardware.Get!WindDir(DeviceID.WindDir);
 	auto sail = Hardware.Get!Sail(DeviceID.Sail);
+	auto roll = Hardware.Get!Roll(DeviceID.Roll);
+
+	assert(sh.enabled==true);
 
 	dec.enabled = false;
 	sh.enabled = false;
@@ -140,6 +143,40 @@ unittest {
 	wind.value = wind.min;
 	sh.AdjustSail();
 	assert(sail.value==sail.min);
+
+	//Roll danger
+	roll.isemulated = true;
+	roll.value = 0.0;
+	auto delta = Config.Get!ubyte("SailHandler", "Delta");
+	auto danger = Config.Get!float("SailHandler", "Danger");
+
+	sh.AdjustSail();
+	assert(sh.m_nMaxTension==sail.max);
+	roll.value = danger+1.0;
+	sh.AdjustSail();
+	assert(sh.m_nMaxTension==sail.max-1*delta);
+	sh.AdjustSail();
+	assert(sh.m_nMaxTension==sail.max-2*delta);
+	sh.AdjustSail();
+	assert(sh.m_nMaxTension==sail.max-3*delta);
+	roll.value = danger-1.0;
+	sh.AdjustSail();
+	assert(sh.m_nMaxTension==sail.max-3*delta);
+	sh.AdjustSail();
+	assert(sh.m_nMaxTension==sail.max-3*delta);
+	roll.value = danger/2.0-1.0;
+	sh.AdjustSail();
+	assert(sh.m_nMaxTension==sail.max-2*delta);
+	sh.AdjustSail();
+	assert(sh.m_nMaxTension==sail.max-1*delta);
+	sh.AdjustSail();
+	sh.AdjustSail();
+	sh.AdjustSail();
+	assert(sh.m_nMaxTension==sail.max);
+	roll.value = danger+1.0;
+	foreach(int i ; 0..100)sh.AdjustSail();
+	assert(sail.max/4-delta<=sh.m_nMaxTension && sh.m_nMaxTension<=sail.max/4);
+
 
 	SailLog.Notify("SailHandler unittest done");
 }

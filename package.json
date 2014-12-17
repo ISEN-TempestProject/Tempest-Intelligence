@@ -10,7 +10,7 @@
 		"VibeCustomMain"
 	],
 	"dependencies": {
-		"vibe-d": "==0.7.21",
+		"vibe-d": "==0.7.20"
 		"dunit": ">=1.0.10"
 	}
 }

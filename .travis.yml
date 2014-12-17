@@ -1,6 +1,7 @@
 language: d
 
-d: dmd-2.066.1
+d: gdc-4.9.0
 
 script:
- - dub test --compiler=$DC
+ - make unittest
+ - ./tempestintel
