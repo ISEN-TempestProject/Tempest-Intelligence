@@ -64,7 +64,7 @@ class DecisionCenter {
 		m_route = [now, start];
 
 		//next destination is the starting one
-		m_nDestinationIndex = 0;
+		m_nDestinationIndex = 1;
 	}
 
 	void StartWithGPS(in GpsCoord startpoint){
@@ -320,5 +320,33 @@ private:
 	GpsCoord[] m_route;
 	
 	Polar m_polarWind, m_polarHeading;
+
+}
+
+
+unittest{
+	auto dc = DecisionCenter.Get;
+	dc.enabled = false;
+	assert(dc.enabled == false);
+
+	dc.m_route = [GpsCoord(1, 1), GpsCoord(2,2)];
+	dc.backToStartPosition();
+	assert(dc.targetposition == GpsCoord(1,1));
+	dc.MakeDecision();
+	assert(dc.targetposition == GpsCoord(1,1));
+
+
+	auto gps = Hardware.Get!Gps(DeviceID.Gps);
+	gps.isemulated = true;
+	dc.m_route = [GpsCoord(1, 1), GpsCoord(2,1), GpsCoord(3,1)];
+	dc.m_nDestinationIndex = 0;
+
+	gps.value = GpsCoord(1,1);
+	dc.MakeDecision();
+	assert(dc.targetposition == GpsCoord(2,1));
+
+
+	//TODO: check polar decisions
+
 
 }
