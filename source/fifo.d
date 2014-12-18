@@ -56,11 +56,6 @@ struct Fifo(T) {
 		size_t capacity(){return m_capacity;}
 	}
 
-	@property nothrow{
-		T front()const {return m_list.front;}
-		void front(T val){m_list.front = val;}
-	}
-
 	/**
 		Returns the contained elements
 	*/
@@ -77,13 +72,13 @@ private:
 }
 
 
-void main() {
+unittest {
 	import saillog;
+	import std.algorithm;
 
 	Fifo!int fifo;
 
 	fifo = Fifo!int([0,1,2,3,4,5,6,7]);
-	writeln(fifo.capacity,"  ",fifo.length);
 	assert(fifo.capacity==8 && fifo.length==8);
 	assert(fifo.elements.equal([0,1,2,3,4,5,6,7]));
 
