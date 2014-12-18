@@ -151,10 +151,12 @@ private:
 		m_stop = true;
 		m_stopCond.notifyAll;
 
-		m_autopilot.destroy;
-		m_sailhandler.destroy;
-		
-		m_thread.join(false);
+		if(m_bStartedWithGPS){
+			m_autopilot.destroy;
+			m_sailhandler.destroy;
+
+			m_thread.join();
+		}
 	}
 
 	Thread m_thread;
