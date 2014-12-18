@@ -3,6 +3,8 @@ module hardware.hardware;
 import std.process;
 import std.socket;
 import core.thread;
+import core.sync.condition;
+import core.sync.mutex;
 import saillog;
 import datalog;
 import config;
@@ -85,6 +87,7 @@ private:
 			}
 		}
 		//m_datalog = new DataLog();
+		m_stopCond = new Condition(new Mutex);
 		
 		SailLog.Success(typeof(this).stringof~" instantiated in ",Thread.getThis().name," thread");
 	}
@@ -94,6 +97,7 @@ private:
 		SailLog.Critical("Destroying ",typeof(this).stringof);
 		if(m_thread !is null){
 			m_stopthread = true;
+			m_stopCond.notifyAll;
 			m_thread.join();
 		}
 		if(m_connected){
@@ -117,6 +121,7 @@ private:
 	}
 
 
+	Condition m_stopCond;
 	/**
 		Handles socket communications
 	*/
@@ -183,7 +188,7 @@ private:
 			}
 			catch(Exception e){
 				SailLog.Critical("Error when trying to connect socket: ",e.msg);
-				Thread.sleep(dur!("seconds")(2));
+				synchronized(m_stopCond.mutex) m_stopCond.wait(dur!("seconds")(2));
 			}
 			catch(Throwable t){
 				SailLog.Critical("In thread ",m_thread.name,": ",t.toString);
@@ -211,8 +216,8 @@ private:
 	UnixAddress m_addr;
 	Socket m_socket;
 	Thread m_thread;
-	bool m_connected = false;
-	bool m_stopthread = false;
+	shared bool m_connected = false;
+	shared bool m_stopthread = false;
 
 	Object[DeviceID] m_hwlist;
 

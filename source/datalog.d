@@ -1,6 +1,8 @@
 module datalog;
 
 import core.thread;
+import core.sync.condition;
+import core.sync.mutex;
 import std.stdio;
 import std.string;
 import std.datetime;
@@ -14,6 +16,7 @@ import gpscoord;
 class DataLog {
 
     this(){
+        m_stopCond = new Condition(new Mutex);
         m_thread = new Thread(&LogThread);
         m_thread.name(typeof(this).stringof);
         m_thread.isDaemon(true);
@@ -22,13 +25,15 @@ class DataLog {
     
     ~this(){
         m_stop = true;
+        m_stopCond.notifyAll;
         m_thread.join();
     }
     
     private:
         File m_logfile;
         
-        bool m_stop = false;
+        shared bool m_stop = false;
+        Condition m_stopCond;
         uint m_nLoopTimeMS = 1000;
         Thread m_thread;
         
@@ -46,8 +51,7 @@ class DataLog {
                 }catch(Throwable t){
                     SailLog.Critical("In thread ",m_thread.name,": ",t.toString);
                 }
-    
-                Thread.sleep(dur!("msecs")(m_nLoopTimeMS));
+                synchronized(m_stopCond.mutex) m_stopCond.wait(dur!("msecs")(m_nLoopTimeMS));
             }
         }
         

@@ -3,6 +3,8 @@ module decisioncenter;
 import core.thread;
 import std.json, std.file, std.conv, std.string, std.math;
 import hardware.hardware, gpscoord, config, saillog, polar;
+import core.sync.condition;
+import core.sync.mutex;
 
 public import autopilot, sailhandler;
 
@@ -108,6 +110,7 @@ private:
 
 		m_nLoopTimeMS = Config.Get!uint("DecisionCenter", "Period");
 		m_bEnabled = false;//Will be enabled by GPS device on first coordinate
+		m_stopCond = new Condition(new Mutex);
 
 		m_fDistanceToTarget = Config.Get!float("DecisionCenter", "DistanceToTarget");
 		m_fDistanceToRoute = Config.Get!float("DecisionCenter", "DistanceToRoute");
@@ -146,15 +149,17 @@ private:
 	~this(){
 		SailLog.Critical("Destroying ",typeof(this).stringof);
 		m_stop = true;
+		m_stopCond.notifyAll;
 
 		m_autopilot.destroy;
 		m_sailhandler.destroy;
 		
-		m_thread.join();
+		m_thread.join(false);
 	}
 
 	Thread m_thread;
-	bool m_stop = false;
+	shared bool m_stop = false;
+	Condition m_stopCond;
 	void DecisionThread(){
 		while(!m_stop){
 			try{
@@ -168,7 +173,7 @@ private:
 				SailLog.Critical("In thread ",m_thread.name,": ",t.toString);
 			}
 
-			Thread.sleep(dur!("msecs")(m_nLoopTimeMS));
+			synchronized(m_stopCond.mutex) m_stopCond.wait(dur!("msecs")(m_nLoopTimeMS));
 		}
 	}
 
