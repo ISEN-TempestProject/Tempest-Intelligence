@@ -13,11 +13,9 @@ import server;
 import core.sys.posix.signal;
 extern(C) @system
 void SigHdl(int sig) nothrow{
-	bQuit = true;
 	try getEventDriver.exitEventLoop();
 	catch(Throwable t){}
 }
-bool bQuit = false;
 
 int main(string[] args)
 {
@@ -61,7 +59,7 @@ int main(string[] args)
 		runEventLoop();
 
 	}
-	SailLog.Critical("Exiting program !");
+	SailLog.Success("Exiting program !");
 	DecisionCenter.Get().destroy;
 	Hardware.GetClass().destroy;
 	return 0;
