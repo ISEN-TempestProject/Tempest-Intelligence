@@ -9,47 +9,55 @@ struct Fifo(T) {
 	/**
 		Creates an empty fifo
 	*/
-	this(size_t size) {
-		m_nMaxSize = size;
+	this(size_t capacity) {
+		m_capacity = capacity;
 	}
 
 	/**
 		Creates a fifo with content
 	*/
-	this(size_t size, ref DList!T list) {
-		m_nMaxSize = size;
+	this(T[] data, size_t capacity=0) {
+		this(DList!T(data), capacity>0? capacity : data.length);
+	}
 
-		int nCount;
-		foreach(ref cell ; list){
-			m_list.insertBack(cell);
-			nCount++;
-			if(nCount>=m_nMaxSize)
+	/**
+		Creates a fifo with content
+	*/
+	this(DList!T data, size_t capacity) {
+		this(capacity);
+
+		int count;
+		foreach_reverse(ref cell ; data){
+			m_list.insertFront(cell);
+			count++;
+			if(count>=m_capacity)
 				break;
 		}
-		m_nSize = nCount;
+		m_length = count;
 	}
 
 	/**
 		Appends a value to the front of the fifo
 	*/
-	void Append(T val){
-		if(m_nSize>=m_nMaxSize){
-			m_list.removeBack();
-			m_list.insertFront(val);
+	void add(T val){
+		if(m_length>=m_capacity){
+			m_list.removeFront();
+			m_list.insertBack(val);
 		}
 		else{
-			m_list.insertFront(val);
-			m_nSize++;
+			m_length++;
+			m_list.insertBack(val);
 		}
 	}
 
 	@property const nothrow{
 		bool empty(){return m_list.empty;}
-		size_t length(){return m_nSize;}
+		size_t length(){return m_length;}
+		size_t capacity(){return m_capacity;}
 	}
 
 	@property nothrow{
-		T front(){return m_list.front;}
+		T front()const {return m_list.front;}
 		void front(T val){m_list.front = val;}
 	}
 
@@ -57,29 +65,54 @@ struct Fifo(T) {
 		Returns the contained elements
 	*/
 	@property{
-		ref DList!T elements(){
-			return m_list;
+		auto ref elements(){
+			return m_list[];
 		}
 	}
 
 private:
-	size_t m_nMaxSize;
-	size_t m_nSize = 0;
+	size_t m_capacity;
+	size_t m_length = 0;
 	DList!T m_list;
 }
 
 
-unittest {
+void main() {
 	import saillog;
-	int GetSize(T)(ref DList!T list){
-		int i=0;
-		foreach(ref cell ; list) i++;
-		return i;
-	}
-	auto array = [0, 1, 2, 3, 4, 5, 6, 7];
-	auto complete = DList!int(array);
-	auto fifo = Fifo!int(5, complete);
-	assert(fifo.length==5 && GetSize!int(fifo.elements)==5);
+
+	Fifo!int fifo;
+
+	fifo = Fifo!int([0,1,2,3,4,5,6,7]);
+	writeln(fifo.capacity,"  ",fifo.length);
+	assert(fifo.capacity==8 && fifo.length==8);
+	assert(fifo.elements.equal([0,1,2,3,4,5,6,7]));
+
+	//too long array
+	fifo = Fifo!int([0,1,2,3,4,5,6,7], 5);
+	assert(fifo.capacity==5 && fifo.length==5);
+	assert(fifo.elements.equal([3,4,5,6,7]));
+	//add elements to fifo
+	fifo.add(8);
+	assert(fifo.capacity==5 && fifo.length==5);
+	assert(fifo.elements.equal([4,5,6,7,8]));
+	fifo.add(9);
+	assert(fifo.capacity==5 && fifo.length==5);
+	assert(fifo.elements.equal([5,6,7,8,9]));
+
+
+	fifo = Fifo!int([0,1,2], 5);
+	assert(fifo.capacity==5 && fifo.length==3);
+	assert(fifo.elements.equal([0,1,2]));
+	fifo.add(3);
+	assert(fifo.capacity==5 && fifo.length==4);
+	assert(fifo.elements.equal([0,1,2,3]));
+	fifo.add(4);
+	assert(fifo.capacity==5 && fifo.length==5);
+	assert(fifo.elements.equal([0,1,2,3,4]));
+	fifo.add(5);
+	assert(fifo.capacity==5 && fifo.length==5);
+	assert(fifo.elements.equal([1,2,3,4,5]));
+
 
 	SailLog.Notify("Fifo unittest done");
 }
