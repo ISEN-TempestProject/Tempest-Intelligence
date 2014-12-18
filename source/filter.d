@@ -20,26 +20,10 @@ static class Filter {
 			Returns the last value stored in the data
 		*/
 		T Raw(T)(ref Fifo!(TimestampedValue!T) data){
-			if(data.elements.empty)
+			if(data.empty)
 				return GetZero!T();
 			
-			return data.front().value;
-		}
-
-		/**
-			Returns the average of all values stored in data
-		*/
-		T DumbAvg(T)(ref Fifo!(TimestampedValue!T) data){
-			T ret = GetZero!T();
-
-			size_t nElements = 0;
-			foreach(ref cell ; data.elements){
-				nElements++;
-				ret += cell.value;
-			}
-			if(nElements>0)
-				return ret/(nElements*1.0);
-			return T.init;
+			return data.elements.back.value;
 		}
 
 		/**
@@ -48,16 +32,16 @@ static class Filter {
 		T TimedAvg(T)(ref Fifo!(TimestampedValue!T) data){
 			T ret = GetZero!T();
 
-			auto rng = data.elements.opSlice();
+			auto rng = data.elements;
 			if(!rng.empty){
 				TickDuration dt = rng.back.time-rng.front.time;
-				TimestampedValue!T last = rng.front;
-				rng.popFront();
+				TimestampedValue!T last = rng.back;
+				rng.popBack();
 
 				if(!rng.empty){
-					for( ; !rng.empty ; rng.popFront()){
-						ret = ret + (last.value*(rng.front.time - last.time).length);
-						last = rng.front;
+					for( ; !rng.empty ; rng.popBack()){
+						ret = ret + (last.value*(last.time-rng.back.time).length);
+						last = rng.back;
 					}
 					ret = ret/dt.length;
 				}
@@ -75,21 +59,20 @@ static class Filter {
 		T TimedAvgOnDuration(T)(ref Fifo!(TimestampedValue!T) data, TickDuration dur){
 			T ret = GetZero!T();
 
-			auto rng = data.elements.opSlice();
+			auto rng = data.elements;
 			if(rng.empty)
 				return ret;
 
 			TickDuration now = Clock.currAppTick();
-
 			TickDuration prevdate=now;
 			
-			while(!rng.empty && (now-rng.front.time)<=dur){
+			while(!rng.empty && (now-rng.back.time)<=dur){
 
-				ret += rng.front.value * (prevdate-rng.front.time).length;
+				ret += rng.back.value * (prevdate-rng.back.time).length;
 
 				//Update values
-				prevdate = rng.front.time;
-				rng.popFront();
+				prevdate = rng.back.time;
+				rng.popBack();
 			}
 
 			TickDuration totalduration;
@@ -98,7 +81,7 @@ static class Filter {
 			if(!rng.empty){
 				totalduration = dur;
 				TickDuration notcalculatedtime = dur - (now-prevdate);
-				ret += rng.front.value * notcalculatedtime.length;
+				ret += rng.back.value * notcalculatedtime.length;
 
 			}
 			//Calculation on the elements duration
@@ -113,24 +96,25 @@ static class Filter {
             Returns the time-weighted average of priodic angle in degrees values stored in data for a specified time in milliseconds
         */
         T TimedAvgOnDurationAngle(T)(ref Fifo!(TimestampedValue!T) data, TickDuration dur){
-            T ret = GetZero!T(), cosAvg = GetZero!T(), sinAvg = GetZero!T();
+            T ret = GetZero!T();
+            T cosAvg = GetZero!T();
+            T sinAvg = GetZero!T();
 
-            auto rng = data.elements.opSlice();
+            auto rng = data.elements;
             if(rng.empty)
                 return ret;
 
             TickDuration now = Clock.currAppTick();
-
             TickDuration prevdate=now;
             
-            while(!rng.empty && (now-rng.front.time)<=dur){
+            while(!rng.empty && (now-rng.back.time)<=dur){
 
-                cosAvg += cos(GpsCoord.toRad(rng.front.value)) * (prevdate-rng.front.time).length;
-                sinAvg += sin(GpsCoord.toRad(rng.front.value)) * (prevdate-rng.front.time).length;
+                cosAvg += cos(GpsCoord.toRad(rng.back.value)) * (prevdate-rng.back.time).length;
+                sinAvg += sin(GpsCoord.toRad(rng.back.value)) * (prevdate-rng.back.time).length;
 
                 //Update values
-                prevdate = rng.front.time;
-                rng.popFront();
+                prevdate = rng.back.time;
+                rng.popBack();
             }
 
             TickDuration totalduration;
@@ -139,8 +123,8 @@ static class Filter {
             if(!rng.empty){
                 totalduration = dur;
                 TickDuration notcalculatedtime = dur - (now-prevdate);
-                cosAvg += cos(GpsCoord.toRad(rng.front.value)) * notcalculatedtime.length;
-                sinAvg += sin(GpsCoord.toRad(rng.front.value)) * notcalculatedtime.length;
+                cosAvg += cos(GpsCoord.toRad(rng.back.value)) * notcalculatedtime.length;
+                sinAvg += sin(GpsCoord.toRad(rng.back.value)) * notcalculatedtime.length;
 
             }
             //Calculation on the elements duration
@@ -148,21 +132,11 @@ static class Filter {
                 totalduration = now - prevdate;
             }
             
-            sinAvg = sinAvg / totalduration.length;
-            cosAvg = cosAvg / totalduration.length;
+            sinAvg /= totalduration.length;
+            cosAvg /= totalduration.length;
 
             return GpsCoord.toDeg(atan2(sinAvg, cosAvg));
         }
-
-		/**
-			Executes a kalman filter on the stored values
-		*/
-		T Kalman(T)(ref Fifo!(TimestampedValue!T) data){
-
-			//TODO : implement this !
-
-			return Raw!T(data);
-		}
 
 	}
 
@@ -189,12 +163,47 @@ unittest {
 
 	alias Tsvf = TimestampedValue!float;
 
-	auto list = DList!Tsvf([Tsvf(TickDuration(10), 1), Tsvf(TickDuration(30), 2), Tsvf(TickDuration(60), 3), Tsvf(TickDuration(80), 4)]);
-	auto fifo = Fifo!(Tsvf)(4, list);
+	bool approx(double a, double b){
+		return std.math.abs(a-b)<=0.1;
+	}
 
-	assert(Filter.Raw!float(fifo)==1);
-	assert(Filter.DumbAvg!float(fifo)==2.5);
-	assert(Filter.TimedAvg!float(fifo)==2.0);
+	auto now = Clock.currAppTick();
+	auto fifo = Fifo!Tsvf(
+		[
+		Tsvf(now-TickDuration.from!"seconds"(90), 2), 
+		Tsvf(now-TickDuration.from!"seconds"(60), 4), 
+		Tsvf(now-TickDuration.from!"seconds"(30), 8), 
+		Tsvf(now-TickDuration.from!"seconds"(10), 16)
+		], 4);
+
+	//Raw
+	assert(Filter.Raw!float(fifo)==16);
+
+	//TimedAvg
+	assert(approx(Filter.TimedAvg!float(fifo), (16*20+8*30+4*30)/80.0));
+
+	//TimedAvgOnDuration
+	assert(approx(Filter.TimedAvgOnDuration!float(fifo, TickDuration.from!"seconds"(10)), 16));
+	assert(approx(Filter.TimedAvgOnDuration!float(fifo, TickDuration.from!"seconds"(20)), 12));
+	assert(approx(Filter.TimedAvgOnDuration!float(fifo, TickDuration.from!"seconds"(90)), 500/90.0));
+	assert(approx(Filter.TimedAvgOnDuration!float(fifo, TickDuration.from!"seconds"(200)), 500/90.0));
+	//TODO: check for durations that are not round
+
+
+	auto fifoangle = Fifo!Tsvf(
+		[
+		Tsvf(now-TickDuration.from!"seconds"(70), 90),
+		Tsvf(now-TickDuration.from!"seconds"(60), 180),
+		Tsvf(now-TickDuration.from!"seconds"(50), 270+360),
+		Tsvf(now-TickDuration.from!"seconds"(40), 360),
+		Tsvf(now-TickDuration.from!"seconds"(20), -90),
+		Tsvf(now-TickDuration.from!"seconds"(10), -180)
+		]);
+	assert(approx(Filter.TimedAvgOnDurationAngle!float(fifoangle, TickDuration.from!"seconds"(10)), -180));
+	assert(approx(Filter.TimedAvgOnDurationAngle!float(fifoangle, TickDuration.from!"seconds"(20)), -135));
+	assert(approx(Filter.TimedAvgOnDurationAngle!float(fifoangle, TickDuration.from!"seconds"(40)), -67.5));//??????????????false
+
+	/*
 
 	auto now = Clock.currAppTick();
 	list = DList!Tsvf([
@@ -216,6 +225,6 @@ unittest {
     fifo = Fifo!(Tsvf)(2, list);
     SailLog.Critical("AvgAngle is : ", Filter.TimedAvgOnDurationAngle!float(fifo, TickDuration.from!"msecs"(100)) );
     assert(std.math.abs(Filter.TimedAvgOnDurationAngle!float(fifo, TickDuration.from!"msecs"(100)) - 180.0)<0.1);
-    
+    */
 	SailLog.Notify("Filter unittest done");
 }
