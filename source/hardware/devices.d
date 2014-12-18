@@ -115,8 +115,9 @@ class Gps : HWSens!GpsCoord {
 
 		void ParseValue(ulong[2] data)
 		out{
-			assert(m_min.latitude<=m_values.front.value.latitude && m_values.front.value.latitude<=m_max.latitude, "Value is out of bound");
-			assert(m_min.longitude<=m_values.front.value.longitude && m_values.front.value.longitude<=m_max.longitude, "Value is out of bound");
+			auto v = m_values.elements.back.value;
+			assert(m_min.latitude<=v.latitude && v.latitude<=m_max.latitude, "Value is out of bound");
+			assert(m_min.longitude<=v.longitude && v.longitude<=m_max.longitude, "Value is out of bound");
 		}body{
 			GpsCoord coord = GpsCoord(
 				GpsCoord.toRad(((m_max.latitude-m_min.latitude)*data[0]/ulong.max)+m_min.latitude),
@@ -124,7 +125,7 @@ class Gps : HWSens!GpsCoord {
 				);
 			SailLog.Warning("Received ",typeof(this).stringof,"=", coord);
 			synchronized(this.classinfo){
-				m_values.Append(TimestampedValue!GpsCoord(
+				m_values.add(TimestampedValue!GpsCoord(
 					Clock.currAppTick(),
 					coord
 				));
@@ -142,7 +143,7 @@ class Gps : HWSens!GpsCoord {
 		}
 
 		void ExecFilter(){
-			m_lastvalue = Filter.TimedAvgOnDuration!GpsCoord(m_values, TickDuration.from!"seconds"(2));
+			//m_lastvalue = Filter.TimedAvgOnDuration!GpsCoord(m_values, TickDuration.from!"seconds"(2));
 		}
 
 		void CheckIsOutOfService(){
@@ -183,11 +184,12 @@ class Roll : HWSens!float {
 
 		void ParseValue(ulong[2] data)
 		out{
-			assert(m_min<=m_values.front.value && m_values.front.value<=m_max, "Value is out of bound");
+			auto v = m_values.elements.back.value;
+			assert(m_min<=v && v<=m_max, "Value is out of bound");
 		}body{
 			auto value = to!float((m_max-m_min)*data[0]/ulong.max)+m_min;
 			synchronized(this.classinfo){
-				m_values.Append(TimestampedValue!float(
+				m_values.add(TimestampedValue!float(
 					Clock.currAppTick(),
 					value
 				));
@@ -196,7 +198,7 @@ class Roll : HWSens!float {
 		}
 
 		void ExecFilter(){
-			m_lastvalue = Filter.TimedAvgOnDuration!float(m_values, TickDuration.from!"seconds"(7));
+			//m_lastvalue = Filter.TimedAvgOnDuration!float(m_values, TickDuration.from!"seconds"(7));
 			
 			if(m_lastvalue>180.0)
 				m_lastvalue-=360.0;
@@ -228,7 +230,8 @@ class WindDir : HWSens!float {
 	override{
 		void ParseValue(ulong[2] data)
 		out{
-			assert(m_min<=m_values.front.value && m_values.front.value<=m_max, "Value is out of bound");
+			auto v = m_values.elements.back.value;
+			assert(m_min<=v && v<=m_max, "Value is out of bound");
 		}body{
 			float value = to!float((m_max-m_min)*data[0]/ulong.max)+m_min;
 			if(value>180)
@@ -236,7 +239,7 @@ class WindDir : HWSens!float {
 			SailLog.Warning("Received ",typeof(this).stringof,"=", value);
 
 			synchronized(this.classinfo){
-				m_values.Append(TimestampedValue!float(
+				m_values.add(TimestampedValue!float(
 					Clock.currAppTick(),
 					value
 				));
@@ -244,7 +247,7 @@ class WindDir : HWSens!float {
 		}
 
 		void ExecFilter(){
-			m_lastvalue = Filter.TimedAvgOnDurationAngle!float(m_values, TickDuration.from!"seconds"(3));
+			//m_lastvalue = Filter.TimedAvgOnDurationAngle!float(m_values, TickDuration.from!"seconds"(3));
 
 			if(m_lastvalue>180.0)
 				m_lastvalue-=360.0;
@@ -286,11 +289,12 @@ class Compass : HWSens!float {
 	override{
 		void ParseValue(ulong[2] data)
 		out{
-			assert(m_min<=m_values.front.value && m_values.front.value<=m_max, "Value is out of bound");
+			auto v = m_values.elements.back.value;
+			assert(m_min<=v && v<=m_max, "Value is out of bound");
 		}body{
 			auto value = to!float((m_max-m_min)*data[0]/ulong.max)+m_min;
 			synchronized(this.classinfo){
-				m_values.Append(TimestampedValue!float(
+				m_values.add(TimestampedValue!float(
 					Clock.currAppTick(),
 					value
 				));
@@ -299,7 +303,7 @@ class Compass : HWSens!float {
 		}
 
 		void ExecFilter(){
-			m_lastvalue = Filter.TimedAvgOnDurationAngle!float(m_values, TickDuration.from!"seconds"(3));
+			//m_lastvalue = Filter.TimedAvgOnDurationAngle!float(m_values, TickDuration.from!"seconds"(3));
 
 			if(m_lastvalue<0.0)
 				m_lastvalue+=360.0;
@@ -332,12 +336,13 @@ class Battery : HWSens!float {
 	override{
 		void ParseValue(ulong[2] data)
 		out{
-			assert(m_min<=m_values.front.value && m_values.front.value<=m_max, "Value is out of bound");
+			auto v = m_values.elements.back.value;
+			assert(m_min<=v && v<=m_max, "Value is out of bound");
 		}body{
 			float value = to!float((m_max-m_min)*data[0]/ulong.max)+m_min;
 			
 			synchronized(this.classinfo){
-				m_values.Append(TimestampedValue!float(
+				m_values.add(TimestampedValue!float(
 					Clock.currAppTick(),
 					value
 				));
@@ -386,11 +391,12 @@ class TurnSpeed : HWSens!float {
 	override{
 		void ParseValue(ulong[2] data)
 		out{
-			assert(m_min<=m_values.front.value && m_values.front.value<=m_max, "Value is out of bound");
+			auto v = m_values.elements.back.value;
+			assert(m_min<=v && v<=m_max, "Value is out of bound");
 		}body{
 			auto value = to!float((m_max-m_min)*data[0]/ulong.max)+m_min;
 			synchronized(this.classinfo){
-				m_values.Append(TimestampedValue!float(
+				m_values.add(TimestampedValue!float(
 					Clock.currAppTick(),
 					value
 				));
