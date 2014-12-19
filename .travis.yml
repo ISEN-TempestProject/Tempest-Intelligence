@@ -4,4 +4,4 @@ d: gdc-4.9.0
 
 script:
  - make unittest
- - ./tempestintel
+ - timeout -k 1 10 ./tempestintel
