@@ -89,7 +89,7 @@ private:
 
 
 		float fDeltaSpeed = fTrgSpeed - fSpeed;
-		if(fDeltaSpeed<0.0){
+		if(fDeltaSpeed>0.0){
 			//The boat should turn faster to the right
 			float fNewValue = helm.value + std.math.abs(fDeltaSpeed) * m_fCommandRatio;
 
@@ -108,7 +108,7 @@ private:
 				m_nCounter = 0;
 			}
 		}
-		else if(fDeltaSpeed>0.0){
+		else if(fDeltaSpeed<0.0){
 			//The boat should turn faster to the left
 			float fNewValue = helm.value - std.math.abs(fDeltaSpeed) * m_fCommandRatio;
 

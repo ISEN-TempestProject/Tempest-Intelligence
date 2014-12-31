@@ -271,7 +271,7 @@ class WindDir : HWSens!float {
 */
 class Compass : HWSens!float {
 	this(){
-		super(5);
+		super(1);
 		m_id = DeviceID.Compass;
 		m_min = 0;
 		m_max = 360;
@@ -299,7 +299,7 @@ class Compass : HWSens!float {
 		}
 
 		void ExecFilter(){
-			m_lastvalue = Filter.TimedAvgOnDurationAngle!float(m_values, TickDuration.from!"seconds"(3));
+			m_lastvalue = Filter.Raw!float(m_values);//Filter.TimedAvgOnDurationAngle!float(m_values, TickDuration.from!"seconds"(3));
 
 			if(m_lastvalue<0.0)
 				m_lastvalue+=360.0;
