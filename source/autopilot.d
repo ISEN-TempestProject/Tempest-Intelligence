@@ -76,57 +76,16 @@ private:
 		auto turns = Hardware.Get!TurnSpeed(DeviceID.TurnSpeed);
 
 		float fDeltaHead = ((DecisionCenter.Get()).targetheading - comp.value)%360.0;
-		//if(fDeltaHead<-180.0)
-		//	fDeltaHead+=360.0;
-		//else if(fDeltaHead>180.0)
-		//	fDeltaHead-=360.0;
+		if(fDeltaHead<-180.0)
+			fDeltaHead+=360.0;
+		else if(fDeltaHead>180.0)
+			fDeltaHead-=360.0;
 
-		//TurnSpeed the boat should have
-		float fTrgSpeed = m_polSpeed.getValue(fDeltaHead);
+		float fNewValue = -fDeltaHead;
+		if(fNewValue<-45)fNewValue=-45;
+		else if(fNewValue>45)fNewValue=45;
 
-		//TurnSpeed the boat have
-		float fSpeed = turns.value;
-
-
-		float fDeltaSpeed = fTrgSpeed - fSpeed;
-		if(fDeltaSpeed<0.0){
-			//The boat should turn faster to the right
-			float fNewValue = helm.value + std.math.abs(fDeltaSpeed) * m_fCommandRatio;
-
-			if(fNewValue>helm.max){
-				m_nCounter++;
-				if(m_nCounter>=m_nEdgeLocks){
-					helm.value = helm.init;
-					m_nCounter = 0;
-				}
-				else
-					helm.value = helm.max;
-			}
-			else
-			{
-				helm.value = fNewValue;
-				m_nCounter = 0;
-			}
-		}
-		else if(fDeltaSpeed>0.0){
-			//The boat should turn faster to the left
-			float fNewValue = helm.value - std.math.abs(fDeltaSpeed) * m_fCommandRatio;
-
-			if(fNewValue<helm.min){
-				m_nCounter++;
-				if(m_nCounter>=m_nEdgeLocks){
-					helm.value = helm.init;
-					m_nCounter = 0;
-				}
-				else
-					helm.value = helm.min;
-			}
-			else
-			{
-				helm.value = fNewValue;
-				m_nCounter = 0;
-			}
-		}
+		helm.value = fNewValue;
 	}
   
 	uint m_nLoopTimeMS;
@@ -143,140 +102,142 @@ private:
 		auto helm = Hardware.Get!Helm(DeviceID.Helm);
 		auto turns = Hardware.Get!TurnSpeed(DeviceID.TurnSpeed);
 
-		dec.enabled = false;
-		ap.enabled = false;
-		Thread.sleep(dur!("msecs")(100));
+		pragma(msg, "WARNING: No unittests for the autopilot");
 
-		comp.isemulated = true;
-		turns.isemulated = true;
-		dec.targetheading = 90;
+		//dec.enabled = false;
+		//ap.enabled = false;
+		//Thread.sleep(dur!("msecs")(100));
+
+		//comp.isemulated = true;
+		//turns.isemulated = true;
+		//dec.targetheading = 90;
 		
-		//Dont move helm when speed is good
-		comp.value = 90;
-		turns.value = 0;
-		helm.value = helm.init;
-		ap.AdjustHelm();
-		assert(helm.value==helm.init);
+		////Dont move helm when speed is good
+		//comp.value = 90;
+		//turns.value = 0;
+		//helm.value = helm.init;
+		//ap.AdjustHelm();
+		//assert(helm.value==helm.init);
 
-		//Move by delta if speed is incorrect
-		comp.value = 90;
-		turns.value = 10;
-		helm.value = helm.init;
-		ap.AdjustHelm();
-		assert(helm.value==10.0);
-		ap.AdjustHelm();
-		assert(helm.value==20.0);
-		turns.value = -10;
-		ap.AdjustHelm();
-		assert(helm.value==10.0);
-		turns.value = 0;
-		ap.AdjustHelm();
-		assert(helm.value==10.0);
+		////Move by delta if speed is incorrect
+		//comp.value = 90;
+		//turns.value = 10;
+		//helm.value = helm.init;
+		//ap.AdjustHelm();
+		//assert(helm.value==10.0);
+		//ap.AdjustHelm();
+		//assert(helm.value==20.0);
+		//turns.value = -10;
+		//ap.AdjustHelm();
+		//assert(helm.value==10.0);
+		//turns.value = 0;
+		//ap.AdjustHelm();
+		//assert(helm.value==10.0);
 
-		//Delta is a function of DeltaSpeed
-		turns.value = 20;
-		helm.value = helm.init;
-		ap.AdjustHelm();
-		assert(helm.value==20.0);
-		turns.value = -50;
-		ap.AdjustHelm();
-		assert(helm.value==-30.0);
-		turns.value = -15;
-		ap.AdjustHelm();
-		assert(helm.value==-45.0);
-		turns.value = 90;
-		ap.AdjustHelm();
-		assert(helm.value==45.0);
+		////Delta is a function of DeltaSpeed
+		//turns.value = 20;
+		//helm.value = helm.init;
+		//ap.AdjustHelm();
+		//assert(helm.value==20.0);
+		//turns.value = -50;
+		//ap.AdjustHelm();
+		//assert(helm.value==-30.0);
+		//turns.value = -15;
+		//ap.AdjustHelm();
+		//assert(helm.value==-45.0);
+		//turns.value = 90;
+		//ap.AdjustHelm();
+		//assert(helm.value==45.0);
 
-		//Edge-lock: helm should return to init if max is over-reach 5 times
-		turns.value = 0.01;
-		helm.value = helm.max;
-		ap.AdjustHelm();
-		assert(helm.value==helm.max);
-		ap.AdjustHelm();
-		assert(helm.value==helm.max);
-		ap.AdjustHelm();
-		assert(helm.value==helm.max);
-		ap.AdjustHelm();
-		assert(helm.value==helm.max);
-		ap.AdjustHelm();
-		assert(helm.value==helm.init);
-		//The counter is reset if the helm turns the other side
-		turns.value = 0.01;
-		helm.value = helm.max;
-		ap.AdjustHelm();
-		assert(helm.value==helm.max);
-		ap.AdjustHelm();
-		assert(helm.value==helm.max);
-		ap.AdjustHelm();
-		assert(helm.value==helm.max);
-		ap.AdjustHelm();
-		assert(helm.value==helm.max);
-		turns.value = -0.01;
-		ap.AdjustHelm();
-		assert(std.math.abs(helm.value-helm.max-0.01)<0.02);
-		turns.value = 0.015;
-		ap.AdjustHelm();
-		assert(helm.value==helm.max);
-		ap.AdjustHelm();
-		assert(helm.value==helm.max);
-		ap.AdjustHelm();
-		assert(helm.value==helm.max);
-		ap.AdjustHelm();
-		assert(helm.value==helm.max);
-		ap.AdjustHelm();
-		assert(helm.value==helm.init);
-		//Same the other side
-		turns.value = -0.01;
-		helm.value = helm.min;
-		ap.AdjustHelm();
-		assert(helm.value==helm.min);
-		ap.AdjustHelm();
-		assert(helm.value==helm.min);
-		ap.AdjustHelm();
-		assert(helm.value==helm.min);
-		ap.AdjustHelm();
-		assert(helm.value==helm.min);
-		turns.value = 0.01;
-		ap.AdjustHelm();
-		assert(std.math.abs(helm.value-(helm.min+0.01))<0.01);
-		turns.value = -0.015;
-		ap.AdjustHelm();
-		assert(helm.value==helm.min);
-		ap.AdjustHelm();
-		assert(helm.value==helm.min);
-		ap.AdjustHelm();
-		assert(helm.value==helm.min);
-		ap.AdjustHelm();
-		assert(helm.value==helm.min);
-		ap.AdjustHelm();
-		assert(helm.value==helm.init);
+		////Edge-lock: helm should return to init if max is over-reach 5 times
+		//turns.value = 0.01;
+		//helm.value = helm.max;
+		//ap.AdjustHelm();
+		//assert(helm.value==helm.max);
+		//ap.AdjustHelm();
+		//assert(helm.value==helm.max);
+		//ap.AdjustHelm();
+		//assert(helm.value==helm.max);
+		//ap.AdjustHelm();
+		//assert(helm.value==helm.max);
+		//ap.AdjustHelm();
+		//assert(helm.value==helm.init);
+		////The counter is reset if the helm turns the other side
+		//turns.value = 0.01;
+		//helm.value = helm.max;
+		//ap.AdjustHelm();
+		//assert(helm.value==helm.max);
+		//ap.AdjustHelm();
+		//assert(helm.value==helm.max);
+		//ap.AdjustHelm();
+		//assert(helm.value==helm.max);
+		//ap.AdjustHelm();
+		//assert(helm.value==helm.max);
+		//turns.value = -0.01;
+		//ap.AdjustHelm();
+		//assert(std.math.abs(helm.value-helm.max-0.01)<0.02);
+		//turns.value = 0.015;
+		//ap.AdjustHelm();
+		//assert(helm.value==helm.max);
+		//ap.AdjustHelm();
+		//assert(helm.value==helm.max);
+		//ap.AdjustHelm();
+		//assert(helm.value==helm.max);
+		//ap.AdjustHelm();
+		//assert(helm.value==helm.max);
+		//ap.AdjustHelm();
+		//assert(helm.value==helm.init);
+		////Same the other side
+		//turns.value = -0.01;
+		//helm.value = helm.min;
+		//ap.AdjustHelm();
+		//assert(helm.value==helm.min);
+		//ap.AdjustHelm();
+		//assert(helm.value==helm.min);
+		//ap.AdjustHelm();
+		//assert(helm.value==helm.min);
+		//ap.AdjustHelm();
+		//assert(helm.value==helm.min);
+		//turns.value = 0.01;
+		//ap.AdjustHelm();
+		//assert(std.math.abs(helm.value-(helm.min+0.01))<0.01);
+		//turns.value = -0.015;
+		//ap.AdjustHelm();
+		//assert(helm.value==helm.min);
+		//ap.AdjustHelm();
+		//assert(helm.value==helm.min);
+		//ap.AdjustHelm();
+		//assert(helm.value==helm.min);
+		//ap.AdjustHelm();
+		//assert(helm.value==helm.min);
+		//ap.AdjustHelm();
+		//assert(helm.value==helm.init);
 
-		//Heading diff change targeted speed
-		comp.value = 60;
-		turns.value = 0;
-		helm.value = helm.init;
-		ap.AdjustHelm();
-		assert(std.math.abs(helm.value+20.0)<=0.1);
-		comp.value = 75;
-		ap.AdjustHelm();
-		assert(std.math.abs(helm.value+30.0)<=0.1);
-		comp.value = 90;
-		ap.AdjustHelm();
-		assert(std.math.abs(helm.value+30.0)<=0.1);
-		comp.value = 180;
-		ap.AdjustHelm();
-		assert(std.math.abs(helm.value+10.0)<=0.1);
-		ap.AdjustHelm();
-		assert(std.math.abs(helm.value-10.0)<=0.1);
-		comp.value = 90;
-		ap.AdjustHelm();
-		assert(std.math.abs(helm.value-10.0)<=0.1);
-		comp.value = 75;
-		ap.AdjustHelm();
-		assert(std.math.abs(helm.value)<=0.1);
+		////Heading diff change targeted speed
+		//comp.value = 60;
+		//turns.value = 0;
+		//helm.value = helm.init;
+		//ap.AdjustHelm();
+		//assert(std.math.abs(helm.value+20.0)<=0.1);
+		//comp.value = 75;
+		//ap.AdjustHelm();
+		//assert(std.math.abs(helm.value+30.0)<=0.1);
+		//comp.value = 90;
+		//ap.AdjustHelm();
+		//assert(std.math.abs(helm.value+30.0)<=0.1);
+		//comp.value = 180;
+		//ap.AdjustHelm();
+		//assert(std.math.abs(helm.value+10.0)<=0.1);
+		//ap.AdjustHelm();
+		//assert(std.math.abs(helm.value-10.0)<=0.1);
+		//comp.value = 90;
+		//ap.AdjustHelm();
+		//assert(std.math.abs(helm.value-10.0)<=0.1);
+		//comp.value = 75;
+		//ap.AdjustHelm();
+		//assert(std.math.abs(helm.value)<=0.1);
 
 
-		SailLog.Notify("Autopilot unittest done");
+		//SailLog.Notify("Autopilot unittest done");
 	}
 }
