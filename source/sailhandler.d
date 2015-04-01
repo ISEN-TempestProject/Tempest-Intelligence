@@ -12,9 +12,6 @@ class SailHandler {
 	this() {
 		SailLog.Notify("Starting ",typeof(this).stringof," instantiation in ",Thread.getThis().name," thread...");
 		//Get configuration
-		m_nLoopTimeMS = Config.Get!uint("SailHandler", "Period");
-		m_fDelta = Config.Get!float("SailHandler", "Delta");
-		m_fDanger = Config.Get!float("SailHandler", "Danger");
 
 		m_nMaxTension = Hardware.Get!Sail(DeviceID.Sail).max;
 
@@ -61,7 +58,7 @@ private:
 				SailLog.Critical("In thread ",m_thread.name,": ",t.toString);
 			}
 
-			synchronized(m_stopCond.mutex) m_stopCond.wait(dur!("msecs")(m_nLoopTimeMS));
+			synchronized(m_stopCond.mutex) m_stopCond.wait(dur!("msecs")(Config.Get!uint("SailHandler", "Period")));
 		}
 	}
 
@@ -81,8 +78,10 @@ private:
 			sail.value = to!(typeof(sail.value))(m_nMaxTension-(m_nMaxTension-sail.min)*(fWind-25)/(180-25));
 		}
 
+		auto danger = Config.Get!float("SailHandler", "Danger");
+
 		//Handling m_nMaxTension (safety max tension)
-		if(abs(roll)>m_fDanger){
+		if(abs(roll)>danger){
 			ubyte nDelta = Config.Get!ubyte("SailHandler", "Delta");
 
 			//Reduce max tension, minimum to sail.max/4
@@ -93,7 +92,7 @@ private:
 
 			SailLog.Warning("Roll is too dangerous (",roll,"°), reducing sail max tension to ",m_nMaxTension);
 		}
-		else if(m_nMaxTension!=sail.max && abs(roll)<m_fDanger/2.0){
+		else if(m_nMaxTension!=sail.max && abs(roll)<danger/2.0){
 			ubyte nDelta = Config.Get!ubyte("SailHandler", "Delta");
 
 			//Reduce max tension, minimum to sail.max/4
@@ -105,11 +104,6 @@ private:
 			SailLog.Notify("Roll seems safe (",roll,"°), raising sail max tension to ",m_nMaxTension);
 		}
 	}
-
-
-	uint m_nLoopTimeMS;
-	float m_fDelta;
-	float m_fDanger;
 
 	ubyte m_nMaxTension;
 }

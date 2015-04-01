@@ -108,12 +108,8 @@ private:
 	this() {
 		SailLog.Notify("Starting ",typeof(this).stringof," instantiation in ",Thread.getThis().name," thread...");
 
-		m_nLoopTimeMS = Config.Get!uint("DecisionCenter", "Period");
 		m_bEnabled = false;//Will be enabled by GPS device on first coordinate
 		m_stopCond = new Condition(new Mutex);
-
-		m_fDistanceToTarget = Config.Get!float("DecisionCenter", "DistanceToTarget");
-		m_fDistanceToRoute = Config.Get!float("DecisionCenter", "DistanceToRoute");
 
 		//Route parsing
 		string sFile = Config.Get!string("DecisionCenter", "RestoreRoute");
@@ -175,7 +171,7 @@ private:
 				SailLog.Critical("In thread ",m_thread.name,": ",t.toString);
 			}
 
-			synchronized(m_stopCond.mutex) m_stopCond.wait(dur!("msecs")(m_nLoopTimeMS));
+			synchronized(m_stopCond.mutex) m_stopCond.wait(dur!("msecs")(Config.Get!uint("DecisionCenter", "Period")));
 		}
 	}
 
@@ -252,11 +248,13 @@ private:
 	    float distanceToRoute = to!float(Hardware.Get!Gps(DeviceID.Gps).value.GetDistanceToRoute(m_route[m_nDestinationIndex - 1], m_route[m_nDestinationIndex] ));
 		SailLog.Post("Distance to route: ", distanceToRoute, "m");
 	    
-	    if(distanceToRoute > m_fDistanceToRoute){
+	    auto distToRouteMax = Config.Get!float("DecisionCenter", "DistanceToRoute");
+
+	    if(distanceToRoute > distToRouteMax){
 	        //Right : disable right side
 	        m_polarHeading.setSide(true, false);
 	    }
-	    else if( -distanceToRoute > m_fDistanceToRoute){
+	    else if( -distanceToRoute > distToRouteMax){
 	        //Left : disable left side
 	        m_polarHeading.setSide(false, true);
 	    }
@@ -270,7 +268,7 @@ private:
 		GpsCoord currPos = Hardware.Get!Gps(DeviceID.Gps).value;
 		float fDistance = currPos.GetDistanceTo(m_route[m_nDestinationIndex]);
 		SailLog.Post("Distance to target: ", fDistance, "m");
-		if(fDistance<=m_fDistanceToTarget){
+		if(fDistance<=Config.Get!float("DecisionCenter", "DistanceToTarget")){
 			m_nDestinationIndex++;
 			SailLog.Notify("Set new target to ",m_route[m_nDestinationIndex].To(GpsCoord.Unit.DecDeg)," (index=",m_nDestinationIndex,")");
 		    
@@ -319,9 +317,6 @@ private:
 
 	Autopilot m_autopilot;
 	SailHandler m_sailhandler;
-
-	float m_fDistanceToTarget;
-	float m_fDistanceToRoute;
 
 	ushort m_nDestinationIndex;
 	GpsCoord[] m_route;

@@ -89,6 +89,12 @@ public:
 		}
 	}
 
+	static string GetUptime(){
+		import std.string;
+		import std.datetime;
+		return format("%.1f", Clock.currAppTick().to!("seconds", float)).rightJustify(7);
+	}
+
 private:
 	static __gshared SailLog m_inst;//Stored in global storage, not thread local storage (TLS)
 
@@ -101,11 +107,6 @@ private:
 		}
 	}
 
-	static string GetUptime(){
-		import std.string;
-		import std.datetime;
-		return format("%.1f", Clock.currAppTick().to!("seconds", float)).rightJustify(7);
-	}
 
 	static enum string MOTD = 
 				 bg.white~"                                                            "~var.end~"\n"

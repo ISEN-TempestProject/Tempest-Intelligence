@@ -15,12 +15,6 @@ class Autopilot{
 	this(){
 		SailLog.Notify("Starting ",typeof(this).stringof," instantiation in ",Thread.getThis().name," thread...");
 
-		//Get configuration
-		m_nLoopTimeMS = Config.Get!uint("Autopilot", "Period");
-		m_nEdgeLocks = Config.Get!uint("Autopilot", "EdgeLocks");
-		m_fCommandRatio = Config.Get!float("Autopilot", "CommandRatio");
-		m_polSpeed = Polar(Config.Get!string("Polars", "HelmSpeed"));
-
 		m_bEnabled = true;
 
 		//Start the thread
@@ -63,7 +57,7 @@ private:
 				SailLog.Critical("In thread ",m_thread.name,": ",t.toString);
 			}
 
-			synchronized(m_stopCond.mutex) m_stopCond.wait(dur!("msecs")(m_nLoopTimeMS));
+			synchronized(m_stopCond.mutex) m_stopCond.wait(dur!("msecs")(Config.Get!uint("Autopilot", "Period")));
 		}
 	}
 
@@ -74,6 +68,10 @@ private:
 		auto comp = Hardware.Get!Compass(DeviceID.Compass);
 		auto helm = Hardware.Get!Helm(DeviceID.Helm);
 		auto turns = Hardware.Get!TurnSpeed(DeviceID.TurnSpeed);
+
+		//uint nEdgeLocks = Config.Get!uint("Autopilot", "EdgeLocks");
+		//float fCommandRatio = Config.Get!float("Autopilot", "CommandRatio");
+		//Polar polSpeed = Polar(Config.Get!string("Polars", "HelmSpeed"));
 
 		float fDeltaHead = ((DecisionCenter.Get()).targetheading - comp.value)%360.0;
 		if(fDeltaHead<-180.0)
@@ -87,11 +85,6 @@ private:
 
 		helm.value = fNewValue;
 	}
-  
-	uint m_nLoopTimeMS;
-	Polar m_polSpeed;
-	uint m_nEdgeLocks;
-	float m_fCommandRatio;
 
 	int m_nCounter = 0;
 

@@ -4,6 +4,11 @@ import saillog;
 import inireader;
 import std.stdio;
 
+debug{
+	import std.datetime : SysTime;
+	import std.file : timeLastModified;
+}
+
 
 /**
 	Configuration class, to handle configuration lines... >_<"
@@ -68,16 +73,19 @@ public:
 	*/
 	static T Get(T)(string sHeader, string sName){
 		if(m_inst is null)m_inst = new Config();
+		debug m_inst.ReloadConfigIfNeeded();
 		return m_inst.m_ini.Get!T(sHeader, sName);
 	}
 
 	static void Set(T)(string sHeader, string sName, T value){
 		if(m_inst is null)m_inst = new Config();
+		debug m_inst.ReloadConfigIfNeeded();
 		m_inst.m_ini.Set!T(sHeader, sName, value);
 	}
 
 	static string toString(){
 		if(m_inst is null)m_inst = new Config();
+		debug m_inst.ReloadConfigIfNeeded();
 		return m_inst.m_ini.toString;
 	}
 
@@ -93,9 +101,28 @@ private:
 		else{
 			m_ini = new INIReader(CONFIG_PATH, CONFIG_DEFAULT);
 		}
+		debug m_lastReload = timeLastModified(CONFIG_PATH);
 		writeln("Config loaded: "~CONFIG_PATH);
 	}
 
+
 	INIReader m_ini;
 
+	debug{
+		void ReloadConfigIfNeeded(){
+			synchronized{
+				auto mod = timeLastModified(CONFIG_PATH);
+				if(mod>m_lastReload){
+					import col;
+					import saillog;
+					auto uptime = SailLog.GetUptime();
+					writeln(var.faded~uptime~"|"~var.end~fg.lightblack~var.bold~"Notify:   "~var.end, "Config file reloaded");
+
+					m_ini = new INIReader(CONFIG_PATH, CONFIG_DEFAULT);
+					m_lastReload = mod;
+				}
+			}
+		}
+		SysTime m_lastReload;
+	}
 }
