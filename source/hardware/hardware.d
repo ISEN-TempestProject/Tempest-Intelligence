@@ -6,7 +6,6 @@ import core.thread;
 import core.sync.condition;
 import core.sync.mutex;
 import saillog;
-import datalog;
 import config;
 
 public import hardware.devices;
